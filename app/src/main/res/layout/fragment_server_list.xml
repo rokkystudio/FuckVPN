@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="15dp">
+
+    <!-- Верхняя панель -->
+    <LinearLayout
+        android:id="@+id/topButtonsLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonCountryFilter"
+            android:layout_width="@dimen/serverlist_button_width"
+            android:layout_height="@dimen/serverlist_button_height"
+            android:contentDescription="@string/serverlist_coutry_filter"
+            android:tooltipText="@string/serverlist_coutry_filter"
+            app:icon="@drawable/ic_flags" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonDownloadServers"
+            android:layout_width="@dimen/serverlist_button_width"
+            android:layout_height="@dimen/serverlist_button_height"
+            android:contentDescription="@string/serverlist_download_servers"
+            android:tooltipText="@string/serverlist_download_servers"
+            app:icon="@drawable/ic_web" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonAddServers"
+            android:layout_width="@dimen/serverlist_button_width"
+            android:layout_height="@dimen/serverlist_button_height"
+            android:contentDescription="@string/serverlist_add_server"
+            android:tooltipText="@string/serverlist_add_server"
+            app:icon="@drawable/ic_add" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonRemoveServers"
+            android:layout_width="@dimen/serverlist_button_width"
+            android:layout_height="@dimen/serverlist_button_height"
+            android:contentDescription="@string/serverlist_remove_server"
+            android:tooltipText="@string/serverlist_remove_server"
+            app:icon="@drawable/ic_remove" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonEmptyServers"
+            android:layout_width="@dimen/serverlist_button_width"
+            android:layout_height="@dimen/serverlist_button_height"
+            android:contentDescription="@string/serverlist_empty_list"
+            android:tooltipText="@string/serverlist_empty_list"
+            app:icon="@drawable/ic_empty" />
+    </LinearLayout>
+
+    <!-- Список серверов -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerServers"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/topButtonsLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="serverlist_remove_server">Удалить сервер</string>
+    <string name="app_name">VPN</string>
+    <string name="serverlist_empty_list">Очистить список</string>
+    <string name="serverlist_add_server">Добавить сервер</string>
+    <string name="serverlist_coutry_filter">Выбор стран</string>
+    <string name="serverlist_download_servers">Загрузить серверы</string>
+</resources>
