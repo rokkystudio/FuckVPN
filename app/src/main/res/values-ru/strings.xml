@@ -6,4 +6,5 @@
     <string name="serverlist_add_server">Добавить сервер</string>
     <string name="serverlist_coutry_filter">Выбор стран</string>
     <string name="serverlist_download_servers">Загрузить серверы</string>
+    <string name="countryfilter_title">Выберите страны</string>
 </resources>

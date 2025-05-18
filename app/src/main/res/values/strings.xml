@@ -5,4 +5,5 @@
     <string name="serverlist_add_server">Add server</string>
     <string name="serverlist_coutry_filter">Select country</string>
     <string name="serverlist_download_servers">Download servers</string>
+    <string name="countryfilter_title">Select countries</string>
 </resources>

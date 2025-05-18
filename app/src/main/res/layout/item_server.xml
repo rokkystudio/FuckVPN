@@ -1,34 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="10dp">
 
-<ImageView
-    android:id="@+id/imageFlag"
-    android:layout_width="32dp"
-    android:layout_height="20dp"
-    android:layout_gravity="center_vertical"
-    android:layout_marginEnd="8dp"
-    android:scaleType="centerCrop"
-    android:src="@drawable/flag_xx" />
+    <ImageView
+        android:id="@+id/imageFlag"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/flag_xx"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-<TextView
-    android:id="@+id/textCountry"
-    android:layout_width="0dp"
-    android:layout_weight="1"
-    android:layout_height="wrap_content"
-    android:text="Country"
-    android:textSize="16sp" />
+    <TextView
+        android:id="@+id/textCountry"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="Country"
+        android:textSize="18sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/imageFlag"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/imageFavorite" />
 
-<TextView
-    android:id="@+id/textPing"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="--- ms"
-    android:textSize="14sp"
-    android:textColor="#888888" />
-</LinearLayout>
+    <TextView
+        android:id="@+id/textIp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="IP address"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="#00a0d0"
+        app:layout_constraintStart_toEndOf="@id/imageFlag"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/imageFavorite" />
+
+    <ImageView
+        android:id="@+id/imageFavorite"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="10dp"
+        android:contentDescription="Favorite star"
+        app:layout_constraintStart_toEndOf="@id/textIp"
+        app:layout_constraintTop_toTopOf="@id/textPing"
+        app:layout_constraintBottom_toBottomOf="@id/textPing"
+        app:layout_constraintEnd_toStartOf="@id/textPing"
+        app:tint="@color/favorite_tint_color" />
+
+    <TextView
+        android:id="@+id/textPing"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="8000 ms"
+        android:textSize="14sp"
+        android:textAlignment="textEnd"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

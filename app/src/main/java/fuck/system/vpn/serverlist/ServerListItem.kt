@@ -1,9 +1,9 @@
 package fuck.system.vpn.serverlist;
 
-data class VpnServer(
+data class ServerListItem(
     val ip: String,
     val country: String,
-    val countryCode: String,
     val ping: Int,
+    val favorite: Boolean,
     val openVpnConfigBase64: String
 )
