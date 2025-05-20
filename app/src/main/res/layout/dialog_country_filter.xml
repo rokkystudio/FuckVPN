@@ -1,25 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/CountryFilterRoot"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:id="@+id/CountryFilterTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/countryfilter_title"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:gravity="center"
-        android:layout_marginBottom="8dp" />
+    android:padding="12dp">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/CountryFilterList"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp" />
+        android:layout_height="match_parent"
+        android:maxHeight="400dp"
+        android:overScrollMode="ifContentScrolls"
+        android:scrollbars="vertical" />
+
+    <!-- Нижняя панель -->
+    <LinearLayout
+        android:id="@+id/CountryFilterActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="8dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/CountryFilterButtonSelectAll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="20dp"
+            app:icon="@drawable/ic_filter_select_all"
+            android:contentDescription="@string/filter_select_all"
+            android:tooltipText="@string/filter_select_all" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/CountryFilterButtonUnselectAll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="20dp"
+            app:icon="@drawable/ic_filter_unselect_all"
+            android:contentDescription="@string/filter_unselect_all"
+            android:tooltipText="@string/filter_unselect_all" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/CountryFilterButtonClose"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:icon="@drawable/ic_filter_close"
+            android:contentDescription="@string/filter_close"
+            android:tooltipText="@string/filter_close" />
+
+    </LinearLayout>
 
 </LinearLayout>

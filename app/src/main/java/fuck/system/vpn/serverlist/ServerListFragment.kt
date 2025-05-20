@@ -16,7 +16,6 @@ import fuck.system.vpn.R
 import fuck.system.vpn.countryfilter.CountryFilterDialog
 import fuck.system.vpn.countryfilter.CountryFilterStorage
 import fuck.system.vpn.getservers.GetServersDialog
-
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -24,7 +23,6 @@ import java.io.InputStreamReader
 class ServerListFragment : Fragment(R.layout.fragment_server_list)
 {
     private val assetCsv: String = "vpngate.csv"
-    private val webCsv: String = "https://www.vpngate.net/api/iphone/"
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ServerAdapter
@@ -40,20 +38,7 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         adapter = ServerAdapter(filteredServers)
         recyclerView.adapter = adapter
 
-        val buttonCountryFilter: Button = view.findViewById(R.id.buttonCountryFilter)
-        buttonCountryFilter.setOnClickListener {
-            openCountryFilterDialog()
-        }
-
-        val buttonRefresh: Button = view.findViewById(R.id.buttonDownloadServers)
-        buttonRefresh.setOnClickListener {
-            openGetServersDialog()
-        }
-
-        val buttonEmptyServers: Button = view.findViewById(R.id.buttonEmptyServers)
-        buttonEmptyServers.setOnClickListener {
-            openEmptyServersDialog()
-        }
+        setupButtons(view)
 
         if (vpnServers.isEmpty()) {
             vpnServers.addAll(ServerListStorage.loadAll(requireContext()))
@@ -61,6 +46,11 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
 
         if (vpnServers.isEmpty()) {
             loadServersFromAssets(requireContext())
+        }
+
+        // Добавляем слушатель результата из CountryFilterDialog
+        parentFragmentManager.setFragmentResultListener("filter_changed", this) { _, _ ->
+            updateServersWithPing()
         }
     }
 
@@ -74,8 +64,34 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         context?.let { updateServers() }
     }
 
-    private fun loadServersFromAssets(context: Context)
+    private fun setupButtons(view: View)
     {
+        view.findViewById<Button>(
+            R.id.ServersButtonFilter)
+            .setOnClickListener {
+                openCountryFilterDialog()
+            }
+
+        view.findViewById<Button>(
+            R.id.ServersButtonGetServers)
+            .setOnClickListener {
+                openGetServersDialog()
+            }
+
+        view.findViewById<Button>(
+            R.id.ServersButtonAddServer)
+            .setOnClickListener {
+                openAddServerDialog()
+            }
+
+        view.findViewById<Button>(
+            R.id.ServersButtonEmptyServers)
+            .setOnClickListener {
+                openEmptyServersDialog()
+            }
+    }
+
+    private fun loadServersFromAssets(context: Context) {
         try {
             context.assets.open(assetCsv).use { inputStream ->
                 BufferedReader(InputStreamReader(inputStream)).use { reader ->
@@ -89,20 +105,18 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
     }
 
     private fun openGetServersDialog() {
-        val dialog = GetServersDialog.newInstance(vpnServers) {
-            servers -> applyWebServers(servers)
+        val dialog = GetServersDialog.newInstance(vpnServers) { servers ->
+            applyWebServers(servers)
         }
         dialog.show(parentFragmentManager, GetServersDialog.TAG)
     }
 
-    private fun parseCsv(reader: BufferedReader)
-    {
+    private fun parseCsv(reader: BufferedReader) {
         val existingMap = vpnServers.associateBy { it.ip }.toMutableMap()
 
         var line: String?
         var lineCount = 0
-        while (reader.readLine().also { line = it } != null)
-        {
+        while (reader.readLine().also { line = it } != null) {
             lineCount++
             if (lineCount <= 2 || line.isNullOrBlank()) continue
 
@@ -116,7 +130,8 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
             val ping = parts[3].toIntOrNull() ?: 999
             val config = parts[14]
 
-            val newServer = ServerListItem(ip = ip, country = country, ping = ping, favorite = false, openVpnConfigBase64 = config)
+            val newServer =
+                ServerListItem(ip = ip, country = country, ping = ping, favorite = false, openVpnConfigBase64 = config)
             existingMap[ip] = newServer
         }
 
@@ -144,14 +159,15 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         updateServers()
     }
 
-    private fun applyWebServers(servers: List<ServerListItem>)
-    {
+    private fun applyWebServers(servers: List<ServerListItem>) {
         val favorites = vpnServers.filter { it.favorite }.associateBy { it.ip }
 
         vpnServers.clear()
-        vpnServers.addAll(servers.map {
-            if (favorites.containsKey(it.ip)) it.copy(favorite = true) else it
-        })
+        vpnServers.addAll(
+            servers.map {
+                if (favorites.containsKey(it.ip)) it.copy(favorite = true) else it
+            }
+        )
 
         ServerListStorage.saveAll(requireContext(), vpnServers)
         Toast.makeText(requireContext(), "Список серверов обновлён", Toast.LENGTH_SHORT).show()
@@ -166,8 +182,7 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun updateServers()
-    {
+    private fun updateServers() {
         val countryFilters = CountryFilterStorage.loadAll(requireContext())
 
         filteredServers.clear()

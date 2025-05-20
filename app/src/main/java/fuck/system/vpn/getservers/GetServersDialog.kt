@@ -16,6 +16,7 @@ import kotlin.concurrent.thread
 
 class GetServersDialog : DialogFragment()
 {
+    private val webCsv: String = "https://www.vpngate.net/api/iphone/"
 
     private var cancelled = false
     private var currentServers: List<ServerListItem> = emptyList()
@@ -87,7 +88,7 @@ class GetServersDialog : DialogFragment()
     private fun downloadAndParse(): List<ServerListItem> {
         val servers = mutableListOf<ServerListItem>()
         try {
-            val url = URL("https://www.vpngate.net/api/iphone/")
+            val url = URL(webCsv)
             val connection = url.openConnection() as HttpURLConnection
             connection.connectTimeout = 5000
             connection.readTimeout = 10000

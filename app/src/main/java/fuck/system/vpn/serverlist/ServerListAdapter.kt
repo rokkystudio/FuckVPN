@@ -38,8 +38,8 @@ class ServerAdapter(private val servers: List<ServerListItem>) :
         holder.imageFlag.setImageResource(FlagMap.getFlag(server.country))
 
         // Установка иконки избранного
-        var starRes = R.drawable.ic_star_outline
-        if (server.favorite) starRes = R.drawable.ic_star_filled
+        var starRes = R.drawable.ic_servers_star_outline
+        if (server.favorite) starRes = R.drawable.ic_servers_star_filled
         holder.imageFavorite.setImageResource(starRes)
     }
 

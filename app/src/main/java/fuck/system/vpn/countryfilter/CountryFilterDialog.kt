@@ -1,29 +1,93 @@
 package fuck.system.vpn.countryfilter
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fuck.system.vpn.R
+import kotlin.math.min
 
-class CountryFilterDialog : DialogFragment()
-{
+class CountryFilterDialog : DialogFragment() {
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: CountryFilterAdapter
-    private lateinit var adapterFilters: MutableList<CountryFilterItem>
+    private var adapterFilters: MutableList<CountryFilterItem> = mutableListOf()
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    @Suppress("InflateParams")
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
+    {
         val builder = AlertDialog.Builder(requireContext())
-        val view = requireActivity().layoutInflater.inflate(R.layout.dialog_country_filter, null)
+        val inflater = requireActivity().layoutInflater
+        val view = inflater.inflate(R.layout.dialog_country_filter, null, false)
 
+        setupRecyclerView(view)
+        setupButtons(view)
+        prepareData()
+        setupAdapter()
+        adjustRecyclerViewHeight()
+
+        builder.setView(view)
+        return builder.create()
+    }
+
+    private fun setupRecyclerView(view: View) {
         recyclerView = view.findViewById(R.id.CountryFilterList)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.itemAnimator = DefaultItemAnimator()
+    }
 
-        val usingCountries = arguments?.getStringArrayList("country_codes") ?: arrayListOf()
+    @SuppressLint("NotifyDataSetChanged")
+    private fun setupButtons(view: View)
+    {
+        view.findViewById<Button>(
+            R.id.CountryFilterButtonSelectAll)
+            .setOnClickListener {
+                onSelectAllClicked()
+            }
 
+        view.findViewById<Button>(
+            R.id.CountryFilterButtonUnselectAll)
+            .setOnClickListener {
+                onUnselectAllClicked()
+            }
+
+        view.findViewById<Button>(
+            R.id.CountryFilterButtonClose)
+            .setOnClickListener {
+                onCloseClicked()
+            }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun onSelectAllClicked() {
+        if (adapterFilters.isEmpty()) return
+        adapterFilters.forEach { it.enabled = true }
+        CountryFilterStorage.saveAll(requireContext(), adapterFilters)
+        adapter.notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun onUnselectAllClicked() {
+        if (adapterFilters.isEmpty()) return
+        adapterFilters.forEach { it.enabled = false }
+        CountryFilterStorage.saveAll(requireContext(), adapterFilters)
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun onCloseClicked() {
+        dismiss()
+    }
+
+    private fun prepareData() {
+        val usingCountries = arguments?.getStringArrayList(KEY) ?: arrayListOf()
         val savedFilters = CountryFilterStorage.loadAll(requireContext()).toMutableList()
+
         usingCountries.forEach { code ->
             if (savedFilters.none { it.country == code }) {
                 savedFilters.add(CountryFilterItem(code, true))
@@ -36,18 +100,25 @@ class CountryFilterDialog : DialogFragment()
             .filter { it.country in usingCountries || !it.enabled }
             .sortedBy { it.country }
             .toMutableList()
+    }
 
+    private fun adjustRecyclerViewHeight() {
+        val displayMetrics = resources.displayMetrics
+        val screenHeight = displayMetrics.heightPixels
+        val maxDialogHeight = (screenHeight * 0.7).toInt()
+
+        recyclerView.post {
+            recyclerView.layoutParams?.let { params ->
+                params.height = min(recyclerView.measuredHeight, maxDialogHeight)
+                recyclerView.layoutParams = params
+                recyclerView.requestLayout()
+            }
+        }
+    }
+
+    private fun setupAdapter() {
         adapter = CountryFilterAdapter(adapterFilters, ::onCountryItemClicked)
         recyclerView.adapter = adapter
-
-        builder
-            .setView(view)
-            .setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
-            .setPositiveButton("ОК") { dialog, _ ->
-                dialog.dismiss()
-            }
-
-        return builder.create()
     }
 
     private fun onCountryItemClicked(position: Int) {
@@ -59,11 +130,12 @@ class CountryFilterDialog : DialogFragment()
 
     companion object {
         const val TAG = "CountryFilterDialog"
+        const val KEY = "CountryCodesKey"
 
         fun newInstance(countryCodes: List<String>): CountryFilterDialog {
             val fragment = CountryFilterDialog()
             val bundle = Bundle()
-            bundle.putStringArrayList("country_codes", ArrayList(countryCodes))
+            bundle.putStringArrayList(KEY, ArrayList(countryCodes))
             fragment.arguments = bundle
             return fragment
         }

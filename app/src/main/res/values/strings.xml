@@ -6,4 +6,7 @@
     <string name="serverlist_coutry_filter">Select country</string>
     <string name="serverlist_download_servers">Download servers</string>
     <string name="countryfilter_title">Select countries</string>
+    <string name="filter_select_all">Select All</string>
+    <string name="filter_unselect_all">Unselect All</string>
+    <string name="filter_close">Close</string>
 </resources>

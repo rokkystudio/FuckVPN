@@ -18,17 +18,20 @@ class CountryFilterAdapter(
 {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_country_filter, parent, false)
+            .inflate(R.layout.dialog_country_filter_item, parent, false)
         return CountryViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: CountryViewHolder, position: Int)
-    {
+    override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
         val item = countries[position]
 
         holder.countryFilterName.text = FlagMap.getCountry(item.country)
         holder.countryFilterCheck.isChecked = item.enabled
         holder.countryFilterFlag.setImageResource(FlagMap.getFlag(item.country))
+
+        holder.itemView.setOnClickListener {
+            onItemClicked(position)
+        }
     }
 
     override fun getItemCount(): Int = countries.size

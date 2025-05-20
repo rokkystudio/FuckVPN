@@ -7,4 +7,7 @@
     <string name="serverlist_coutry_filter">Выбор стран</string>
     <string name="serverlist_download_servers">Загрузить серверы</string>
     <string name="countryfilter_title">Выберите страны</string>
+    <string name="filter_select_all">Включить все</string>
+    <string name="filter_unselect_all">Отключить все</string>
+    <string name="filter_close">Закрыть</string>
 </resources>
