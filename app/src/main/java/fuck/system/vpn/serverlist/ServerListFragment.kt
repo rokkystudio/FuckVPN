@@ -3,8 +3,6 @@ package fuck.system.vpn.serverlist
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -15,15 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import fuck.system.vpn.R
-import fuck.system.vpn.countryfilter.CountryFilterFragment
+import fuck.system.vpn.countryfilter.CountryFilterDialog
 import fuck.system.vpn.countryfilter.CountryFilterStorage
+import fuck.system.vpn.getservers.GetServersDialog
 
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
-import kotlin.concurrent.thread
 
 class ServerListFragment : Fragment(R.layout.fragment_server_list)
 {
@@ -46,17 +42,17 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
 
         val buttonCountryFilter: Button = view.findViewById(R.id.buttonCountryFilter)
         buttonCountryFilter.setOnClickListener {
-            openCountryFilter()
+            openCountryFilterDialog()
         }
 
         val buttonRefresh: Button = view.findViewById(R.id.buttonDownloadServers)
         buttonRefresh.setOnClickListener {
-            loadServersFromWeb()
+            openGetServersDialog()
         }
 
         val buttonEmptyServers: Button = view.findViewById(R.id.buttonEmptyServers)
         buttonEmptyServers.setOnClickListener {
-            showEmptyServersDialog()
+            openEmptyServersDialog()
         }
 
         if (vpnServers.isEmpty()) {
@@ -75,7 +71,7 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         val navView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         navView.menu.findItem(R.id.nav_servers).isChecked = true
 
-        context?.let { applyFiltersAndSort() }
+        context?.let { updateServers() }
     }
 
     private fun loadServersFromAssets(context: Context)
@@ -84,7 +80,7 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
             context.assets.open(assetCsv).use { inputStream ->
                 BufferedReader(InputStreamReader(inputStream)).use { reader ->
                     parseCsv(reader)
-                    applyFiltersAndSort()
+                    updateServersWithPing()
                 }
             }
         } catch (e: IOException) {
@@ -92,56 +88,11 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         }
     }
 
-    private fun loadServersFromWeb()
-    {
-        val handler = Handler(Looper.getMainLooper())
-
-        // Флаг, что загрузка еще идет
-        var isLoading = true
-
-        // Показываем длинный тост что загрузка началась
-        Toast.makeText(context, "Идёт загрузка списка серверов с сайта...", Toast.LENGTH_LONG).show()
-
-        // Запускаем таймаут на 5 секунд, если загрузка не закончилась — покажем ошибку
-        handler.postDelayed({
-            if (isLoading)
-            {
-                Toast.makeText(context, "Не удалось загрузить данные (таймаут)", Toast.LENGTH_SHORT).show()
-            }
-        }, 5000)
-
-        thread {
-            try {
-                Log.d("VPN", "Start loading servers from web...")
-
-                val url = URL(webCsv)
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
-                connection.connectTimeout = 10_000
-                connection.readTimeout = 10_000
-
-                val responseCode = connection.responseCode
-                Log.d("VPN", "Response code: $responseCode")
-
-                if (responseCode != HttpURLConnection.HTTP_OK) {
-                    throw IOException("HTTP error code $responseCode")
-                }
-
-                val reader = BufferedReader(InputStreamReader(connection.inputStream))
-                parseCsv(reader)
-
-                activity?.runOnUiThread {
-                    isLoading = false
-                    applyFiltersAndSort()
-                    Toast.makeText(context, "Список серверов обновлён", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                activity?.runOnUiThread {
-                    isLoading = false
-                    Toast.makeText(context, "Ошибка загрузки: ${e.message}", Toast.LENGTH_LONG).show()
-                }
-            }
+    private fun openGetServersDialog() {
+        val dialog = GetServersDialog.newInstance(vpnServers) {
+            servers -> applyWebServers(servers)
         }
+        dialog.show(parentFragmentManager, GetServersDialog.TAG)
     }
 
     private fun parseCsv(reader: BufferedReader)
@@ -176,7 +127,7 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         ServerListStorage.saveAll(requireContext(), vpnServers)
     }
 
-    private fun showEmptyServersDialog() {
+    private fun openEmptyServersDialog() {
         AlertDialog.Builder(requireContext())
             .setTitle("Очистка списка серверов")
             .setMessage("Вы действительно хотите очистить список серверов?")
@@ -190,26 +141,46 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
     private fun emptyServers() {
         vpnServers.clear()
         ServerListStorage.saveAll(requireContext(), vpnServers)
-        applyFiltersAndSort()
+        updateServers()
+    }
+
+    private fun applyWebServers(servers: List<ServerListItem>)
+    {
+        val favorites = vpnServers.filter { it.favorite }.associateBy { it.ip }
+
+        vpnServers.clear()
+        vpnServers.addAll(servers.map {
+            if (favorites.containsKey(it.ip)) it.copy(favorite = true) else it
+        })
+
+        ServerListStorage.saveAll(requireContext(), vpnServers)
+        Toast.makeText(requireContext(), "Список серверов обновлён", Toast.LENGTH_SHORT).show()
+
+        updateServersWithPing()
+    }
+
+    private fun updateServersWithPing() {
+        PingServersDialog(requireContext(), vpnServers) {
+            updateServers()
+        }.start()
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun applyFiltersAndSort()
+    private fun updateServers()
     {
         val countryFilters = CountryFilterStorage.loadAll(requireContext())
 
         filteredServers.clear()
         filteredServers.addAll(
-            vpnServers.run {
-                filter { server ->
-                    val filter = countryFilters.find { it.country == server.country }
-                    val enabled = filter == null || filter.enabled
-                    enabled
-                }.sortedWith(
-                    compareByDescending<ServerListItem> { it.favorite }
-                        .thenBy { it.ping }
-                )
+            vpnServers.filter { server ->
+                val filter = countryFilters.find { it.country == server.country }
+                filter == null || filter.enabled
             }
+        )
+
+        filteredServers.sortWith(
+            compareByDescending<ServerListItem> { it.favorite }
+                .thenBy { it.ping }
         )
 
         adapter.notifyDataSetChanged()
@@ -219,19 +190,9 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         return vpnServers.map { it.country }.distinct().sorted()
     }
 
-    private fun openCountryFilter()
-    {
+    private fun openCountryFilterDialog() {
         val uniqueCountryCodes = extractUniqueCountryCodes()
-
-        val fragment = CountryFilterFragment()
-        val bundle = Bundle().apply {
-            putStringArrayList("country_codes", ArrayList(uniqueCountryCodes))
-        }
-        fragment.arguments = bundle
-
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
+        val dialog = CountryFilterDialog.newInstance(uniqueCountryCodes)
+        dialog.show(parentFragmentManager, CountryFilterDialog.TAG)
     }
 }
