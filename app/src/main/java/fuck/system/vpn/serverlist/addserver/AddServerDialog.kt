@@ -1,5 +1,6 @@
 package fuck.system.vpn.serverlist.addserver
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,8 +27,10 @@ class AddServerDialog : DialogFragment()
         }
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_server, null)
+    @SuppressLint("InflateParams")
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
+    {
+        val view = layoutInflater.inflate(R.layout.dialog_add_server, null, false)
         val inputCountry = view.findViewById<EditText>(R.id.inputCountry)
         val inputIp = view.findViewById<EditText>(R.id.inputIp)
 
