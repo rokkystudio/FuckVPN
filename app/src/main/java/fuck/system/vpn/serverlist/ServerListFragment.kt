@@ -13,9 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import fuck.system.vpn.R
-import fuck.system.vpn.countryfilter.CountryFilterDialog
-import fuck.system.vpn.countryfilter.CountryFilterStorage
-import fuck.system.vpn.getservers.GetServersDialog
+import fuck.system.vpn.serverlist.addserver.AddServerDialog
+import fuck.system.vpn.serverlist.countryfilter.CountryFilterDialog
+import fuck.system.vpn.serverlist.countryfilter.CountryFilterStorage
+import fuck.system.vpn.serverlist.getservers.GetServersDialog
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -102,6 +103,13 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         } catch (e: IOException) {
             Log.e("VPN", "Ошибка чтения $assetCsv из assets", e)
         }
+    }
+
+    private fun openAddServerDialog() {
+        AddServerDialog.newInstance { newServer ->
+            vpnServers.add(newServer)
+            updateServersWithPing()
+        }.show(parentFragmentManager, AddServerDialog.TAG)
     }
 
     private fun openGetServersDialog() {

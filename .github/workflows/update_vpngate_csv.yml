@@ -1,0 +1,32 @@
+name: Update VPNGate CSV
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"  # каждые 30 минут
+  workflow_dispatch:        # возможность ручного запуска
+
+jobs:
+  update-csv:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Download VPNGate CSV
+        run: |
+          mkdir -p app/src/main/assets
+          curl -o app/src/main/assets/vpngate.csv https://www.vpngate.net/api/iphone/
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add app/src/main/assets/vpngate.csv
+          git commit -m "🔄 Update vpngate.csv" || echo "No changes to commit"
+          git push

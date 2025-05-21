@@ -1,4 +1,4 @@
-package fuck.system.vpn.countryfilter
+package fuck.system.vpn.serverlist.countryfilter
 
 import android.content.Context
 import org.json.JSONArray

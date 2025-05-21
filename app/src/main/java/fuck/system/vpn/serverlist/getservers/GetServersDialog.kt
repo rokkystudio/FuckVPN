@@ -1,4 +1,4 @@
-package fuck.system.vpn.getservers
+package fuck.system.vpn.serverlist.getservers
 
 import android.app.Dialog
 import android.os.Bundle

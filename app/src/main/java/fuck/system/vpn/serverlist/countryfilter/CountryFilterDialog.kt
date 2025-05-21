@@ -1,4 +1,4 @@
-package fuck.system.vpn.countryfilter
+package fuck.system.vpn.serverlist.countryfilter
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -13,11 +13,24 @@ import androidx.recyclerview.widget.RecyclerView
 import fuck.system.vpn.R
 import kotlin.math.min
 
-class CountryFilterDialog : DialogFragment() {
-
+class CountryFilterDialog : DialogFragment()
+{
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: CountryFilterAdapter
     private var adapterFilters: MutableList<CountryFilterItem> = mutableListOf()
+
+    companion object {
+        const val TAG = "CountryFilterDialog"
+        const val KEY = "CountryCodesKey"
+
+        fun newInstance(countryCodes: List<String>): CountryFilterDialog {
+            val fragment = CountryFilterDialog()
+            val bundle = Bundle()
+            bundle.putStringArrayList(KEY, ArrayList(countryCodes))
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
 
     @Suppress("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
@@ -126,18 +139,5 @@ class CountryFilterDialog : DialogFragment() {
         item.enabled = !item.enabled
         CountryFilterStorage.saveItem(requireContext(), item)
         adapter.notifyItemChanged(position)
-    }
-
-    companion object {
-        const val TAG = "CountryFilterDialog"
-        const val KEY = "CountryCodesKey"
-
-        fun newInstance(countryCodes: List<String>): CountryFilterDialog {
-            val fragment = CountryFilterDialog()
-            val bundle = Bundle()
-            bundle.putStringArrayList(KEY, ArrayList(countryCodes))
-            fragment.arguments = bundle
-            return fragment
-        }
     }
 }
