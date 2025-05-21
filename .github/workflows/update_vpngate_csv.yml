@@ -5,6 +5,9 @@ on:
     - cron: "*/30 * * * *"  # каждые 30 минут
   workflow_dispatch:        # возможность ручного запуска
 
+  permissions:
+    contents: write  # 💡 Обязательно для git push
+
 jobs:
   update-csv:
     runs-on: ubuntu-latest
