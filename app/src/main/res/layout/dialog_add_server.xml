@@ -1,23 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="20dp">
 
-    <EditText
-        android:id="@+id/inputCountry"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Название / Страна"
-        android:inputType="textCapWords" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/inputIp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="IP адрес"
-        android:inputType="textUri"
-        android:layout_marginTop="12dp" />
-</LinearLayout>
+        <EditText
+            android:id="@+id/inputCountry"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Название / Страна"
+            android:inputType="textCapWords" />
+
+        <EditText
+            android:id="@+id/inputIp"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="IP адрес"
+            android:inputType="textUri"
+            android:layout_marginTop="12dp" />
+
+        <EditText
+            android:id="@+id/inputPort"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Порт (например, 1194)"
+            android:inputType="number"
+            android:layout_marginTop="12dp" />
+
+        <Spinner
+            android:id="@+id/protocolSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:entries="@array/protocol_array"
+            android:spinnerMode="dropdown"
+            android:background="?attr/editTextBackground"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
+
+        <EditText
+            android:id="@+id/inputUsername"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Имя пользователя"
+            android:inputType="text"
+            android:layout_marginTop="12dp" />
+
+        <EditText
+            android:id="@+id/inputPassword"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            android:layout_marginTop="12dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/buttonCancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Отмена"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/buttonSave"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Сохранить"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

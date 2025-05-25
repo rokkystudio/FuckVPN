@@ -1,4 +1,16 @@
 <resources>
+    <integer name="default_vpn_port">1194</integer>
+    <string name="default_login" translatable="false">vpn</string>
+    <string name="default_password" translatable="false">vpn</string>
+
+    <string name="protocol_udp" translatable="false">UDP</string>
+    <string name="protocol_tcp" translatable="false">TCP</string>
+
+    <string-array name="protocol_array">
+        <item>@string/protocol_udp</item>
+        <item>@string/protocol_tcp</item>
+    </string-array>
+
     <string name="app_name">VPN</string>
     <string name="serverlist_remove_server">Remove server</string>
     <string name="serverlist_empty_list">Empty list</string>
