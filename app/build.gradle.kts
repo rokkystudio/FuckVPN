@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.maxmind.db)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.okhttp)
     implementation(libs.openvpn.aar)

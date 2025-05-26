@@ -1,0 +1,6 @@
+GeoLite2 Data Attribution
+
+This product includes GeoLite2 data created by MaxMind, available from https://www.maxmind.com.
+
+License: Creative Commons Attribution-ShareAlike 4.0 International
+https://creativecommons.org/licenses/by-sa/4.0/

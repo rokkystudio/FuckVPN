@@ -147,3 +147,14 @@
 - 🔄 **L2TP/IPSec** и **SSTP** — альтернативы при блокировке OpenVPN.
 - ⚠️ **PPTP** — устаревший, только в крайнем случае.
 - 🗝️ Для всех альтернатив логин/пароль: `vpn` / `vpn`.  
+
+
+## GeoLite2 Attribution
+
+This product includes GeoLite2 data created by MaxMind, available from https://www.maxmind.com.
+
+License: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)  
+https://creativecommons.org/licenses/by-sa/4.0/
+
+The GeoLite2-Country.mmdb file used in this project is a copy of the original file provided by MaxMind.  
+It was obtained from: https://github.com/P3TERX/GeoLite.mmdb

@@ -1,0 +1,43 @@
+name: Update GeoLite2 MMDB
+
+on:
+  workflow_dispatch:          # ✅ позволяет вручную запускать
+  schedule:
+    - cron: '0 0 * * *'       # ✅ 1 раз в день в 00:00 UTC
+
+permissions:
+  contents: write             # ✅ позволяет делать git push
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download remote GeoLite2-Country.mmdb
+        run: |
+          curl -L -o new.mmdb https://github.com/P3TERX/GeoLite.mmdb/raw/files/GeoLite2-Country.mmdb
+
+      - name: Compare with current file
+        id: compare
+        run: |
+          LOCAL="app/src/main/assets/geolite.mmdb"
+          if [ -f "$LOCAL" ]; then
+            cmp --silent "$LOCAL" new.mmdb && echo "same=true" >> $GITHUB_OUTPUT || echo "same=false" >> $GITHUB_OUTPUT
+          else
+            echo "same=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Replace and commit if different
+        if: steps.compare.outputs.same == 'false'
+        run: |
+          mv new.mmdb app/src/main/assets/geolite.mmdb
+
+        # Commit
+      - name: Commit and push
+        if: steps.compare.outputs.same == 'false'
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Auto-update GeoLite2 MMDB"
+          add: "app/src/main/assets/geolite.mmdb"
