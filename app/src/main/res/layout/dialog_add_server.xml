@@ -2,7 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:padding="20dp">
 
     <LinearLayout
@@ -17,20 +17,12 @@
             android:hint="Название / хост (не обязательно)"
             android:inputType="textCapWords" />
 
-        <EditText
-            android:id="@+id/inputCountry"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Страна"
-            android:inputType="textCapWords" />
-
         <Spinner
             android:id="@+id/vpnTypeSpinner"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="12dp"
-            android:entries="@array/protocol_array"
-            android:spinnerMode="dropdown"
+            android:entries="@array/vpntype_array"
             android:background="?attr/editTextBackground"
             android:paddingStart="12dp"
             android:paddingEnd="12dp" />
@@ -51,30 +43,29 @@
             android:inputType="number"
             android:layout_marginTop="12dp" />
 
-        <Spinner
-            android:id="@+id/protocolSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="12dp"
-            android:entries="@array/protocol_array"
-            android:spinnerMode="dropdown"
-            android:background="?attr/editTextBackground"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp" />
-
         <EditText
             android:id="@+id/inputOvpnKey"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:hint="OpenVPN ключ / конфиг"
             android:inputType="textMultiLine"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="12dp"
+            android:maxLines="4"
+            android:minLines="4" />
 
         <EditText
             android:id="@+id/inputUsername"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="Имя пользователя"
+            android:inputType="text"
+            android:layout_marginTop="12dp" />
+
+        <EditText
+            android:id="@+id/inputPsk"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="IPSec PSK (предварительный ключ)"
             android:inputType="text"
             android:layout_marginTop="12dp" />
 
@@ -86,14 +77,6 @@
             android:inputType="textPassword"
             android:layout_marginTop="12dp" />
 
-        <EditText
-            android:id="@+id/inputPsk"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="IPSec PSK (предварительный ключ)"
-            android:inputType="text"
-            android:layout_marginTop="12dp" />
-
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -102,14 +85,20 @@
 
             <Button
                 android:id="@+id/buttonCreate"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:text="Создать" />
 
             <Button
                 android:id="@+id/buttonCancel"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:text="Отмена" />
 
         </LinearLayout>

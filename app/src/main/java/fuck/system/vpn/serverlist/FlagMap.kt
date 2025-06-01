@@ -4,11 +4,11 @@ import fuck.system.vpn.R
 
 object FlagMap
 {
-    fun getFlag(countryCode: String): Int {
+    fun getFlag(countryCode: String?): Int {
         return flagMap[countryCode] ?: R.drawable.flag_xx
     }
 
-    fun getCountry(countryCode: String): String {
+    fun getCountry(countryCode: String?): String {
         return countryNames[countryCode] ?: "Unknown"
     }
 

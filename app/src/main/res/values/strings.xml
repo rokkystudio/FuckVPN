@@ -6,10 +6,17 @@
     <string name="protocol_udp" translatable="false">UDP</string>
     <string name="protocol_tcp" translatable="false">TCP</string>
 
-    <string-array name="protocol_array">
-        <item>@string/protocol_udp</item>
-        <item>@string/protocol_tcp</item>
+    <string name="vpntype_open" translatable="false">OpenVPN</string>
+    <string name="vpntype_l2tp" translatable="false">L2TP/IPSec</string>
+    <string name="vpntype_pptp" translatable="false">PPTP</string>
+
+    <string-array name="vpntype_array">
+        <item>@string/vpntype_open</item>
+        <item>@string/vpntype_l2tp</item>
+        <item>@string/vpntype_pptp</item>
     </string-array>
+
+    <string name="ping_value" translatable="false">%1$d ms</string>
 
     <string name="app_name">VPN</string>
     <string name="serverlist_remove_server">Remove server</string>
@@ -21,4 +28,5 @@
     <string name="filter_select_all">Select All</string>
     <string name="filter_unselect_all">Unselect All</string>
     <string name="filter_close">Close</string>
+
 </resources>

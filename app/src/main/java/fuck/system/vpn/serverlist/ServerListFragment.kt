@@ -20,6 +20,7 @@ import fuck.system.vpn.serverlist.getservers.GetServersDialog
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import android.util.Base64
 
 class ServerListFragment : Fragment(R.layout.fragment_server_list)
 {
@@ -119,7 +120,18 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         dialog.show(parentFragmentManager, GetServersDialog.TAG)
     }
 
-    private fun parseCsv(reader: BufferedReader) {
+
+    private fun decodeConfig(input: String): String {
+        return try {
+            String(Base64.decode(input, Base64.DEFAULT))
+        } catch (e: Exception) {
+            input // если ошибка, возвращаем оригинал без декодирования
+        }
+    }
+
+
+    private fun parseCsv(reader: BufferedReader)
+    {
         val existingMap = vpnServers.associateBy { it.ip }.toMutableMap()
 
         var line: String?
@@ -135,11 +147,22 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
             if (existingMap.containsKey(ip)) continue
 
             val country = parts[6].lowercase()
-            val ping = parts[3].toIntOrNull() ?: 999
-            val config = parts[14]
+            val ping = parts[3].toIntOrNull()
+            val ovpn = decodeConfig(parts[14])
 
-            val newServer =
-                ServerListItem(ip = ip, country = country, ping = ping, favorite = false, openVpnConfigBase64 = config)
+            val newServer = ServerListItem(
+                name = name,
+                vpntype = vpntype,
+                ip = ip,
+                port = port,
+                country = country,
+                ping = ping,
+                favorite = false,
+                username = null,
+                password = null,
+                psk = null,
+                ovpn = ovpn,
+                )
             existingMap[ip] = newServer
         }
 

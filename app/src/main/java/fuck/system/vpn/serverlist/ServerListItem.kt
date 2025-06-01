@@ -3,6 +3,8 @@ package fuck.system.vpn.serverlist;
 data class ServerListItem
 (
     val name: String? = null,
+    val vpntype: String,
+
     val ip: String,
     val port: Int,
 

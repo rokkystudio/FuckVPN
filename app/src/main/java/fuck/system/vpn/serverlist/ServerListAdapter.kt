@@ -33,7 +33,9 @@ class ServerAdapter(private val servers: List<ServerListItem>) :
 
         holder.textCountry.text = FlagMap.getCountry(server.country)
         holder.textIp.text = server.ip
-        holder.textPing.text = "${server.ping} ms"
+        holder.textPing.text = holder.textPing.context.getString(R.string.ping_value, server.ping)
+
+
         holder.textPing.setTextColor(getPingGradientColor(server.ping))
         holder.imageFlag.setImageResource(FlagMap.getFlag(server.country))
 
@@ -45,7 +47,8 @@ class ServerAdapter(private val servers: List<ServerListItem>) :
 
     override fun getItemCount(): Int = servers.size
 
-    private fun getPingGradientColor(ping: Int): Int {
+    private fun getPingGradientColor(ping: Int?): Int
+    {
         val evaluator = ArgbEvaluator()
 
         val green = "#448844".toColorInt()   // 0 ms
@@ -54,6 +57,7 @@ class ServerAdapter(private val servers: List<ServerListItem>) :
         val red = "#CC4444".toColorInt()     // 500+ ms
 
         return when {
+            ping == null -> red
             ping <= 0 -> green
             ping <= 100 -> evaluator.evaluate(ping / 100f, green, yellow) as Int
             ping <= 250 -> evaluator.evaluate((ping - 100) / 150f, yellow, orange) as Int

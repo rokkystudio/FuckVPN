@@ -8,29 +8,29 @@ import androidx.fragment.app.DialogFragment
 import fuck.system.vpn.R
 import fuck.system.vpn.serverlist.ServerListItem
 
-class AddServerDialog : DialogFragment()
-{
+class AddServerDialog : DialogFragment() {
+
     private var onResult: ((ServerListItem) -> Unit)? = null
 
     // Поля диалога
-    private lateinit var inputCountry: EditText
+    private lateinit var inputName: EditText
     private lateinit var inputIp: EditText
     private lateinit var inputPort: EditText
     private lateinit var inputUsername: EditText
     private lateinit var inputPassword: EditText
-    private lateinit var inputProtocol: Spinner
+    private lateinit var vpnTypeSpinner: Spinner
+    private lateinit var inputOvpnKey: EditText
+    private lateinit var inputPsk: EditText
     private lateinit var buttonCreate: Button
     private lateinit var buttonCancel: Button
 
     // Значения по умолчанию
-    private val defaultPort = resources.getInteger(R.integer.default_vpn_port)
-    private val defaultLogin = getString(R.string.default_login)
-    private val defaultPassword = getString(R.string.default_password)
-    private val defaultProtocol = getString(R.string.default_protocol)
+    private val defaultPort by lazy { resources.getInteger(R.integer.default_vpn_port) }
+    private val defaultLogin by lazy { getString(R.string.default_login) }
+    private val defaultPassword by lazy { getString(R.string.default_password) }
 
     companion object {
         const val TAG = "AddServerDialog"
-
         fun newInstance(onResult: (ServerListItem) -> Unit): AddServerDialog {
             val fragment = AddServerDialog()
             fragment.onResult = onResult
@@ -39,39 +39,64 @@ class AddServerDialog : DialogFragment()
     }
 
     @SuppressLint("InflateParams")
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
-    {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = Dialog(requireContext())
         val view = layoutInflater.inflate(R.layout.dialog_add_server, null, false)
-
         dialog.setContentView(view)
         dialog.setTitle("Добавить сервер вручную")
 
-        // Инициализация виджетов
-        inputCountry = view.findViewById(R.id.inputCountry)
+        // Инициализация виджетов (строго по id из layout)
+        inputName = view.findViewById(R.id.inputName)
         inputIp = view.findViewById(R.id.inputIp)
         inputPort = view.findViewById(R.id.inputPort)
         inputUsername = view.findViewById(R.id.inputUsername)
         inputPassword = view.findViewById(R.id.inputPassword)
-        inputProtocol = view.findViewById(R.id.protocolSpinner)
+        vpnTypeSpinner = view.findViewById(R.id.vpnTypeSpinner)
+        inputOvpnKey = view.findViewById(R.id.inputOvpnKey)
+        inputPsk = view.findViewById(R.id.inputPsk)
         buttonCreate = view.findViewById(R.id.buttonCreate)
         buttonCancel = view.findViewById(R.id.buttonCancel)
 
-        // Применение дефолтных значений к полям ввода
+        // Значения по умолчанию
         inputPort.setText(defaultPort.toString())
         inputUsername.setText(defaultLogin)
         inputPassword.setText(defaultPassword)
-        // spinner можно настроить при необходимости, например, выбрать defaultProtocol, если он есть в списке
+
+        // Spinner всегда выбирает первый элемент (OpenVPN)
+        updateFieldsVisibility(vpnTypeSpinner.selectedItemPosition)
+
+        vpnTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
+                updateFieldsVisibility(position)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
 
         buttonCreate.setOnClickListener {
             onCreateClicked()
         }
-
         buttonCancel.setOnClickListener {
             dismiss()
         }
-
         return dialog
+    }
+
+    private fun updateFieldsVisibility(selected: Int) {
+        // 0: OpenVPN, 1: L2TP/IPSec, 2: PPTP (см. vpntype_array)
+        when (selected) {
+            0 -> { // OpenVPN
+                inputOvpnKey.visibility = android.view.View.VISIBLE
+                inputPsk.visibility = android.view.View.GONE
+            }
+            1 -> { // L2TP/IPSec
+                inputOvpnKey.visibility = android.view.View.GONE
+                inputPsk.visibility = android.view.View.VISIBLE
+            }
+            else -> { // PPTP или другие
+                inputOvpnKey.visibility = android.view.View.GONE
+                inputPsk.visibility = android.view.View.GONE
+            }
+        }
     }
 
     private fun onCreateClicked() {
@@ -80,22 +105,22 @@ class AddServerDialog : DialogFragment()
     }
 
     private data class ServerInputData(
-        val country: String,
+        val name: String?,
+        val vpntype: String,
         val ip: String,
         val port: Int,
         val username: String,
         val password: String,
-        val protocol: String
+        val psk: String?,
+        val ovpn: String?
     )
 
-    private fun validateInput(): ServerInputData?
-    {
-        val country = inputCountry.text.toString().trim()
+    private fun validateInput(): ServerInputData? {
+        val name = inputName.text.toString().trim().ifEmpty { null }
         val ip = inputIp.text.toString().trim()
         val portStr = inputPort.text.toString().trim()
         val username = inputUsername.text.toString().trim().ifEmpty { defaultLogin }
         val password = inputPassword.text.toString().trim().ifEmpty { defaultPassword }
-        val protocol = inputProtocol.selectedItem as? String ?: defaultProtocol
 
         if (ip.isEmpty() || portStr.isEmpty()) {
             Toast.makeText(requireContext(), "IP адрес и Port обязательны!", Toast.LENGTH_SHORT).show()
@@ -108,24 +133,27 @@ class AddServerDialog : DialogFragment()
             return null
         }
 
-        return ServerInputData(country, ip, port, username, password, protocol)
+        val selectedType = vpnTypeSpinner.selectedItemPosition
+        val vpntype = vpnTypeSpinner.selectedItem.toString()
+        val psk = if (selectedType == 1) inputPsk.text.toString().trim().ifEmpty { null } else null
+        val ovpn = if (selectedType == 0) inputOvpnKey.text.toString().trim().ifEmpty { null } else null
+
+        return ServerInputData(name, vpntype, ip, port, username, password, psk, ovpn)
     }
 
-
-    private fun createServerAndReturnResult(data: ServerInputData)
-    {
+    private fun createServerAndReturnResult(data: ServerInputData) {
         val server = ServerListItem(
-            name = null,
+            name = data.name,
+            vpntype = data.vpntype,
             ip = data.ip,
             port = data.port,
-            country = data.country,
+            country = null, // автоопределение через geolite.mmdb по IP в другом месте
             ping = null,
             favorite = true,
             username = data.username,
             password = data.password,
-            protocol = data.protocol,
-            psk = null,
-            ovpn = null
+            psk = data.psk,
+            ovpn = data.ovpn
         )
         onResult?.invoke(server)
         dismiss()
