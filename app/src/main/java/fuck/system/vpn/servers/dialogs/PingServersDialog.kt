@@ -25,6 +25,10 @@ class PingServersDialog(
     private var cancelled = false
     private val threadPool = Executors.newFixedThreadPool(threads)
 
+    companion object {
+        const val TAG = "CountryFilterDialog"
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_ping_servers)
@@ -95,7 +99,7 @@ class PingServersDialog(
                     onComplete()
                 }
             }
-        }.start()
+        }
     }
 
     private fun tcpCheck(ip: String, port: Int, timeoutMs: Int): Int? {

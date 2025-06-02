@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity()
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_servers -> loadFragment(ServersFragment())
-                R.id.nav_status -> loadFragment(VpnStatusFragment())
+                R.id.nav_status -> loadFragment(StatusFragment())
                 R.id.nav_settings -> loadFragment(SettingsFragment())
             }
             true

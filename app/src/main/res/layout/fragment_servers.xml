@@ -21,8 +21,8 @@
             android:layout_weight="1"
             android:layout_marginEnd="20dp"
             android:minHeight="48dp"
-            android:contentDescription="@string/serverlist_coutry_filter"
-            android:tooltipText="@string/serverlist_coutry_filter"
+            android:contentDescription="@string/servers_country_filter"
+            android:tooltipText="@string/servers_country_filter"
             app:icon="@drawable/ic_servers_flags" />
 
         <com.google.android.material.button.MaterialButton
@@ -32,8 +32,8 @@
             android:layout_weight="1"
             android:layout_marginEnd="20dp"
             android:minHeight="48dp"
-            android:contentDescription="@string/serverlist_download_servers"
-            android:tooltipText="@string/serverlist_download_servers"
+            android:contentDescription="@string/servers_get_title"
+            android:tooltipText="@string/servers_get_title"
             app:icon="@drawable/ic_servers_web" />
 
         <com.google.android.material.button.MaterialButton
@@ -43,8 +43,8 @@
             android:layout_weight="1"
             android:layout_marginEnd="20dp"
             android:minHeight="48dp"
-            android:contentDescription="@string/serverlist_add_server"
-            android:tooltipText="@string/serverlist_add_server"
+            android:contentDescription="@string/servers_add_server"
+            android:tooltipText="@string/servers_add_server"
             app:icon="@drawable/ic_servers_add" />
 
         <com.google.android.material.button.MaterialButton
@@ -53,8 +53,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:minHeight="48dp"
-            android:contentDescription="@string/serverlist_empty_list"
-            android:tooltipText="@string/serverlist_empty_list"
+            android:contentDescription="@string/servers_empty_list"
+            android:tooltipText="@string/servers_empty_list"
             app:icon="@drawable/ic_servers_empty" />
     </LinearLayout>
 

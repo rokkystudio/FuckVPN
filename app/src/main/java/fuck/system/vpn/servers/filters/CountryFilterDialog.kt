@@ -21,7 +21,7 @@ class CountryFilterDialog : DialogFragment()
 
     companion object {
         const val TAG = "CountryFilterDialog"
-        const val KEY = "CountryCodesKey"
+        const val KEY = "CountryFilterKey"
 
         fun newInstance(countryCodes: List<String>): CountryFilterDialog {
             val fragment = CountryFilterDialog()
@@ -47,6 +47,11 @@ class CountryFilterDialog : DialogFragment()
 
         builder.setView(view)
         return builder.create()
+    }
+
+    override fun onDismiss(dialog: android.content.DialogInterface) {
+        super.onDismiss(dialog)
+        parentFragmentManager.setFragmentResult(KEY, Bundle())
     }
 
     private fun setupRecyclerView(view: View) {

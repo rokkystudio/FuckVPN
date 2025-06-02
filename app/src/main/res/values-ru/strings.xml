@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="serverlist_remove_server">Удалить сервер</string>
+    <string name="servers_remove_server">Удалить сервер</string>
     <string name="ping_value">%1$s мс</string>
     <string name="app_name">VPN</string>
-    <string name="serverlist_empty_list">Очистить список</string>
-    <string name="serverlist_add_server">Добавить сервер</string>
-    <string name="serverlist_coutry_filter">Выбор стран</string>
-    <string name="serverlist_download_servers">Загрузить серверы</string>
-    <string name="countryfilter_title">Выберите страны</string>
-    <string name="filter_select_all">Включить все</string>
-    <string name="filter_unselect_all">Отключить все</string>
-    <string name="filter_close">Закрыть</string>
+    <string name="servers_empty_list">Очистить список</string>
+    <string name="servers_add_server">Добавить сервер</string>
+    <string name="servers_country_filter">Выбор стран</string>
+    <string name="servers_get_title">Загрузить серверы</string>
+    <string name="country_filter_title">Выберите страны</string>
+    <string name="select_all">Включить все</string>
+    <string name="clear_all">Очистить все</string>
+    <string name="unselect_all">Отключить все</string>
+    <string name="close">Закрыть</string>
     <string name="cancel">Отмена</string>
     <string name="servers_ping_title">Опрос серверов</string>
     <string name="servers_ping_state">Выполнено: %1$d/%2$d</string>
-    <string name="server_add_name">Имя сервера (не обязательно)</string>
+    <string name="server_add_name">Имя сервера</string>
     <string name="server_add_openvpn">OpenVPN конфигурация</string>
+    <string name="server_add_openvpn_required">Требуется указать конфигурацию!</string>
     <string name="server_add_load_file">Загрузить из ovpn</string>
     <string name="save">Сохранить</string>
+    <string name="server_add_load_file_error">Ошибка чтения файла</string>
+    <string name="servers_get_loading">Загрузка списка серверов</string>
+    <string name="servers_get_loading_percent">Загрузка: %1$d%%</string>
+    <string name="menu_server_connect">Подключиться к серверу</string>
+    <string name="menu_server_add_favorite">Добавить в избранное</string>
+    <string name="menu_server_delete">Удалить сервер</string>
 </resources>

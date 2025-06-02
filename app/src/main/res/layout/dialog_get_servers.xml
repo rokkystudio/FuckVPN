@@ -7,16 +7,9 @@
 
     <TextView
         android:id="@+id/GetServersTextMessage"
-        android:text="Загрузка..."
+        android:text="@string/servers_get_title"
         android:textSize="16sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="16dp" />
-
-    <Button
-        android:id="@+id/GetServersButtonCancel"
-        android:text="Отмена"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end" />
+        android:paddingBottom="8dp" />
 </LinearLayout>
