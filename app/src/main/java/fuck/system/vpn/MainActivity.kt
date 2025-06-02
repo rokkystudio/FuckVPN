@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import fuck.system.vpn.databinding.ActivityMainBinding
-import fuck.system.vpn.serverlist.ServerListFragment
+import fuck.system.vpn.servers.ServersFragment
 
 class MainActivity : AppCompatActivity()
 {
@@ -26,12 +26,12 @@ class MainActivity : AppCompatActivity()
         findViewById<TextView>(R.id.appTitle).text = "FUCK VPN v$versionName"
 
         // Загружаем фрагмент со списком серверов при запуске
-        loadFragment(ServerListFragment())
+        loadFragment(ServersFragment())
 
         // Обработка выбора пунктов нижней навигации
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_servers -> loadFragment(ServerListFragment())
+                R.id.nav_servers -> loadFragment(ServersFragment())
                 R.id.nav_status -> loadFragment(VpnStatusFragment())
                 R.id.nav_settings -> loadFragment(SettingsFragment())
             }

@@ -1,12 +1,11 @@
-package fuck.system.vpn.serverlist
+package fuck.system.vpn.servers.server
 
 import android.content.Context
 import androidx.core.content.edit
 import org.json.JSONArray
 import org.json.JSONObject
-import fuck.system.vpn.R
 
-object ServerListStorage
+object ServerStorage
 {
     private const val PREF_NAME = "vpn_server_list"
     private const val KEY_SERVERS = "servers"
@@ -19,10 +18,7 @@ object ServerListStorage
     private fun JSONObject.optIntOrNull(key: String): Int? =
         if (has(key) && !isNull(key)) getInt(key) else null
 
-    /**
-     * Сохраняет список серверов в SharedPreferences в виде JSON.
-     */
-    fun saveAll(context: Context, servers: List<ServerListItem>)
+    fun saveAll(context: Context, servers: List<ServerItem>)
     {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         val jsonArray = JSONArray()
@@ -35,10 +31,6 @@ object ServerListStorage
                 put("country", server.country)
                 put("ping", server.ping ?: JSONObject.NULL)
                 put("favorite", server.favorite)
-                put("username", server.username)
-                put("password", server.password)
-                put("protocol", server.protocol)
-                put("psk", server.psk)
                 put("ovpn", server.ovpn)
             }
             jsonArray.put(obj)
@@ -46,35 +38,25 @@ object ServerListStorage
         prefs.edit { putString(KEY_SERVERS, jsonArray.toString()) }
     }
 
-    /**
-     * Загружает список серверов из SharedPreferences и парсит их в объекты ServerListItem.
-     */
-    fun loadAll(context: Context): List<ServerListItem>
+    fun loadAll(context: Context): List<ServerItem>
     {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         val jsonStr = prefs.getString(KEY_SERVERS, null) ?: return emptyList()
-        val result = mutableListOf<ServerListItem>()
-
-        // Получение значения порта по умолчанию из ресурсов
-        val defaultPort = context.resources.getInteger(R.integer.default_vpn_port)
-
+        val result = mutableListOf<ServerItem>()
         val jsonArray = JSONArray(jsonStr)
+
         for (i in 0 until jsonArray.length())
         {
             val obj = jsonArray.getJSONObject(i)
             result.add(
-                ServerListItem(
-                    name = obj.optStringOrNull("name"),
-                    ip = obj.getString("ip"),
-                    port = obj.optInt("port", defaultPort),
-                    country = obj.optStringOrNull("country"),
-                    ping = obj.optIntOrNull("ping"),
+                ServerItem(
+                    name = obj.optStringOrNull("name") ?: "",
+                    ovpn = obj.optStringOrNull("ovpn") ?: "",
                     favorite = obj.optBoolean("favorite", false),
-                    username = obj.optStringOrNull("username"),
-                    password = obj.optStringOrNull("password"),
-                    protocol = obj.optStringOrNull("protocol"),
-                    psk = obj.optStringOrNull("psk"),
-                    ovpn = obj.optStringOrNull("ovpn")
+                    ip = obj.optStringOrNull("ip"),
+                    port = obj.optIntOrNull("port"),
+                    country = obj.optStringOrNull("country"),
+                    ping = obj.optIntOrNull("ping")
                 )
             )
         }

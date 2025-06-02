@@ -1,16 +1,15 @@
-package fuck.system.vpn.serverlist.getservers
+package fuck.system.vpn.servers.dialogs
 
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import fuck.system.vpn.R
-import fuck.system.vpn.serverlist.ServerListItem
+import fuck.system.vpn.servers.server.ServerItem
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -25,15 +24,15 @@ class GetServersDialog : DialogFragment() {
         "https://storage.googleapis.com/YOUR_BUCKET_NAME_HERE/vpngate.csv" // TODO: заменить
 
     private var cancelled = false
-    private var currentServers: List<ServerListItem> = emptyList()
-    private var onResult: ((List<ServerListItem>) -> Unit)? = null
+    private var currentServers: List<ServerItem> = emptyList()
+    private var onResult: ((List<ServerItem>) -> Unit)? = null
 
     companion object {
         const val TAG = "GetServersDialog"
 
         fun newInstance(
-            currentServers: List<ServerListItem>,
-            onResult: (List<ServerListItem>) -> Unit
+            currentServers: List<ServerItem>,
+            onResult: (List<ServerItem>) -> Unit
         ): GetServersDialog {
             val fragment = GetServersDialog()
             fragment.currentServers = currentServers
@@ -90,7 +89,7 @@ class GetServersDialog : DialogFragment() {
         }
     }
 
-    private fun deliverResult(servers: List<ServerListItem>, success: Boolean) {
+    private fun deliverResult(servers: List<ServerItem>, success: Boolean) {
         if (!cancelled && isAdded) {
             requireActivity().runOnUiThread {
                 if (success) {
@@ -107,8 +106,8 @@ class GetServersDialog : DialogFragment() {
         }
     }
 
-    private fun downloadAndParse(statusView: TextView, urlStr: String): List<ServerListItem> {
-        val servers = mutableListOf<ServerListItem>()
+    private fun downloadAndParse(statusView: TextView, urlStr: String): List<ServerItem> {
+        val servers = mutableListOf<ServerItem>()
         try {
             val url = URL(urlStr)
             val connection = url.openConnection() as HttpURLConnection
@@ -141,7 +140,7 @@ class GetServersDialog : DialogFragment() {
                         val config = parts[14]
 
                         servers.add(
-                            ServerListItem(
+                            ServerItem(
                                 ip = ip,
                                 country = country,
                                 ping = ping,
@@ -167,9 +166,9 @@ class GetServersDialog : DialogFragment() {
     }
 
     private fun mergeFavorites(
-        newServers: List<ServerListItem>,
-        oldServers: List<ServerListItem>
-    ): List<ServerListItem> {
+        newServers: List<ServerItem>,
+        oldServers: List<ServerItem>
+    ): List<ServerItem> {
         val favorites = oldServers.filter { it.favorite }.associateBy { it.ip }
         return newServers.map { server ->
             if (favorites.containsKey(server.ip)) server.copy(favorite = true) else server

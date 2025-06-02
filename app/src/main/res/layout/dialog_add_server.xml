@@ -11,71 +11,31 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/inputName"
+            android:id="@+id/ServerAddName"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="Название / хост (не обязательно)"
+            android:hint="@string/server_add_name"
             android:inputType="textCapWords" />
 
-        <Spinner
-            android:id="@+id/vpnTypeSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="12dp"
-            android:entries="@array/vpntype_array"
-            android:background="?attr/editTextBackground"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp" />
 
         <EditText
-            android:id="@+id/inputIp"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="IP адрес"
-            android:inputType="textUri"
-            android:layout_marginTop="12dp" />
-
-        <EditText
-            android:id="@+id/inputPort"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Порт (например, 1194)"
-            android:inputType="number"
-            android:layout_marginTop="12dp" />
-
-        <EditText
-            android:id="@+id/inputOvpnKey"
+            android:id="@+id/ServerAddOpenVpn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="OpenVPN ключ / конфиг"
+            android:hint="@string/server_add_openvpn"
             android:inputType="textMultiLine"
             android:layout_marginTop="12dp"
-            android:maxLines="4"
-            android:minLines="4" />
+            android:maxLines="10"
+            android:minLines="10" />
 
-        <EditText
-            android:id="@+id/inputUsername"
+        <Button
+            android:id="@+id/ServerAddLoadFile"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Имя пользователя"
-            android:inputType="text"
-            android:layout_marginTop="12dp" />
-
-        <EditText
-            android:id="@+id/inputPsk"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="IPSec PSK (предварительный ключ)"
-            android:inputType="text"
-            android:layout_marginTop="12dp" />
-
-        <EditText
-            android:id="@+id/inputPassword"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Пароль"
-            android:inputType="textPassword"
-            android:layout_marginTop="12dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:text="@string/server_add_load_file" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -84,22 +44,20 @@
             android:layout_marginTop="20dp">
 
             <Button
-                android:id="@+id/buttonCreate"
+                android:id="@+id/ServerAddSave"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
-                android:text="Создать" />
+                android:text="@string/save" />
 
             <Button
-                android:id="@+id/buttonCancel"
+                android:id="@+id/ServersAddCancel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:text="Отмена" />
+                android:text="@string/cancel" />
 
         </LinearLayout>
 

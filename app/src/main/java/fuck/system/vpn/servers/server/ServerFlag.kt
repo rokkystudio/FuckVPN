@@ -1,8 +1,8 @@
-package fuck.system.vpn.serverlist;
+package fuck.system.vpn.servers.server;
 
 import fuck.system.vpn.R
 
-object FlagMap
+object ServerFlag
 {
     fun getFlag(countryCode: String?): Int {
         return flagMap[countryCode] ?: R.drawable.flag_xx

@@ -1,4 +1,4 @@
-package fuck.system.vpn.serverlist.countryfilter
+package fuck.system.vpn.servers.filters
 
 data class CountryFilterItem(
     var country: String,

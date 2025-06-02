@@ -1,4 +1,4 @@
-package fuck.system.vpn.serverlist.countryfilter
+package fuck.system.vpn.servers.filters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 import fuck.system.vpn.R
-import fuck.system.vpn.serverlist.FlagMap
+import fuck.system.vpn.servers.server.ServerFlag
 
 class CountryFilterAdapter(
     private val countries: List<CountryFilterItem>,
@@ -25,9 +25,9 @@ class CountryFilterAdapter(
     override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
         val item = countries[position]
 
-        holder.countryFilterName.text = FlagMap.getCountry(item.country)
+        holder.countryFilterName.text = ServerFlag.getCountry(item.country)
         holder.countryFilterCheck.isChecked = item.enabled
-        holder.countryFilterFlag.setImageResource(FlagMap.getFlag(item.country))
+        holder.countryFilterFlag.setImageResource(ServerFlag.getFlag(item.country))
 
         holder.itemView.setOnClickListener {
             onItemClicked(position)

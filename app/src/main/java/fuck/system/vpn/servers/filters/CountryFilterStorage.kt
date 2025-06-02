@@ -1,10 +1,10 @@
-package fuck.system.vpn.serverlist.countryfilter
+package fuck.system.vpn.servers.filters
 
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 import androidx.core.content.edit
-import fuck.system.vpn.serverlist.FlagMap
+import fuck.system.vpn.servers.server.ServerFlag
 
 object CountryFilterStorage
 {
@@ -65,11 +65,11 @@ object CountryFilterStorage
     }
 
 
-    fun initDefault(context: Context): List<CountryFilterItem>
+    private fun initDefault(context: Context): List<CountryFilterItem>
     {
         val filterList = mutableListOf<CountryFilterItem>()
 
-        for ((country) in FlagMap.countryNames) {
+        for ((country) in ServerFlag.countryNames) {
             filterList.add(
                 CountryFilterItem(country = country, enabled = true)
             )

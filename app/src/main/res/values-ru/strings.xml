@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="serverlist_remove_server">Удалить сервер</string>
+    <string name="ping_value">%1$s мс</string>
     <string name="app_name">VPN</string>
     <string name="serverlist_empty_list">Очистить список</string>
     <string name="serverlist_add_server">Добавить сервер</string>
@@ -10,4 +11,11 @@
     <string name="filter_select_all">Включить все</string>
     <string name="filter_unselect_all">Отключить все</string>
     <string name="filter_close">Закрыть</string>
+    <string name="cancel">Отмена</string>
+    <string name="servers_ping_title">Опрос серверов</string>
+    <string name="servers_ping_state">Выполнено: %1$d/%2$d</string>
+    <string name="server_add_name">Имя сервера (не обязательно)</string>
+    <string name="server_add_openvpn">OpenVPN конфигурация</string>
+    <string name="server_add_load_file">Загрузить из ovpn</string>
+    <string name="save">Сохранить</string>
 </resources>

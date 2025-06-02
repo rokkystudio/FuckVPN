@@ -1,4 +1,4 @@
-package fuck.system.vpn.serverlist
+package fuck.system.vpn.servers
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -13,23 +13,27 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import fuck.system.vpn.R
-import fuck.system.vpn.serverlist.addserver.AddServerDialog
-import fuck.system.vpn.serverlist.countryfilter.CountryFilterDialog
-import fuck.system.vpn.serverlist.countryfilter.CountryFilterStorage
-import fuck.system.vpn.serverlist.getservers.GetServersDialog
+import fuck.system.vpn.servers.dialogs.AddServerDialog
+import fuck.system.vpn.servers.filters.CountryFilterDialog
+import fuck.system.vpn.servers.filters.CountryFilterStorage
+import fuck.system.vpn.servers.dialogs.GetServersDialog
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import android.util.Base64
+import fuck.system.vpn.servers.dialogs.PingServersDialog
+import fuck.system.vpn.servers.server.ServerAdapter
+import fuck.system.vpn.servers.server.ServerItem
+import fuck.system.vpn.servers.server.ServerStorage
 
-class ServerListFragment : Fragment(R.layout.fragment_server_list)
+class ServersFragment : Fragment(R.layout.fragment_server_list)
 {
     private val assetCsv: String = "vpngate.csv"
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ServerAdapter
-    private val vpnServers = mutableListOf<ServerListItem>()
-    private var filteredServers = mutableListOf<ServerListItem>()
+    private val vpnServers = mutableListOf<ServerItem>()
+    private var filteredServers = mutableListOf<ServerItem>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
@@ -43,7 +47,7 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         setupButtons(view)
 
         if (vpnServers.isEmpty()) {
-            vpnServers.addAll(ServerListStorage.loadAll(requireContext()))
+            vpnServers.addAll(ServerStorage.loadAll(requireContext()))
         }
 
         if (vpnServers.isEmpty()) {
@@ -150,17 +154,13 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
             val ping = parts[3].toIntOrNull()
             val ovpn = decodeConfig(parts[14])
 
-            val newServer = ServerListItem(
+            val newServer = ServerItem(
                 name = name,
-                vpntype = vpntype,
                 ip = ip,
                 port = port,
                 country = country,
                 ping = ping,
                 favorite = false,
-                username = null,
-                password = null,
-                psk = null,
                 ovpn = ovpn,
                 )
             existingMap[ip] = newServer
@@ -170,7 +170,7 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
 
         vpnServers.clear()
         vpnServers.addAll(existingMap.values)
-        ServerListStorage.saveAll(requireContext(), vpnServers)
+        ServerStorage.saveAll(requireContext(), vpnServers)
     }
 
     private fun openEmptyServersDialog() {
@@ -186,11 +186,11 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
 
     private fun emptyServers() {
         vpnServers.clear()
-        ServerListStorage.saveAll(requireContext(), vpnServers)
+        ServerStorage.saveAll(requireContext(), vpnServers)
         updateServers()
     }
 
-    private fun applyWebServers(servers: List<ServerListItem>) {
+    private fun applyWebServers(servers: List<ServerItem>) {
         val favorites = vpnServers.filter { it.favorite }.associateBy { it.ip }
 
         vpnServers.clear()
@@ -200,7 +200,7 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
             }
         )
 
-        ServerListStorage.saveAll(requireContext(), vpnServers)
+        ServerStorage.saveAll(requireContext(), vpnServers)
         Toast.makeText(requireContext(), "Список серверов обновлён", Toast.LENGTH_SHORT).show()
 
         updateServersWithPing()
@@ -225,7 +225,7 @@ class ServerListFragment : Fragment(R.layout.fragment_server_list)
         )
 
         filteredServers.sortWith(
-            compareByDescending<ServerListItem> { it.favorite }
+            compareByDescending<ServerItem> { it.favorite }
                 .thenBy { it.ping }
         )
 

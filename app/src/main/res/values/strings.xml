@@ -1,22 +1,8 @@
 <resources>
-    <integer name="default_vpn_port">1194</integer>
-    <string name="default_login" translatable="false">vpn</string>
-    <string name="default_password" translatable="false">vpn</string>
-
     <string name="protocol_udp" translatable="false">UDP</string>
     <string name="protocol_tcp" translatable="false">TCP</string>
 
-    <string name="vpntype_open" translatable="false">OpenVPN</string>
-    <string name="vpntype_l2tp" translatable="false">L2TP/IPSec</string>
-    <string name="vpntype_pptp" translatable="false">PPTP</string>
-
-    <string-array name="vpntype_array">
-        <item>@string/vpntype_open</item>
-        <item>@string/vpntype_l2tp</item>
-        <item>@string/vpntype_pptp</item>
-    </string-array>
-
-    <string name="ping_value" translatable="false">%1$d ms</string>
+    <string name="ping_value">%1$s ms</string>
 
     <string name="app_name">VPN</string>
     <string name="serverlist_remove_server">Remove server</string>
@@ -28,5 +14,12 @@
     <string name="filter_select_all">Select All</string>
     <string name="filter_unselect_all">Unselect All</string>
     <string name="filter_close">Close</string>
+    <string name="cancel">Cancel</string>
+    <string name="servers_ping_title">Ping servers</string>
+    <string name="servers_ping_state">Completed: %1$d/%2$d</string>
+    <string name="server_add_name">Server name (not required)</string>
+    <string name="server_add_openvpn">OpenVPN configuration</string>
+    <string name="server_add_load_file">Load from ovpn</string>
+    <string name="save">Save</string>
 
 </resources>

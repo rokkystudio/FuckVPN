@@ -1,4 +1,4 @@
-package fuck.system.vpn.serverlist;
+package fuck.system.vpn.servers.server;
 
 import android.animation.ArgbEvaluator
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import fuck.system.vpn.R
 import androidx.core.graphics.toColorInt
 
-class ServerAdapter(private val servers: List<ServerListItem>) :
+class ServerAdapter(private val servers: List<ServerItem>) :
     RecyclerView.Adapter<ServerAdapter.ServerViewHolder>()
 {
 
@@ -31,13 +31,14 @@ class ServerAdapter(private val servers: List<ServerListItem>) :
     override fun onBindViewHolder(holder: ServerViewHolder, position: Int) {
         val server = servers[position]
 
-        holder.textCountry.text = FlagMap.getCountry(server.country)
+        holder.textCountry.text = ServerFlag.getCountry(server.country)
         holder.textIp.text = server.ip
-        holder.textPing.text = holder.textPing.context.getString(R.string.ping_value, server.ping)
+        holder.textPing.text = holder.textPing.context.getString(
+            R.string.ping_value, server.ping?.toString() ?: "—")
 
 
         holder.textPing.setTextColor(getPingGradientColor(server.ping))
-        holder.imageFlag.setImageResource(FlagMap.getFlag(server.country))
+        holder.imageFlag.setImageResource(ServerFlag.getFlag(server.country))
 
         // Установка иконки избранного
         var starRes = R.drawable.ic_servers_star_outline
