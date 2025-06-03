@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -26,7 +27,7 @@ import fuck.system.vpn.servers.dialogs.MenuServerDialog
 import fuck.system.vpn.servers.server.ServerAdapter
 import fuck.system.vpn.servers.server.ServerItem
 import fuck.system.vpn.servers.server.ServerStorage
-import fuck.system.vpn.status.StatusFragment
+import fuck.system.vpn.status.LastServerStorage
 
 class ServersFragment : Fragment(R.layout.fragment_servers)
 {
@@ -220,8 +221,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     }
 
     private fun extractUniqueCountryCodes(): List<String> {
-        return vpnServers.map { it.country }
-            .filterNotNull()
+        return vpnServers.mapNotNull { it.country }
             .distinct()
             .sorted()
     }
@@ -233,10 +233,8 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     }
 
     private fun openStatusFragmentWithServer(server: ServerItem) {
-        val fragment = StatusFragment.newInstance(server)
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
+        LastServerStorage.save(requireContext(), server)
+        LastServerStorage.setAutoConnect(requireContext(), true)
+        findNavController().navigate(R.id.nav_status)
     }
 }

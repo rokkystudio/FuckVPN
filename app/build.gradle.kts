@@ -37,6 +37,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
     implementation(libs.marsounjan.icmp4a)
     implementation(libs.google.gson)
     implementation(libs.geoip2)

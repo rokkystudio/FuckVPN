@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="servers_remove_server">Удалить сервер</string>
     <string name="ping_value">%1$s мс</string>
-    <string name="app_name">VPN</string>
+    <string name="servers_remove_server">Удалить сервер</string>
     <string name="servers_empty_list">Очистить список</string>
     <string name="servers_add_server">Добавить сервер</string>
     <string name="servers_country_filter">Выбор стран</string>

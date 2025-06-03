@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/serversFragment">
+
+    <fragment
+        android:id="@+id/serversFragment"
+        android:name="fuck.system.vpn.servers.ServersFragment"
+        android:label="Servers"
+        tools:layout="@layout/fragment_servers" />
+
+    <fragment
+        android:id="@+id/statusFragment"
+        android:name="fuck.system.vpn.status.StatusFragment"
+        android:label="Status"
+        tools:layout="@layout/fragment_status" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="fuck.system.vpn.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
+</navigation>

@@ -4,17 +4,17 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import fuck.system.vpn.databinding.ActivityMainBinding
-import fuck.system.vpn.servers.ServersFragment
 
 class MainActivity : AppCompatActivity()
 {
     private lateinit var binding: ActivityMainBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)
+    {
         super.onCreate(savedInstanceState)
-        // Инициализация ViewBinding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -23,33 +23,14 @@ class MainActivity : AppCompatActivity()
 
         // Получаем версию приложения и устанавливаем заголовок
         val versionName = packageManager.getPackageInfo(packageName, 0).versionName
-        findViewById<TextView>(R.id.appTitle).text = "FUCK VPN v$versionName"
+        findViewById<TextView>(R.id.appTitle).text = getString(R.string.app_title, versionName)
 
-        // Загружаем фрагмент со списком серверов при запуске
-        loadFragment(ServersFragment())
+        // Ищем NavController
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
 
-        // Обработка выбора пунктов нижней навигации
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_servers -> loadFragment(ServersFragment())
-                R.id.nav_status -> loadFragment(StatusFragment())
-                R.id.nav_settings -> loadFragment(SettingsFragment())
-            }
-            true
-        }
-    }
-
-    private fun loadFragment(fragment: Fragment) {
-        val fragmentManager = supportFragmentManager
-
-        // Очистка back stack перед загрузкой нового фрагмента
-        while (fragmentManager.backStackEntryCount > 0) {
-            fragmentManager.popBackStackImmediate()
-        }
-
-        // Замена фрагмента в контейнере
-        fragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
+        // Связываем BottomNavigation с Navigation
+        binding.bottomNavigation.setupWithNavController(navController)
     }
 }

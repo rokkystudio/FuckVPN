@@ -1,10 +1,7 @@
 <resources>
-    <string name="protocol_udp" translatable="false">UDP</string>
-    <string name="protocol_tcp" translatable="false">TCP</string>
-
+    <string name="app_name" translatable="false">VPN</string>
+    <string name="app_title" translatable="false">FUCK VPN v%s</string>
     <string name="ping_value">%1$s ms</string>
-
-    <string name="app_name">VPN</string>
 
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>

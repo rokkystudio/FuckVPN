@@ -682,6 +682,8 @@ string vpnselected
 string warn_no_dns
 string weakmd
 string weakmd_title
+style blinkt
+style blinkt.dialog
 styleable FileSelectLayout fileTitle certificate showClear
 styleable PagerSlidingTabStrip pstsIndicatorColor pstsUnderlineColor pstsDividerColor pstsDividerWidth pstsIndicatorHeight pstsUnderlineHeight pstsDividerPadding pstsTabPaddingLeftRight pstsScrollOffset pstsTabBackground pstsShouldExpand pstsTextAllCaps pstsPaddingMiddle pstsTextStyle pstsTextSelectedStyle pstsTextAlpha pstsTextSelectedAlpha
 xml app_restrictions

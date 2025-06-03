@@ -1,9 +1,0 @@
-de.blinkt.openvpn.test.main-androidTest-0 C:\FILES\PROJECTS\FVPN\main\build\generated\res\resValues\androidTest\debug
-de.blinkt.openvpn.test.main-mergeDebugAndroidTestResources-1 C:\FILES\PROJECTS\FVPN\main\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
-de.blinkt.openvpn.test.main-mergeDebugAndroidTestResources-2 C:\FILES\PROJECTS\FVPN\main\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
-de.blinkt.openvpn.test.main-debugAndroidTest-3 C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
-de.blinkt.openvpn.test.main-debug-4 C:\FILES\PROJECTS\FVPN\main\build\intermediates\packaged_res\debug\packageDebugResources
-de.blinkt.openvpn.test.main-lifecycle-runtime-2.3.1-5 C:\Users\User\.gradle\caches\8.10.2\transforms\31315a42458df9c1bd718e3bd548f97e\transformed\lifecycle-runtime-2.3.1\res
-de.blinkt.openvpn.test.main-core-1.10.1-6 C:\Users\User\.gradle\caches\8.10.2\transforms\716c25e562d37eaf4218cd858646926f\transformed\core-1.10.1\res
-de.blinkt.openvpn.test.main-core-ktx-1.10.1-7 C:\Users\User\.gradle\caches\8.10.2\transforms\ac468432b597c20cf80766a6438ddc3b\transformed\core-ktx-1.10.1\res
-de.blinkt.openvpn.test.main-annotation-experimental-1.3.0-8 C:\Users\User\.gradle\caches\8.10.2\transforms\d82293adf145e927666da3d4aaf64007\transformed\annotation-experimental-1.3.0\res

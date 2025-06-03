@@ -1,7 +1,7 @@
 package fuck.system.vpn.status
 
 import android.content.*
-import android.os.*
+import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
@@ -16,17 +16,11 @@ import fuck.system.vpn.servers.server.ServerFlag
 
 class StatusFragment : Fragment(R.layout.fragment_status)
 {
-    // ---- Данные ----
     private var pendingServer: ServerItem? = null
     private var currentServer: ServerItem? = null
 
-    // ---- Live VPN Status ----
-    private var vpnStatusLevel: String? = null
-
-    // ---- Пинг ----
     private var pingObserver: PingObserver? = null
 
-    // ---- View ----
     private lateinit var textName: TextView
     private lateinit var textIp: TextView
     private lateinit var textPort: TextView
@@ -35,7 +29,6 @@ class StatusFragment : Fragment(R.layout.fragment_status)
     private lateinit var imageFlag: ImageView
     private lateinit var buttonConnectDisconnect: Button
 
-    // ---- Receivers ----
     private val vpnDisconnectedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             context?.let {
@@ -48,14 +41,13 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         }
     }
 
+    // Просто обновляем статус — детали (true/false) получаем через OpenVPNService.isConnected()
     private val vpnStatusReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            vpnStatusLevel = intent?.getStringExtra("status")
             updateVpnStatus()
         }
     }
 
-    // ---- Жизненный цикл ----
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -100,13 +92,13 @@ class StatusFragment : Fragment(R.layout.fragment_status)
 
         currentServer = server
         fillViews(server)
-        // При первом запуске status можем не знать — запросим у ProfileManager
-        if (vpnStatusLevel == null) {
-            vpnStatusLevel = if (ProfileManager.getLastConnectedProfile(requireContext().applicationContext) != null)
-                "LEVEL_CONNECTED"
-            else
-                "LEVEL_NOTCONNECTED"
+
+        // Блок автоподключения
+        if (LastServerStorage.getAutoConnect(requireContext())) {
+            LastServerStorage.setAutoConnect(requireContext(), false)
+            startVpn(server)
         }
+
         updateVpnStatus()
 
         if (server.ip != null) {
@@ -162,7 +154,7 @@ class StatusFragment : Fragment(R.layout.fragment_status)
 
     private fun cleanOldProfiles(context: Context) {
         val manager = ProfileManager.getInstance(context)
-        val allProfiles = manager.getProfiles().toList()
+        val allProfiles = manager.profiles.toList()
         allProfiles.forEach { profile ->
             manager.removeProfile(context, profile)
         }
@@ -191,15 +183,15 @@ class StatusFragment : Fragment(R.layout.fragment_status)
     }
 
     private fun updateVpnStatus() {
-        buttonConnectDisconnect.text = if (isVpnConnected()) {
-            getString(R.string.status_disconnect)
+        if (isVpnConnected()) {
+            buttonConnectDisconnect.text = getString(R.string.status_disconnect)
         } else {
-            getString(R.string.status_connect)
+            buttonConnectDisconnect.text = getString(R.string.status_connect)
         }
         buttonConnectDisconnect.isEnabled = currentServer != null
     }
 
     private fun isVpnConnected(): Boolean {
-        return vpnStatusLevel == "LEVEL_CONNECTED"
+        return OpenVPNService.isConnected()
     }
 }

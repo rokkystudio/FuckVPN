@@ -70,7 +70,14 @@ import de.blinkt.openvpn.api.ExternalAppDatabase;
 import de.blinkt.openvpn.core.VpnStatus.ByteCountListener;
 import de.blinkt.openvpn.core.VpnStatus.StateListener;
 
-public class OpenVPNService extends VpnService implements StateListener, Callback, ByteCountListener, IOpenVPNServiceInternal {
+public class OpenVPNService extends VpnService implements StateListener, Callback, ByteCountListener, IOpenVPNServiceInternal
+{
+    private static volatile boolean connected = false;
+
+    public static boolean isConnected() {
+        return connected;
+    }
+
     public static final String START_SERVICE = "de.blinkt.openvpn.START_SERVICE";
     public static final String START_SERVICE_STICKY = "de.blinkt.openvpn.START_SERVICE_STICKY";
     public static final String ALWAYS_SHOW_NOTIFICATION = "de.blinkt.openvpn.NOTIFICATION_ALWAYS_VISIBLE";
@@ -1336,7 +1343,10 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     }
 
     @Override
-    public void updateState(String state, String logmessage, int resid, ConnectionStatus level, Intent intent) {
+    public void updateState(String state, String logmessage, int resid, ConnectionStatus level, Intent intent)
+    {
+        connected = level == ConnectionStatus.LEVEL_CONNECTED;
+
         // If the process is not running, ignore any state,
         // Notification should be invisible in this state
 
@@ -1376,6 +1386,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         vpnstatus.setAction("de.blinkt.openvpn.VPN_STATUS");
         vpnstatus.putExtra("status", level.toString());
         vpnstatus.putExtra("detailstatus", state);
+        vpnstatus.putExtra("isConnected", connected);
         sendBroadcast(vpnstatus, permission.ACCESS_NETWORK_STATE);
     }
 

@@ -11,7 +11,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 
-class GetServersDialog : DialogFragment() {
+class GetServersDialog : DialogFragment()
+{
     private var onResult: ((String?) -> Unit)? = null
     private var csvUrl: String? = null
 
