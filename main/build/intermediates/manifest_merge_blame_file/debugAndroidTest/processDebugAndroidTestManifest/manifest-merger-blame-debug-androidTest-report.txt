@@ -1,0 +1,304 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="de.blinkt.openvpn.test" >
+4
+5    <uses-sdk
+5-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:5:5-74
+6        android:minSdkVersion="21"
+6-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:5:15-41
+7        android:targetSdkVersion="35" />
+7-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:5:42-71
+8
+9    <instrumentation
+9-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:11:5-15:72
+10        android:name="android.test.InstrumentationTestRunner"
+10-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:11:22-75
+11        android:functionalTest="false"
+11-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:14:22-52
+12        android:handleProfiling="false"
+12-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:13:22-53
+13        android:label="Tests for de.blinkt.openvpn.test"
+13-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:15:22-70
+14        android:targetPackage="de.blinkt.openvpn.test" />
+14-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:12:22-68
+15
+16    <uses-permission android:name="android.permission.INTERNET" />
+16-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-67
+16-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:22-64
+17    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+17-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:5-79
+17-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:22-76
+18    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+18-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:5-81
+18-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:22-78
+19    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+19-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:5-80
+19-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:22-77
+20    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+20-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:5-77
+20-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:22-74
+21    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+21-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:5-77
+21-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:22-74
+22    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+22-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:5-89
+22-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:22-86
+23    <!--
+24         Used to show all apps in the allowed Apps selection,
+25         this app needs the list the app in the allow/deny apps over the VPN
+26    -->
+27    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+27-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:5-22:53
+27-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:9-61
+28
+29    <permission
+29-->[androidx.core:core:1.10.1] C:\Users\User\.gradle\caches\8.10.2\transforms\716c25e562d37eaf4218cd858646926f\transformed\core-1.10.1\AndroidManifest.xml:22:5-24:47
+30        android:name="de.blinkt.openvpn.test.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+30-->[androidx.core:core:1.10.1] C:\Users\User\.gradle\caches\8.10.2\transforms\716c25e562d37eaf4218cd858646926f\transformed\core-1.10.1\AndroidManifest.xml:23:9-81
+31        android:protectionLevel="signature" />
+31-->[androidx.core:core:1.10.1] C:\Users\User\.gradle\caches\8.10.2\transforms\716c25e562d37eaf4218cd858646926f\transformed\core-1.10.1\AndroidManifest.xml:24:9-44
+32
+33    <uses-permission android:name="de.blinkt.openvpn.test.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+33-->[androidx.core:core:1.10.1] C:\Users\User\.gradle\caches\8.10.2\transforms\716c25e562d37eaf4218cd858646926f\transformed\core-1.10.1\AndroidManifest.xml:26:5-97
+33-->[androidx.core:core:1.10.1] C:\Users\User\.gradle\caches\8.10.2\transforms\716c25e562d37eaf4218cd858646926f\transformed\core-1.10.1\AndroidManifest.xml:26:22-94
+34
+35    <application
+35-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:7:5-9:19
+36        android:name="de.blinkt.openvpn.core.ICSOpenVPNApplication"
+36-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:9-68
+37        android:allowBackup="true"
+37-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:26:9-35
+38        android:appCategory="productivity"
+38-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:27:9-43
+39        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+39-->[androidx.core:core:1.10.1] C:\Users\User\.gradle\caches\8.10.2\transforms\716c25e562d37eaf4218cd858646926f\transformed\core-1.10.1\AndroidManifest.xml:28:18-86
+40        android:debuggable="true"
+41        android:extractNativeLibs="true"
+42        android:icon="@mipmap/ic_launcher"
+42-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:9-43
+43        android:label="@string/app"
+43-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:9-36
+44        android:roundIcon="@mipmap/ic_launcher_round"
+44-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:9-54
+45        android:supportsRtl="true"
+45-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:31:9-35
+46        android:theme="@style/blinkt" >
+46-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:32:9-38
+47        <uses-library android:name="android.test.runner" />
+47-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:8:9-60
+47-->C:\FILES\PROJECTS\FVPN\main\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10637018300493548621.xml:8:23-57
+48
+49        <meta-data
+49-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:34:9-36:56
+50            android:name="android.content.APP_RESTRICTIONS"
+50-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:35:13-60
+51            android:resource="@xml/app_restrictions" />
+51-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:36:13-53
+52
+53        <activity
+53-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:38:9-44:52
+54            android:name="de.blinkt.openvpn.activities.DisconnectVPN"
+54-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:39:13-70
+55            android:autoRemoveFromRecents="true"
+55-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:40:13-49
+56            android:excludeFromRecents="true"
+56-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:41:13-46
+57            android:noHistory="true"
+57-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:42:13-37
+58            android:taskAffinity=".DisconnectVPN"
+58-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:43:13-50
+59            android:theme="@style/blinkt.dialog" />
+59-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:44:13-49
+60
+61        <service
+61-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:46:9-59:19
+62            android:name="de.blinkt.openvpn.core.OpenVPNService"
+62-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:47:13-65
+63            android:exported="true"
+63-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:48:13-36
+64            android:foregroundServiceType="specialUse"
+64-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:49:13-55
+65            android:permission="android.permission.BIND_VPN_SERVICE"
+65-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:50:13-69
+66            android:process=":openvpn" >
+66-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:51:13-39
+67            <intent-filter>
+67-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:52:13-54:29
+68                <action android:name="android.net.VpnService" />
+68-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:53:17-65
+68-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:53:25-62
+69            </intent-filter>
+70
+71            <property
+71-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:56:13-58:39
+72                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+72-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:57:17-76
+73                android:value="vpn" />
+73-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:58:17-36
+74        </service>
+75        <service
+75-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:60:9-68:19
+76            android:name="de.blinkt.openvpn.api.ExternalOpenVPNService"
+76-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:61:13-72
+77            android:exported="true"
+77-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:62:13-36
+78            android:process=":openvpn" >
+78-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:63:13-39
+79            <intent-filter>
+79-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:65:13-67:29
+80                <action android:name="de.blinkt.openvpn.api.IOpenVPNAPIService" />
+80-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:66:17-83
+80-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:66:25-80
+81            </intent-filter>
+82        </service>
+83        <service
+83-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:69:9-72:42
+84            android:name="de.blinkt.openvpn.core.OpenVPNStatusService"
+84-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:70:13-71
+85            android:exported="false"
+85-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:71:13-37
+86            android:process=":openvpn" />
+86-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:72:13-39
+87
+88        <activity
+88-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:74:9-80:20
+89            android:name="de.blinkt.openvpn.api.GrantPermissionsActivity"
+89-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:75:13-74
+90            android:exported="true" >
+90-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:76:13-36
+91            <intent-filter>
+91-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:77:13-79:29
+92                <action android:name="android.intent.action.MAIN" />
+92-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:78:17-69
+92-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:78:25-66
+93            </intent-filter>
+94        </activity>
+95        <activity
+95-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:81:9-87:20
+96            android:name="de.blinkt.openvpn.api.ConfirmDialog"
+96-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:82:13-63
+97            android:exported="true" >
+97-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:83:13-36
+98            <intent-filter>
+98-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:77:13-79:29
+99                <action android:name="android.intent.action.MAIN" />
+99-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:78:17-69
+99-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:78:25-66
+100            </intent-filter>
+101        </activity>
+102
+103        <receiver
+103-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:89:9-96:20
+104            android:name="de.blinkt.openvpn.OnBootReceiver"
+104-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:90:13-60
+105            android:exported="true" >
+105-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:91:13-36
+106            <intent-filter android:priority="999" >
+106-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:92:13-95:29
+106-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:92:28-50
+107                <action android:name="android.intent.action.BOOT_COMPLETED" />
+107-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:93:17-79
+107-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:93:25-76
+108                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+108-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:94:17-84
+108-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:94:25-81
+109            </intent-filter>
+110        </receiver>
+111
+112        <service
+112-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:98:9-102:42
+113            android:name="de.blinkt.openvpn.core.keepVPNAlive"
+113-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:99:13-63
+114            android:exported="true"
+114-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:100:13-36
+115            android:permission="android.permission.BIND_JOB_SERVICE"
+115-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:101:13-69
+116            android:process=":openvpn" />
+116-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:102:13-39
+117
+118        <activity
+118-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:104:9-117:20
+119            android:name="de.blinkt.openvpn.LaunchVPN"
+119-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:105:13-55
+120            android:autoRemoveFromRecents="true"
+120-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:106:13-49
+121            android:excludeFromRecents="true"
+121-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:107:13-46
+122            android:exported="true"
+122-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:108:13-36
+123            android:label="@string/vpn_launch_title"
+123-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:109:13-53
+124            android:taskAffinity=".LaunchVPN"
+124-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:110:13-46
+125            android:theme="@style/blinkt.dialog" >
+125-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:111:13-49
+126            <intent-filter>
+126-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:112:13-116:29
+127                <action android:name="android.intent.action.MAIN" />
+127-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:78:17-69
+127-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:78:25-66
+128
+129                <category android:name="android.intent.category.DEFAULT" />
+129-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:115:17-76
+129-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:115:27-73
+130            </intent-filter>
+131        </activity>
+132        <!--
+133        <receiver android:name="core.GetRestrictionReceiver">
+134            <intent-filter>
+135                <action android:name="android.intent.action.GET_RESTRICTION_ENTRIES" />
+136            </intent-filter>
+137        </receiver>
+138        -->
+139        <activity
+139-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:125:9-132:52
+140            android:name="de.blinkt.openvpn.api.RemoteAction"
+140-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:126:13-62
+141            android:autoRemoveFromRecents="true"
+141-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:127:13-49
+142            android:excludeFromRecents="true"
+142-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:128:13-46
+143            android:launchMode="singleInstance"
+143-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:129:13-48
+144            android:noHistory="true"
+144-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:130:13-37
+145            android:taskAffinity=".LaunchVPN"
+145-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:131:13-46
+146            android:theme="@style/blinkt.dialog" />
+146-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:132:13-49
+147
+148        <activity-alias
+148-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:146:9-149:75
+149            android:name="de.blinkt.openvpn.api.ConnectVPN"
+149-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:147:13-60
+150            android:exported="true"
+150-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:148:13-36
+151            android:targetActivity="de.blinkt.openvpn.api.RemoteAction" />
+151-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:149:13-72
+152        <activity-alias
+152-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:142:9-145:75
+153            android:name="de.blinkt.openvpn.api.DisconnectVPN"
+153-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:143:13-63
+154            android:exported="true"
+154-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:144:13-36
+155            android:targetActivity="de.blinkt.openvpn.api.RemoteAction" />
+155-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:145:13-72
+156        <activity-alias
+156-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:138:9-141:75
+157            android:name="de.blinkt.openvpn.api.PauseVPN"
+157-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:139:13-58
+158            android:exported="true"
+158-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:140:13-36
+159            android:targetActivity="de.blinkt.openvpn.api.RemoteAction" />
+159-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:141:13-72
+160        <activity-alias
+160-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:134:9-137:75
+161            android:name="de.blinkt.openvpn.api.ResumeVPN"
+161-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:135:13-59
+162            android:exported="true"
+162-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:136:13-36
+163            android:targetActivity="de.blinkt.openvpn.api.RemoteAction" />
+163-->[:main] C:\FILES\PROJECTS\FVPN\main\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:137:13-72
+164    </application>
+165
+166</manifest>

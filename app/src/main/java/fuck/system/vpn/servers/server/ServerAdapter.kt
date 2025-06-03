@@ -10,9 +10,14 @@ import androidx.recyclerview.widget.RecyclerView
 import fuck.system.vpn.R
 import androidx.core.graphics.toColorInt
 
-class ServerAdapter(private val servers: List<ServerItem>) :
-    RecyclerView.Adapter<ServerAdapter.ServerViewHolder>()
+class ServerAdapter(
+    private val servers: List<ServerItem>,
+    private val clickListener: OnServerClickListener
+) : RecyclerView.Adapter<ServerAdapter.ServerViewHolder>()
 {
+    interface OnServerClickListener {
+        fun onServerClick(isFavorite: Boolean, position: Int)
+    }
 
     class ServerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textCountry: TextView = itemView.findViewById(R.id.textCountry)
@@ -28,7 +33,8 @@ class ServerAdapter(private val servers: List<ServerItem>) :
         return ServerViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ServerViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ServerViewHolder, position: Int)
+    {
         val server = servers[position]
 
         holder.textCountry.text = ServerFlag.getCountry(server.country)
@@ -36,14 +42,16 @@ class ServerAdapter(private val servers: List<ServerItem>) :
         holder.textPing.text = holder.textPing.context.getString(
             R.string.ping_value, server.ping?.toString() ?: "—")
 
-
         holder.textPing.setTextColor(getPingGradientColor(server.ping))
         holder.imageFlag.setImageResource(ServerFlag.getFlag(server.country))
 
-        // Установка иконки избранного
-        var starRes = R.drawable.ic_servers_star_outline
-        if (server.favorite) starRes = R.drawable.ic_servers_star_filled
+        val starRes = if (server.favorite) R.drawable.ic_servers_star_filled else R.drawable.ic_servers_star_outline
         holder.imageFavorite.setImageResource(starRes)
+
+        // Вешаем обработку клика
+        holder.itemView.setOnClickListener {
+            clickListener.onServerClick(server.favorite, position)
+        }
     }
 
     override fun getItemCount(): Int = servers.size

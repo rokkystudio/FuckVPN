@@ -16,10 +16,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url = uri("https://www.jitpack.io" ) }
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
 rootProject.name = "VPN"
 include(":app")
- 
+include(":main")

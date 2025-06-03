@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import fuck.system.vpn.R
+import fuck.system.vpn.parser.ServersParser
 import fuck.system.vpn.servers.dialogs.AddServerDialog
 import fuck.system.vpn.servers.filters.CountryFilterDialog
 import fuck.system.vpn.servers.filters.CountryFilterStorage
@@ -21,9 +22,11 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import fuck.system.vpn.servers.dialogs.PingServersDialog
+import fuck.system.vpn.servers.dialogs.MenuServerDialog
 import fuck.system.vpn.servers.server.ServerAdapter
 import fuck.system.vpn.servers.server.ServerItem
 import fuck.system.vpn.servers.server.ServerStorage
+import fuck.system.vpn.status.StatusFragment
 
 class ServersFragment : Fragment(R.layout.fragment_servers)
 {
@@ -41,15 +44,39 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
 
         recyclerView = view.findViewById(R.id.recyclerServers)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = ServerAdapter(filteredServers)
+        adapter = ServerAdapter(filteredServers, object : ServerAdapter.OnServerClickListener {
+            override fun onServerClick(isFavorite: Boolean, position: Int) {
+                MenuServerDialog.newInstance(isFavorite, position)
+                    .show(parentFragmentManager, MenuServerDialog.TAG)
+            }
+        })
         recyclerView.adapter = adapter
 
         setupButtons(view)
-
         initializeServers()
 
         parentFragmentManager.setFragmentResultListener(CountryFilterDialog.KEY, this) { _, _ ->
             updateServersWithPing()
+        }
+        parentFragmentManager.setFragmentResultListener(MenuServerDialog.RESULT_KEY, this) { _, bundle ->
+            val action = bundle.getString(MenuServerDialog.EXTRA_ACTION)
+            val position = bundle.getInt(MenuServerDialog.EXTRA_POSITION)
+            if (position in filteredServers.indices) {
+                val server = filteredServers[position]
+                when (action) {
+                    MenuServerDialog.ACTION_CONNECT -> openStatusFragmentWithServer(server)
+                    MenuServerDialog.ACTION_FAVORITE -> {
+                        server.favorite = !server.favorite
+                        ServerStorage.saveAll(requireContext(), vpnServers)
+                        updateServers()
+                    }
+                    MenuServerDialog.ACTION_DELETE -> {
+                        vpnServers.removeIf { it.ip == server.ip }
+                        ServerStorage.saveAll(requireContext(), vpnServers)
+                        updateServers()
+                    }
+                }
+            }
         }
     }
 
@@ -96,29 +123,17 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
 
     private fun setupButtons(view: View)
     {
-        view.findViewById<Button>(
-            R.id.ServersButtonFilter)
-            .setOnClickListener {
-                openCountryFilterDialog()
-            }
+        view.findViewById<Button>(R.id.ServersButtonFilter)
+            .setOnClickListener { openCountryFilterDialog() }
 
-        view.findViewById<Button>(
-            R.id.ServersButtonGetServers)
-            .setOnClickListener {
-                openGetServersDialog()
-            }
+        view.findViewById<Button>(R.id.ServersButtonGetServers)
+            .setOnClickListener { openGetServersDialog() }
 
-        view.findViewById<Button>(
-            R.id.ServersButtonAddServer)
-            .setOnClickListener {
-                openAddServerDialog()
-            }
+        view.findViewById<Button>(R.id.ServersButtonAddServer)
+            .setOnClickListener { openAddServerDialog() }
 
-        view.findViewById<Button>(
-            R.id.ServersButtonEmptyServers)
-            .setOnClickListener {
-                openEmptyServersDialog()
-            }
+        view.findViewById<Button>(R.id.ServersButtonEmptyServers)
+            .setOnClickListener { openEmptyServersDialog() }
     }
 
     private fun loadServersFromAssets(context: Context) {
@@ -177,22 +192,6 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         updateServers()
     }
 
-    private fun applyWebServers(servers: List<ServerItem>) {
-        val favorites = vpnServers.filter { it.favorite }.associateBy { it.ip }
-
-        vpnServers.clear()
-        vpnServers.addAll(
-            servers.map {
-                if (favorites.containsKey(it.ip)) it.copy(favorite = true) else it
-            }
-        )
-
-        ServerStorage.saveAll(requireContext(), vpnServers)
-        Toast.makeText(requireContext(), "Список серверов обновлён", Toast.LENGTH_SHORT).show()
-
-        updateServersWithPing()
-    }
-
     private fun updateServersWithPing() {
         val dialog = PingServersDialog(vpnServers) {
             updateServers()
@@ -231,5 +230,13 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         val uniqueCountryCodes = extractUniqueCountryCodes()
         val dialog = CountryFilterDialog.newInstance(uniqueCountryCodes)
         dialog.show(parentFragmentManager, CountryFilterDialog.TAG)
+    }
+
+    private fun openStatusFragmentWithServer(server: ServerItem) {
+        val fragment = StatusFragment.newInstance(server)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 }

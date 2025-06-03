@@ -25,5 +25,9 @@
     <string name="servers_get_loading_percent">Загрузка: %1$d%%</string>
     <string name="menu_server_connect">Подключиться к серверу</string>
     <string name="menu_server_add_favorite">Добавить в избранное</string>
+    <string name="menu_server_remove_favorite">Удалить из избранного</string>
     <string name="menu_server_delete">Удалить сервер</string>
+    <string name="status_country_flag">Флаг страны</string>
+    <string name="status_connect">Подключиться</string>
+    <string name="status_disconnect">Отключиться</string>
 </resources>

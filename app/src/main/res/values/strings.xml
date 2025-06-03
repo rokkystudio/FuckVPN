@@ -38,4 +38,9 @@
     <string name="menu_server_remove_favorite">Remove from favorites</string>
     <string name="menu_server_delete">Delete server</string>
 
+    <string name="status_country_flag">Country flag</string>
+    <string name="status_connect">Connect</string>
+    <string name="status_disconnect">Disconnect</string>
+
+
 </resources>

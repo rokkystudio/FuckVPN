@@ -37,10 +37,11 @@ android {
 }
 
 dependencies {
+    implementation(libs.marsounjan.icmp4a)
+    implementation(libs.google.gson)
     implementation(libs.geoip2)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.okhttp)
-    implementation(libs.openvpn.aar)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -49,4 +50,5 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.core.ktx)
+    implementation(project(":main"))
 }
