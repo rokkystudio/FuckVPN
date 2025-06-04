@@ -1,122 +1,139 @@
 package fuck.system.vpn.servers.dialogs
 
-import android.app.Dialog
+import android.os.Build
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.server.ServerItem
-import java.net.InetSocketAddress
-import java.net.Socket
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
+import fuck.system.vpn.status.PingObserver
+import kotlinx.coroutines.*
+import kotlin.math.min
 
-class PingServersDialog(
-    private val servers: List<ServerItem>,
-    private val onComplete: () -> Unit
-) : DialogFragment() {
-
-    private val threads = 4
-
-    @Volatile
-    private var cancelled = false
-    private val threadPool = Executors.newFixedThreadPool(threads)
+class PingServersDialog : DialogFragment() {
 
     companion object {
-        const val TAG = "CountryFilterDialog"
+        const val TAG = "PingServersDialog"
+        private const val SERVERS_KEY = "SERVERS"
+        const val RESULT_KEY = "PingServersDialogResult"
+        const val RESULT_EXTRA = "SERVERS"
+
+        fun newInstance(servers: List<ServerItem>): PingServersDialog {
+            val fragment = PingServersDialog()
+            val args = Bundle()
+            args.putParcelableArrayList(SERVERS_KEY, ArrayList(servers))
+            fragment.arguments = args
+            return fragment
+        }
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.dialog_ping_servers)
-        return dialog
+    private lateinit var progressBar: ProgressBar
+    private lateinit var progressText: TextView
+    private lateinit var cancelButton: Button
+
+    private val observers = mutableListOf<PingObserver>()
+    private var job: Job? = null
+    private var completed = 0
+    private var cancelled = false
+
+    private var servers: ArrayList<ServerItem> = arrayListOf()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        servers = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelableArrayList(SERVERS_KEY, ServerItem::class.java) ?: arrayListOf()
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getParcelableArrayList(SERVERS_KEY) ?: arrayListOf()
+        }
     }
 
-    override fun onStart() {
-        super.onStart()
-        val dialog = dialog ?: return
-        val progressBar = dialog.findViewById<ProgressBar>(R.id.ServersPingProgress)
-        val progressText = dialog.findViewById<TextView>(R.id.ServersPingState)
-        val cancelButton = dialog.findViewById<Button>(R.id.ServersAddCancel)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return inflater.inflate(R.layout.dialog_ping_servers, container, false)
+    }
 
-        progressBar?.max = servers.size
-        progressBar?.progress = 0
-        progressText?.text = getString(R.string.servers_ping_state, 0, servers.size)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        cancelButton?.setOnClickListener {
+        progressBar = view.findViewById(R.id.ServersPingProgress)
+        progressText = view.findViewById(R.id.ServersPingState)
+        cancelButton = view.findViewById(R.id.ServersAddCancel)
+
+        progressBar.max = servers.size
+        progressText.text = getString(R.string.servers_ping_state, 0, servers.size)
+
+        cancelButton.setOnClickListener {
             cancelled = true
             dismissAllowingStateLoss()
         }
 
-        startPingThreads(progressBar, progressText)
+        startPinging()
     }
 
-    private fun startPingThreads(
-        progressBar: ProgressBar?,
-        progressText: TextView?
-    ) {
-        val total = servers.size
-        var completed = 0
-        val lock = Object()
+    private fun startPinging() {
+        if (!isAdded) return
 
-        if (servers.isEmpty()) {
-            dismissAllowingStateLoss()
-            return
-        }
+        completed = 0
+        observers.clear()
 
-        servers.forEach { server ->
-            threadPool.submit {
-                if (cancelled) {
-                    server.ping = null
-                    return@submit
-                }
+        job = viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                servers.forEach { server ->
+                    val ip = server.ip ?: return@forEach
+                    val observer = PingObserver(ip)
+                    observers.add(observer)
 
-                server.ping = if (server.ip != null && server.port != null)
-                    tcpCheck(server.ip, server.port, 1000)
-                else
-                    null
-
-                synchronized(lock) {
-                    completed++
-                    activity?.runOnUiThread {
-                        progressBar?.progress = completed
-                        progressText?.text =
-                            getString(R.string.servers_ping_state, completed, total)
+                    observer.observe(viewLifecycleOwner) { result ->
+                        if (!cancelled) {
+                            server.ping = result.toIntOrNull()
+                            updateProgress()
+                        }
                     }
-                }
-            }
-        }
 
-        thread {
-            threadPool.shutdown()
-            threadPool.awaitTermination((servers.size * 2).toLong(), TimeUnit.SECONDS)
-            if (!cancelled) {
-                activity?.runOnUiThread {
-                    dismissAllowingStateLoss()
-                    onComplete()
+                    observer.start(viewLifecycleOwner.lifecycleScope)
+                    delay(50)
                 }
             }
         }
     }
 
-    private fun tcpCheck(ip: String, port: Int, timeoutMs: Int): Int? {
-        val start = System.currentTimeMillis()
-        try {
-            Socket().use { socket ->
-                socket.connect(InetSocketAddress(ip, port), timeoutMs)
-            }
-            return (System.currentTimeMillis() - start).toInt()
-        } catch (e: Exception) {
-            return null
+    private fun updateProgress() {
+        if (view == null) return
+
+        completed = min(completed + 1, servers.size)
+
+        progressBar.progress = completed
+        progressText.text = getString(R.string.servers_ping_state, completed, servers.size)
+
+        if (completed >= servers.size && !cancelled && isAdded) {
+            parentFragmentManager.setFragmentResult(RESULT_KEY, Bundle().apply {
+                putParcelableArrayList(RESULT_EXTRA, servers)
+            })
+            dismissAllowingStateLoss()
         }
     }
 
     override fun onDestroyView() {
         cancelled = true
-        threadPool.shutdownNow()
+        job?.cancel()
+        observers.forEach { it.stop() }
+        observers.clear()
         super.onDestroyView()
     }
 }
+
+val Bundle.pingServers: ArrayList<ServerItem>?
+    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        getParcelableArrayList(PingServersDialog.RESULT_EXTRA, ServerItem::class.java)
+    else
+        @Suppress("DEPRECATION") getParcelableArrayList(PingServersDialog.RESULT_EXTRA)

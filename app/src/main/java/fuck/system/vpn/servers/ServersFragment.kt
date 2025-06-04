@@ -2,6 +2,7 @@ package fuck.system.vpn.servers
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -24,6 +25,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import fuck.system.vpn.servers.dialogs.PingServersDialog
 import fuck.system.vpn.servers.dialogs.MenuServerDialog
+import fuck.system.vpn.servers.dialogs.pingServers
 import fuck.system.vpn.servers.server.ServerAdapter
 import fuck.system.vpn.servers.server.ServerItem
 import fuck.system.vpn.servers.server.ServerStorage
@@ -39,8 +41,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     private val vpnServers = mutableListOf<ServerItem>()
     private var filteredServers = mutableListOf<ServerItem>()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
-    {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = view.findViewById(R.id.recyclerServers)
@@ -53,88 +54,99 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         })
         recyclerView.adapter = adapter
 
-        setupButtons(view)
-        initializeServers()
-
-        parentFragmentManager.setFragmentResultListener(CountryFilterDialog.KEY, this) { _, _ ->
+        parentFragmentManager.setFragmentResultListener(
+            CountryFilterDialog.KEY, this) { _, _ ->
             updateServersWithPing()
         }
-        parentFragmentManager.setFragmentResultListener(MenuServerDialog.RESULT_KEY, this) { _, bundle ->
-            val action = bundle.getString(MenuServerDialog.EXTRA_ACTION)
-            val position = bundle.getInt(MenuServerDialog.EXTRA_POSITION)
-            if (position in filteredServers.indices) {
-                val server = filteredServers[position]
-                when (action) {
-                    MenuServerDialog.ACTION_CONNECT -> openStatusFragmentWithServer(server)
-                    MenuServerDialog.ACTION_FAVORITE -> {
-                        server.favorite = !server.favorite
-                        ServerStorage.saveAll(requireContext(), vpnServers)
-                        updateServers()
-                    }
-                    MenuServerDialog.ACTION_DELETE -> {
-                        vpnServers.removeIf { it.ip == server.ip }
-                        ServerStorage.saveAll(requireContext(), vpnServers)
-                        updateServers()
-                    }
+
+        parentFragmentManager.setFragmentResultListener(
+            MenuServerDialog.RESULT_KEY, this) { _, bundle ->
+            onServerMenuAction(bundle)
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            GetServersDialog.RESULT_KEY, this) { _, bundle ->
+            onServersLoaded(bundle)
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            PingServersDialog.RESULT_KEY, this) { _, result ->
+            onPingUpdated(result)
+        }
+
+        setupButtons(view)
+        openGetServersDialog()
+    }
+
+    private fun onServerMenuAction(bundle: Bundle)
+    {
+        val action = bundle.getString(MenuServerDialog.EXTRA_ACTION)
+        val position = bundle.getInt(MenuServerDialog.EXTRA_POSITION)
+        if (position in filteredServers.indices) {
+            val server = filteredServers[position]
+            when (action) {
+                MenuServerDialog.ACTION_CONNECT -> openStatusFragmentWithServer(server)
+                MenuServerDialog.ACTION_FAVORITE -> {
+                    server.favorite = !server.favorite
+                    ServerStorage.saveAll(requireContext(), vpnServers)
+                    updateServers()
+                }
+                MenuServerDialog.ACTION_DELETE -> {
+                    vpnServers.removeIf { it.ip == server.ip }
+                    ServerStorage.saveAll(requireContext(), vpnServers)
+                    updateServers()
                 }
             }
         }
     }
 
-    private fun initializeServers()
+    private fun onServersLoaded(bundle: Bundle)
     {
-        // Список избранных, которые надо сохранить всегда!
-        val favorites = vpnServers.filter { it.favorite }
-
-        val dialog = GetServersDialog.newInstance(githubCsv) { csv ->
-            if (!csv.isNullOrBlank()) {
-                val reader = csv.reader().buffered()
-                val parsed = ServersParser.parseCsv(reader)
-                vpnServers.clear()
-                // Сначала избранные, которых нет в новых данных
-                val nonDuplicatedFavorites = favorites.filter { fav ->
-                    parsed.none { it.ip == fav.ip }
-                }
-                vpnServers.addAll(parsed)
-                vpnServers.addAll(nonDuplicatedFavorites)
-                ServerStorage.saveAll(requireContext(), vpnServers)
-                updateServersWithPing()
-            } else {
-                // Не удалось скачать — берем из storage
-                vpnServers.clear()
-                vpnServers.addAll(ServerStorage.loadAll(requireContext()))
-                if (vpnServers.isEmpty()) {
-                    loadServersFromAssets(requireContext())
-                } else {
-                    updateServersWithPing()
-                }
-            }
+        val csv = bundle.getString(GetServersDialog.RESULT_EXTRA)
+        if (!csv.isNullOrBlank()) {
+            val reader = csv.reader().buffered()
+            val parsed = ServersParser.parseCsv(reader)
+            vpnServers.clear()
+            vpnServers.addAll(parsed)
+            ServerStorage.saveAll(requireContext(), vpnServers)
+            updateServersWithPing()
+        } else {
+            Toast.makeText(requireContext(), "Ошибка загрузки списка!", Toast.LENGTH_SHORT).show()
         }
-        dialog.show(parentFragmentManager, GetServersDialog.TAG)
+    }
+
+    private fun onPingUpdated(result: Bundle) {
+        val updatedServers = result.pingServers ?: return
+        vpnServers.clear()
+        vpnServers.addAll(updatedServers)
+        ServerStorage.saveAll(requireContext(), vpnServers)
+        updateServers()
     }
 
     override fun onResume() {
         super.onResume()
-        // Восстановить выбранную кнопку в нижнем меню
-        val navView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        navView.menu.findItem(R.id.nav_servers).isChecked = true
+        requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+            .menu.findItem(R.id.nav_servers).isChecked = true
 
-        context?.let { updateServers() }
+        updateServers()
     }
 
-    private fun setupButtons(view: View)
-    {
-        view.findViewById<Button>(R.id.ServersButtonFilter)
-            .setOnClickListener { openCountryFilterDialog() }
+    private fun setupButtons(view: View) {
+        view.findViewById<Button>(R.id.ServersButtonFilter).setOnClickListener {
+            openCountryFilterDialog()
+        }
 
-        view.findViewById<Button>(R.id.ServersButtonGetServers)
-            .setOnClickListener { openGetServersDialog() }
+        view.findViewById<Button>(R.id.ServersButtonGetServers).setOnClickListener {
+            openGetServersDialog()
+        }
 
-        view.findViewById<Button>(R.id.ServersButtonAddServer)
-            .setOnClickListener { openAddServerDialog() }
+        view.findViewById<Button>(R.id.ServersButtonAddServer).setOnClickListener {
+            openAddServerDialog()
+        }
 
-        view.findViewById<Button>(R.id.ServersButtonEmptyServers)
-            .setOnClickListener { openEmptyServersDialog() }
+        view.findViewById<Button>(R.id.ServersButtonEmptyServers).setOnClickListener {
+            openEmptyServersDialog()
+        }
     }
 
     private fun loadServersFromAssets(context: Context) {
@@ -161,19 +173,9 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     }
 
     private fun openGetServersDialog() {
-        val dialog = GetServersDialog.newInstance(githubCsv) { csv ->
-            if (!csv.isNullOrBlank()) {
-                val reader = csv.reader().buffered()
-                val parsed = ServersParser.parseCsv(reader)
-                vpnServers.clear()
-                vpnServers.addAll(parsed)
-                ServerStorage.saveAll(requireContext(), vpnServers)
-                updateServersWithPing()
-            } else {
-                Toast.makeText(requireContext(), "Ошибка загрузки списка!", Toast.LENGTH_SHORT).show()
-            }
-        }
-        dialog.show(parentFragmentManager, GetServersDialog.TAG)
+        if (parentFragmentManager.findFragmentByTag(GetServersDialog.TAG)?.isAdded == true) return
+        GetServersDialog.newInstance(githubCsv)
+            .show(parentFragmentManager, GetServersDialog.TAG)
     }
 
     private fun openEmptyServersDialog() {
@@ -194,9 +196,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     }
 
     private fun updateServersWithPing() {
-        val dialog = PingServersDialog(vpnServers) {
-            updateServers()
-        }
+        val dialog = PingServersDialog.newInstance(vpnServers)
         dialog.show(parentFragmentManager, PingServersDialog.TAG)
     }
 
@@ -221,15 +221,13 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     }
 
     private fun extractUniqueCountryCodes(): List<String> {
-        return vpnServers.mapNotNull { it.country }
-            .distinct()
-            .sorted()
+        return vpnServers.mapNotNull { it.country }.distinct().sorted()
     }
 
     private fun openCountryFilterDialog() {
         val uniqueCountryCodes = extractUniqueCountryCodes()
-        val dialog = CountryFilterDialog.newInstance(uniqueCountryCodes)
-        dialog.show(parentFragmentManager, CountryFilterDialog.TAG)
+        CountryFilterDialog.newInstance(uniqueCountryCodes)
+            .show(parentFragmentManager, CountryFilterDialog.TAG)
     }
 
     private fun openStatusFragmentWithServer(server: ServerItem) {

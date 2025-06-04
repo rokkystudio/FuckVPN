@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -30,6 +31,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     kotlinOptions {
         jvmTarget = "11"

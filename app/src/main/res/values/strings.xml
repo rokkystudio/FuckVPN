@@ -17,7 +17,7 @@
     <string name="servers_country_filter">Select country</string>
 
     <string name="servers_get_title">Download servers</string>
-    <string name="servers_get_loading">Server list loading</string>
+    <string name="servers_get_loading">Server list loading …</string>
     <string name="servers_get_loading_percent">Download: %1$d%%</string>
 
     <string name="country_filter_title">Select countries</string>
@@ -38,6 +38,7 @@
     <string name="status_country_flag">Country flag</string>
     <string name="status_connect">Connect</string>
     <string name="status_disconnect">Disconnect</string>
+    <string name="repeat">Try Again</string>
 
 
 </resources>

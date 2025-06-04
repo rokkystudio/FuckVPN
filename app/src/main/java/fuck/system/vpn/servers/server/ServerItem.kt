@@ -1,11 +1,15 @@
 package fuck.system.vpn.servers.server;
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class ServerItem(
-    val name: String,                // Название сервера или хост
-    val ovpn: String,                // OpenVPN-конфиг (расшифрованный)
-    var favorite: Boolean = false,   // Избранный сервер
-    val ip: String? = null,          // Заполняется позже из ovpn файла
-    val port: Int? = null,           // Заполняется позже из ovpn файла
-    val country: String? = null,     // Короткое имя страны
-    var ping: Int? = null            // Выполняется после добавления серверов
-)
+    val name: String,
+    val ovpn: String,
+    var favorite: Boolean = false,
+    val ip: String? = null,
+    val port: Int? = null,
+    val country: String? = null,
+    var ping: Int? = null
+) : Parcelable
