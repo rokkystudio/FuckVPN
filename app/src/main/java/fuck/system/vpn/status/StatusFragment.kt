@@ -12,7 +12,7 @@ import fuck.system.vpn.servers.server.ServerItem
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.OpenVPNService
 import de.blinkt.openvpn.core.ProfileManager
-import fuck.system.vpn.servers.server.ServerFlag
+import fuck.system.vpn.servers.server.ServerGeo
 
 class StatusFragment : Fragment(R.layout.fragment_status)
 {
@@ -165,9 +165,9 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         textName.text = server.name
         textIp.text = "IP: ${server.ip ?: "-"}"
         textPort.text = "Port: ${server.port?.toString() ?: "-"}"
-        textCountry.text = ServerFlag.getCountry(server.country)
+        textCountry.text = ServerGeo.getCountry(server.country)
         textPing.text = "Ping: ${server.ping?.toString() ?: "-"}"
-        imageFlag.setImageResource(ServerFlag.getFlag(server.country))
+        imageFlag.setImageResource(ServerGeo.getFlag(server.country))
         buttonConnectDisconnect.isEnabled = true
     }
 

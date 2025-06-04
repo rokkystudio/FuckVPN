@@ -2,7 +2,7 @@ package fuck.system.vpn.servers
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -28,8 +28,10 @@ import fuck.system.vpn.servers.dialogs.MenuServerDialog
 import fuck.system.vpn.servers.dialogs.pingServers
 import fuck.system.vpn.servers.server.ServerAdapter
 import fuck.system.vpn.servers.server.ServerItem
-import fuck.system.vpn.servers.server.ServerStorage
+import fuck.system.vpn.servers.server.ServersStorage
 import fuck.system.vpn.status.LastServerStorage
+import kotlin.collections.addAll
+import kotlin.text.clear
 
 class ServersFragment : Fragment(R.layout.fragment_servers)
 {
@@ -41,7 +43,26 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     private val vpnServers = mutableListOf<ServerItem>()
     private var filteredServers = mutableListOf<ServerItem>()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+        if (key == "servers") {
+            vpnServers.clear()
+            vpnServers.addAll(ServersStorage.load(requireContext()))
+            updateServers()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        ServersStorage.observe(requireContext(), prefsListener)
+    }
+
+    override fun onStop() {
+        ServersStorage.removeObserver(requireContext(), prefsListener)
+        super.onStop()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = view.findViewById(R.id.recyclerServers)
@@ -65,11 +86,6 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         }
 
         parentFragmentManager.setFragmentResultListener(
-            GetServersDialog.RESULT_KEY, this) { _, bundle ->
-            onServersLoaded(bundle)
-        }
-
-        parentFragmentManager.setFragmentResultListener(
             PingServersDialog.RESULT_KEY, this) { _, result ->
             onPingUpdated(result)
         }
@@ -88,30 +104,15 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
                 MenuServerDialog.ACTION_CONNECT -> openStatusFragmentWithServer(server)
                 MenuServerDialog.ACTION_FAVORITE -> {
                     server.favorite = !server.favorite
-                    ServerStorage.saveAll(requireContext(), vpnServers)
+                    ServersStorage.save(requireContext(), vpnServers)
                     updateServers()
                 }
                 MenuServerDialog.ACTION_DELETE -> {
                     vpnServers.removeIf { it.ip == server.ip }
-                    ServerStorage.saveAll(requireContext(), vpnServers)
+                    ServersStorage.save(requireContext(), vpnServers)
                     updateServers()
                 }
             }
-        }
-    }
-
-    private fun onServersLoaded(bundle: Bundle)
-    {
-        val csv = bundle.getString(GetServersDialog.RESULT_EXTRA)
-        if (!csv.isNullOrBlank()) {
-            val reader = csv.reader().buffered()
-            val parsed = ServersParser.parseCsv(reader)
-            vpnServers.clear()
-            vpnServers.addAll(parsed)
-            ServerStorage.saveAll(requireContext(), vpnServers)
-            updateServersWithPing()
-        } else {
-            Toast.makeText(requireContext(), "Ошибка загрузки списка!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -119,7 +120,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         val updatedServers = result.pingServers ?: return
         vpnServers.clear()
         vpnServers.addAll(updatedServers)
-        ServerStorage.saveAll(requireContext(), vpnServers)
+        ServersStorage.save(requireContext(), vpnServers)
         updateServers()
     }
 
@@ -156,7 +157,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
                     val parsed = ServersParser.parseCsv(reader)
                     vpnServers.clear()
                     vpnServers.addAll(parsed)
-                    ServerStorage.saveAll(requireContext(), vpnServers)
+                    ServersStorage.save(requireContext(), vpnServers)
                     updateServersWithPing()
                 }
             }
@@ -191,7 +192,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
 
     private fun emptyServers() {
         vpnServers.clear()
-        ServerStorage.saveAll(requireContext(), vpnServers)
+        ServersStorage.save(requireContext(), vpnServers)
         updateServers()
     }
 

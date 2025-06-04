@@ -4,7 +4,7 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 import androidx.core.content.edit
-import fuck.system.vpn.servers.server.ServerFlag
+import fuck.system.vpn.servers.server.ServerGeo
 
 object CountryFilterStorage
 {
@@ -69,7 +69,7 @@ object CountryFilterStorage
     {
         val filterList = mutableListOf<CountryFilterItem>()
 
-        for ((country) in ServerFlag.countryNames) {
+        for ((country) in ServerGeo.countryNames) {
             filterList.add(
                 CountryFilterItem(country = country, enabled = true)
             )

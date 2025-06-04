@@ -3,15 +3,17 @@ package fuck.system.vpn.ping
 import android.content.Intent
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DefaultExecutor.isActive
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.io.FileDescriptor
 import java.io.FileInputStream
 
-class PingService : VpnService() {
-
+class PingService : VpnService()
+{
     private var tunInterface: ParcelFileDescriptor? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -40,11 +42,12 @@ class PingService : VpnService() {
         return START_NOT_STICKY
     }
 
-    private suspend fun processIncomingPackets(fd: FileDescriptor) {
+    private suspend fun processIncomingPackets(fd: FileDescriptor)
+    {
         val input = FileInputStream(fd)
         val buffer = ByteArray(32767)
 
-        while (isActive) {
+        while (coroutineContext.isActive) {
             val length = input.read(buffer)
             if (length > 0) {
                 val packet = buffer.copyOf(length)

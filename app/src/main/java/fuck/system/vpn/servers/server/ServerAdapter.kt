@@ -37,13 +37,13 @@ class ServerAdapter(
     {
         val server = servers[position]
 
-        holder.textCountry.text = ServerFlag.getCountry(server.country)
+        holder.textCountry.text = ServerGeo.getCountry(server.country)
         holder.textIp.text = server.ip
         holder.textPing.text = holder.textPing.context.getString(
             R.string.ping_value, server.ping?.toString() ?: "—")
 
         holder.textPing.setTextColor(getPingGradientColor(server.ping))
-        holder.imageFlag.setImageResource(ServerFlag.getFlag(server.country))
+        holder.imageFlag.setImageResource(ServerGeo.getFlag(server.country))
 
         val starRes = if (server.favorite) R.drawable.ic_servers_star_filled else R.drawable.ic_servers_star_outline
         holder.imageFavorite.setImageResource(starRes)

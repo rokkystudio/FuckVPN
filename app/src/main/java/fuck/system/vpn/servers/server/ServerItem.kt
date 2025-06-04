@@ -11,5 +11,6 @@ data class ServerItem(
     val ip: String? = null,
     val port: Int? = null,
     val country: String? = null,
-    var ping: Int? = null
+    var ping: Int? = null,
+    val proto: String? = null
 ) : Parcelable

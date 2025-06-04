@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 import fuck.system.vpn.R
-import fuck.system.vpn.servers.server.ServerFlag
+import fuck.system.vpn.servers.server.ServerGeo
 
 class CountryFilterAdapter(
     private val countries: List<CountryFilterItem>,
@@ -25,9 +25,9 @@ class CountryFilterAdapter(
     override fun onBindViewHolder(holder: CountryViewHolder, position: Int) {
         val item = countries[position]
 
-        holder.countryFilterName.text = ServerFlag.getCountry(item.country)
+        holder.countryFilterName.text = ServerGeo.getCountry(item.country)
         holder.countryFilterCheck.isChecked = item.enabled
-        holder.countryFilterFlag.setImageResource(ServerFlag.getFlag(item.country))
+        holder.countryFilterFlag.setImageResource(ServerGeo.getFlag(item.country))
 
         holder.itemView.setOnClickListener {
             onItemClicked(position)

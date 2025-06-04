@@ -1,11 +1,14 @@
 package fuck.system.vpn.servers.dialogs
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import fuck.system.vpn.R
+import fuck.system.vpn.parser.ServersParser
+import fuck.system.vpn.servers.server.ServersStorage
 import kotlinx.coroutines.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -16,8 +19,6 @@ class GetServersDialog : DialogFragment()
     companion object {
         const val TAG = "GetServersDialog"
         const val URL_KEY = "URL"
-        const val RESULT_KEY = "GetServersResult"
-        const val RESULT_EXTRA = "CSV"
 
         fun newInstance(csvUrl: String): GetServersDialog {
             val fragment = GetServersDialog()
@@ -49,7 +50,8 @@ class GetServersDialog : DialogFragment()
         return inflater.inflate(R.layout.dialog_get_servers, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
         super.onViewCreated(view, savedInstanceState)
 
         textMessage = view.findViewById(R.id.GetServersTextMessage)
@@ -76,34 +78,63 @@ class GetServersDialog : DialogFragment()
         }
     }
 
-    private fun startLoading()
-    {
+    private fun startLoading() {
         val urlStr = csvUrl ?: return
+
         progressBar.progress = 0
         percentView.text = ""
         errorActions.visibility = View.GONE
         textMessage.setText(R.string.servers_get_loading)
 
-        job = lifecycleScope.launch(Dispatchers.IO) {
-            val start = System.currentTimeMillis()
+        job = lifecycleScope.launch(Dispatchers.IO)
+        {
             val csv = try {
-                downloadCsvWithProgress(urlStr)
+                downloadUrl(urlStr)
             } catch (e: Exception) {
                 e.printStackTrace()
                 showError("Ошибка загрузки: ${e.message ?: "Unknown error"}")
                 null
             }
 
-            delay(max(0, 1000 - (System.currentTimeMillis() - start)))
-
-            if (!cancelled && isAdded && csv != null) {
+            if (csv != null) {
                 withContext(Dispatchers.Main) {
-                    parentFragmentManager.setFragmentResult(RESULT_KEY, Bundle().apply {
-                        putString(RESULT_EXTRA, csv)
-                    })
-                    dismissAllowingStateLoss()
+                    parseAndSaveCsv(csv)
+                    if (isAdded && !cancelled) {
+                        dismissAllowingStateLoss()
+                    }
                 }
             }
+        }
+    }
+
+    private fun parseAndSaveCsv(csv: String)
+    {
+        try {
+            val context = requireContext()
+
+            // Загрузка текущих серверов и отбор избранных
+            val current = ServersStorage.load(context)
+            val favorites = current.filter { it.favorite }
+
+            // Парсинг CSV
+            val reader = csv.reader().buffered()
+            val parsed = ServersParser.parseCsv(reader)
+
+            // Создаём карту избранных по IP
+            val resultMap = favorites.associateBy { it.ip }.toMutableMap()
+
+            // Добавляем сервера из CSV, если таких IP ещё нет
+            for (server in parsed) {
+                if (!resultMap.containsKey(server.ip)) {
+                    resultMap[server.ip] = server
+                }
+            }
+
+            // Сохраняем объединённый список
+            ServersStorage.save(context, resultMap.values.toList())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            showError("Ошибка обработки CSV: ${e.message ?: "Unknown error"}")
         }
     }
 
@@ -117,7 +148,8 @@ class GetServersDialog : DialogFragment()
         }
     }
 
-    private fun downloadCsvWithProgress(urlStr: String): String? {
+    private fun downloadUrl(urlStr: String): String?
+    {
         val url = URL(urlStr)
         val connection = url.openConnection() as HttpURLConnection
         connection.connectTimeout = 8000
@@ -130,11 +162,12 @@ class GetServersDialog : DialogFragment()
 
         val length = connection.contentLength
         connection.inputStream.use { inputStream ->
-            return readStreamWithProgress(inputStream, length)
+            return readStream(inputStream, length)
         }
     }
 
-    private fun readStreamWithProgress(inputStream: java.io.InputStream, totalLength: Int): String {
+    private fun readStream(inputStream: java.io.InputStream, totalLength: Int): String
+    {
         val buffer = ByteArray(4096)
         val out = StringBuilder()
         var totalRead = 0
@@ -144,14 +177,14 @@ class GetServersDialog : DialogFragment()
         while (inputStream.read(buffer).also { read = it } != -1 && !cancelled) {
             out.append(String(buffer, 0, read))
             totalRead += read
-            lastProgress = maybeUpdateProgress(totalRead, totalLength, lastProgress)
+            lastProgress = updateProgress(totalRead, totalLength, lastProgress)
         }
 
         showFinalProgress()
         return out.toString()
     }
 
-    private fun maybeUpdateProgress(totalRead: Int, totalLength: Int, lastProgress: Int): Int {
+    private fun updateProgress(totalRead: Int, totalLength: Int, lastProgress: Int): Int {
         if (totalLength <= 0 || !isAdded) return lastProgress
 
         val progress = (totalRead * 100) / totalLength

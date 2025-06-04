@@ -1,15 +1,50 @@
 package fuck.system.vpn.servers.server;
 
+import android.content.Context
+import com.maxmind.geoip2.DatabaseReader
 import fuck.system.vpn.R
+import java.net.InetAddress
 
-object ServerFlag
+object ServerGeo
 {
+    private const val UNKNOWN_CODE = "xx"
+    private const val UNKNOWN_COUNTRY = "Unknown"
+    private val UNKNOWN_FLAG = R.drawable.flag_xx
+
+
+    private var dbReader: DatabaseReader? = null
+
+    fun init(context: Context) {
+        if (dbReader == null) {
+            try {
+                val input = context.assets.open("geolite.mmdb")
+                dbReader = DatabaseReader.Builder(input).build()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getCountryByIp(ip: String): String {
+        var result = UNKNOWN_CODE
+        try {
+            val reader = dbReader ?: return result
+            val inetAddress = InetAddress.getByName(ip)
+            val response = reader.country(inetAddress)
+            val code = response.country.isoCode?.lowercase()
+            if (!code.isNullOrBlank()) result = code
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return result
+    }
+
     fun getFlag(countryCode: String?): Int {
-        return flagMap[countryCode] ?: R.drawable.flag_xx
+        return flagMap[countryCode] ?: UNKNOWN_FLAG
     }
 
     fun getCountry(countryCode: String?): String {
-        return countryNames[countryCode] ?: "Unknown"
+        return countryNames[countryCode] ?: UNKNOWN_COUNTRY
     }
 
     val countryNames = mapOf(
