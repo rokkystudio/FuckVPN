@@ -1,13 +1,10 @@
 package fuck.system.vpn.servers
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -15,14 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import fuck.system.vpn.R
-import fuck.system.vpn.parser.ServersParser
 import fuck.system.vpn.servers.dialogs.AddServerDialog
 import fuck.system.vpn.servers.filters.CountryFilterDialog
 import fuck.system.vpn.servers.filters.CountryFilterStorage
 import fuck.system.vpn.servers.dialogs.GetServersDialog
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
 import fuck.system.vpn.servers.dialogs.PingServersDialog
 import fuck.system.vpn.servers.dialogs.MenuServerDialog
 import fuck.system.vpn.servers.dialogs.pingServers
@@ -30,39 +23,113 @@ import fuck.system.vpn.servers.server.ServerAdapter
 import fuck.system.vpn.servers.server.ServerItem
 import fuck.system.vpn.servers.server.ServersStorage
 import fuck.system.vpn.status.LastServerStorage
-import kotlin.collections.addAll
-import kotlin.text.clear
 
+/**
+ * Фрагмент, отображающий список VPN-серверов, с возможностью обновления, фильтрации,
+ * добавления, удаления, а также запуска диалогов пинга и получения новых серверов.
+ */
 class ServersFragment : Fragment(R.layout.fragment_servers)
 {
+    /** URL с CSV-файлом серверов */
     private val githubCsv = "https://raw.githubusercontent.com/rokkystudio/VPN/master/app/src/main/assets/vpngate.csv"
-    private val assetCsv: String = "vpngate.csv"
 
+    /** Виджет со списком серверов */
     private lateinit var recyclerView: RecyclerView
+
+    /** Адаптер для отображения серверов */
     private lateinit var adapter: ServerAdapter
+
+    /** Основной список всех серверов */
     private val vpnServers = mutableListOf<ServerItem>()
+
+    /** Отфильтрованные серверы, отображаемые на экране */
     private var filteredServers = mutableListOf<ServerItem>()
 
+    /**
+     * Слушатель изменений SharedPreferences для серверов
+     */
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
         if (key == "servers") {
-            vpnServers.clear()
-            vpnServers.addAll(ServersStorage.load(requireContext()))
-            updateServers()
+            onServersChangedFromStorage()
         }
     }
 
+    /**
+     * Вызывается при изменении данных в SharedPreferences
+     */
+    private fun onServersChangedFromStorage()
+    {
+        val context = requireContext()
+        val newServers = ServersStorage.load(context)
+        val oldIps = vpnServers.mapNotNull { it.ip }.toSet()
+        val newIps = newServers.mapNotNull { it.ip }.toSet()
+
+        val added = newIps - oldIps
+        val removed = oldIps - newIps
+
+        if (added.isNotEmpty() || removed.isNotEmpty()) {
+            onServersChanged(newServers)
+        } else {
+            onServersUpdated(newServers)
+        }
+    }
+
+    /**
+     * Обнаружено добавление или удаление серверов
+     */
+    private fun onServersChanged(newServers: List<ServerItem>)
+    {
+        vpnServers.clear()
+        vpnServers.addAll(newServers)
+        updateServers()
+
+        PingServersDialog.newInstance(vpnServers)
+            .show(parentFragmentManager, PingServersDialog.TAG)
+    }
+
+    /**
+     * Обновляет данные серверов в списке vpnServers на основе newServers.
+     * Список не пересоздаётся, порядок сохраняется. Обновляются только поля по совпадающему IP.
+     */
+    private fun onServersUpdated(newServers: List<ServerItem>) {
+        val updatesByIp = newServers.associateBy { it.ip }
+
+        for (server in vpnServers) {
+            val updated = updatesByIp[server.ip]
+            if (updated != null) {
+                server.name = updated.name
+                server.ovpn = updated.ovpn
+                server.favorite = updated.favorite
+                server.country = updated.country
+                server.ping = updated.ping
+                server.port = updated.port
+                server.proto = updated.proto
+            }
+        }
+
+        updateServers()
+    }
+
+    /**
+     * Регистрирует наблюдение за изменением списка серверов
+     */
     override fun onStart() {
         super.onStart()
         ServersStorage.observe(requireContext(), prefsListener)
     }
 
+    /**
+     * Удаляет наблюдение за изменением списка серверов
+     */
     override fun onStop() {
         ServersStorage.removeObserver(requireContext(), prefsListener)
         super.onStop()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
-    {
+    /**
+     * Инициализация UI после создания View
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = view.findViewById(R.id.recyclerServers)
@@ -94,8 +161,10 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         openGetServersDialog()
     }
 
-    private fun onServerMenuAction(bundle: Bundle)
-    {
+    /**
+     * Обработка действия из контекстного меню сервера
+     */
+    private fun onServerMenuAction(bundle: Bundle) {
         val action = bundle.getString(MenuServerDialog.EXTRA_ACTION)
         val position = bundle.getInt(MenuServerDialog.EXTRA_POSITION)
         if (position in filteredServers.indices) {
@@ -116,6 +185,9 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         }
     }
 
+    /**
+     * Получает результат обновлённого пинга серверов
+     */
     private fun onPingUpdated(result: Bundle) {
         val updatedServers = result.pingServers ?: return
         vpnServers.clear()
@@ -124,6 +196,9 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         updateServers()
     }
 
+    /**
+     * Отмечает текущую вкладку как активную
+     */
     override fun onResume() {
         super.onResume()
         requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
@@ -132,6 +207,9 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         updateServers()
     }
 
+    /**
+     * Привязывает обработчики к кнопкам
+     */
     private fun setupButtons(view: View) {
         view.findViewById<Button>(R.id.ServersButtonFilter).setOnClickListener {
             openCountryFilterDialog()
@@ -150,22 +228,9 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         }
     }
 
-    private fun loadServersFromAssets(context: Context) {
-        try {
-            context.assets.open(assetCsv).use { inputStream ->
-                BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                    val parsed = ServersParser.parseCsv(reader)
-                    vpnServers.clear()
-                    vpnServers.addAll(parsed)
-                    ServersStorage.save(requireContext(), vpnServers)
-                    updateServersWithPing()
-                }
-            }
-        } catch (e: IOException) {
-            Log.e("VPN", "Ошибка чтения $assetCsv из assets", e)
-        }
-    }
-
+    /**
+     * Открывает диалог добавления нового сервера
+     */
     private fun openAddServerDialog() {
         AddServerDialog.newInstance { newServer ->
             vpnServers.add(newServer)
@@ -173,12 +238,18 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         }.show(parentFragmentManager, AddServerDialog.TAG)
     }
 
+    /**
+     * Открывает диалог загрузки серверов
+     */
     private fun openGetServersDialog() {
         if (parentFragmentManager.findFragmentByTag(GetServersDialog.TAG)?.isAdded == true) return
         GetServersDialog.newInstance(githubCsv)
             .show(parentFragmentManager, GetServersDialog.TAG)
     }
 
+    /**
+     * Показывает подтверждение очистки списка серверов
+     */
     private fun openEmptyServersDialog() {
         AlertDialog.Builder(requireContext())
             .setTitle("Очистка списка серверов")
@@ -190,17 +261,24 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
             .show()
     }
 
+    /**
+     * Полная очистка списка серверов
+     */
     private fun emptyServers() {
         vpnServers.clear()
         ServersStorage.save(requireContext(), vpnServers)
         updateServers()
     }
 
+    /**
+     * Запускает диалог пинга для всех серверов
+     */
     private fun updateServersWithPing() {
         val dialog = PingServersDialog.newInstance(vpnServers)
         dialog.show(parentFragmentManager, PingServersDialog.TAG)
     }
 
+    /** Обновляет список отображаемых серверов с учётом фильтров */
     @SuppressLint("NotifyDataSetChanged")
     private fun updateServers() {
         val countryFilters = CountryFilterStorage.loadAll(requireContext())
@@ -221,16 +299,25 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         adapter.notifyDataSetChanged()
     }
 
+    /**
+     * Извлекает список уникальных стран из серверов
+     */
     private fun extractUniqueCountryCodes(): List<String> {
         return vpnServers.mapNotNull { it.country }.distinct().sorted()
     }
 
+    /**
+     * Открывает диалог фильтрации по странам
+     */
     private fun openCountryFilterDialog() {
         val uniqueCountryCodes = extractUniqueCountryCodes()
         CountryFilterDialog.newInstance(uniqueCountryCodes)
             .show(parentFragmentManager, CountryFilterDialog.TAG)
     }
 
+    /**
+     * Переход к статусу и подключению к выбранному серверу
+     */
     private fun openStatusFragmentWithServer(server: ServerItem) {
         LastServerStorage.save(requireContext(), server)
         LastServerStorage.setAutoConnect(requireContext(), true)

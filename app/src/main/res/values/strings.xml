@@ -40,5 +40,9 @@
     <string name="status_disconnect">Disconnect</string>
     <string name="repeat">Try Again</string>
 
+    <string name="servers_updated">Updated %1$d servers</string>
+    <string name="servers_update_failed">Failed to update servers</string>
+    <string name="servers_loaded_from_assets">Loaded %1$d servers from file</string>
+    <string name="servers_assets_error">Error loading from assets: %1$s</string>
 
 </resources>

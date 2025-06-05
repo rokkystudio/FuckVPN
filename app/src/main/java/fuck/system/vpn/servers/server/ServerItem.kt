@@ -5,12 +5,12 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ServerItem(
-    val name: String,
-    val ovpn: String,
+    var name: String,
+    var ovpn: String,
     var favorite: Boolean = false,
-    val ip: String? = null,
-    val port: Int? = null,
-    val country: String? = null,
+    var ip: String? = null,
+    var port: Int? = null,
+    var country: String? = null,
     var ping: Int? = null,
-    val proto: String? = null
+    var proto: String? = null
 ) : Parcelable

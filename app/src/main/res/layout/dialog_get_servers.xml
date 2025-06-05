@@ -39,19 +39,9 @@
         android:paddingTop="12dp">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/GetServersRetryButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="16dp"
-            android:text="@string/repeat" />
-
-        <com.google.android.material.button.MaterialButton
             android:id="@+id/GetServersCloseButton"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/close"
-            android:layout_marginStart="16dp" />
+            android:text="@string/close" />
     </LinearLayout>
 </LinearLayout>
