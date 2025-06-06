@@ -15,7 +15,6 @@ import fuck.system.vpn.R
 import fuck.system.vpn.servers.dialogs.AddServerDialog
 import fuck.system.vpn.servers.filters.CountryFilterDialog
 import fuck.system.vpn.servers.filters.CountryFilterStorage
-import fuck.system.vpn.servers.dialogs.GetServersDialog
 import fuck.system.vpn.servers.dialogs.PingServersDialog
 import fuck.system.vpn.servers.dialogs.MenuServerDialog
 import fuck.system.vpn.servers.server.ServerAdapter

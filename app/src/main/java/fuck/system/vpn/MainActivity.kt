@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import fuck.system.vpn.databinding.ActivityMainBinding
-import fuck.system.vpn.servers.dialogs.GetServersDialog
+import fuck.system.vpn.servers.dialogs.GetServersDialogAlert
 
 class MainActivity : AppCompatActivity()
 {
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity()
 
         dialogRunnable = Runnable {
             if (!isFinishing && !isDestroyed) {
-                GetServersDialog(this, this).show()
+                GetServersDialogAlert(this, this).show()
             }
         }
 

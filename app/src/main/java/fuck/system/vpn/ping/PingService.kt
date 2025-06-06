@@ -9,12 +9,14 @@ import java.io.FileDescriptor
 import java.io.FileInputStream
 import kotlin.coroutines.coroutineContext
 
-class PingService : VpnService() {
+class PingService : VpnService()
+{
     private var tunInterface: ParcelFileDescriptor? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private var clientMessenger: Messenger? = null
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
+    {
         val context = applicationContext
 
         // Загружаем список серверов из ServersStorage

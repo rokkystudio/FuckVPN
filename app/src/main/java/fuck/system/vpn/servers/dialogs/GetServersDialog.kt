@@ -1,13 +1,10 @@
 package fuck.system.vpn.servers.dialogs
 
-import android.app.AlertDialog
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
-import androidx.lifecycle.LifecycleOwner
+import android.os.Bundle
+import android.view.*
+import android.widget.*
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import fuck.system.vpn.R
 import fuck.system.vpn.parser.ServersParser
@@ -18,76 +15,118 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-class GetServersDialog(private val context: Context, private val lifecycleOwner: LifecycleOwner) {
+class GetServersDialog : DialogFragment() {
 
     companion object {
+        const val TAG = "GetServersDialog"
         private const val githubCsv = "https://raw.githubusercontent.com/rokkystudio/VPN/master/app/src/main/assets/vpngate.csv"
         private const val assetCsv = "vpngate.csv"
+        private const val estimatedSize = 1024 * 1024 // Примерный размер файла в байтах
     }
 
-    private var dialog: AlertDialog? = null
+    private lateinit var textMessage: TextView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var percentView: TextView
+    private lateinit var closeButton: Button
+
+    @Volatile private var cancelled = false
     private var job: Job? = null
-    private var cancelled = false
+    private var hasStarted = false
 
-    fun show() {
-        val inflater = LayoutInflater.from(context)
-        val view = inflater.inflate(R.layout.dialog_get_servers, null)
+    /**
+     * Подключает layout-ресурс
+     */
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.dialog_get_servers, container, false)
+    }
 
-        val textMessage = view.findViewById<TextView>(R.id.GetServersTextMessage)
-        val progressBar = view.findViewById<ProgressBar>(R.id.GetServersProgressBar)
-        val percentView = view.findViewById<TextView>(R.id.GetServersPercentText)
-        val closeButton = view.findViewById<View>(R.id.GetServersCloseButton)
+    /**
+     * Инициализирует элементы интерфейса и запускает загрузку серверов
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val builder = AlertDialog.Builder(context)
-            .setCancelable(false)
-            .setView(view)
-
-        dialog = builder.create()
-        dialog?.show()
+        textMessage = view.findViewById(R.id.GetServersTextMessage)
+        progressBar = view.findViewById(R.id.GetServersProgressBar)
+        percentView = view.findViewById(R.id.GetServersPercentText)
+        closeButton = view.findViewById(R.id.GetServersCloseButton)
 
         closeButton.setOnClickListener {
             cancelled = true
-            dialog?.dismiss()
+            dismissAllowingStateLoss()
         }
 
-        // Запускаем загрузку серверов с безопасной корутиной
-        job = lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val csv = downloadUrl(githubCsv, progressBar, percentView)
+        if (!hasStarted) {
+            hasStarted = true
+            startLoading()
+        }
+    }
+
+    /**
+     * Запускает фоновую корутину для загрузки серверов из сети или fallback из assets
+     */
+    private fun startLoading() {
+        progressBar.progress = 0
+        percentView.text = ""
+        textMessage.setText(R.string.servers_get_loading)
+
+        val context = requireContext()
+
+        job = requireActivity().lifecycleScope.launch(Dispatchers.IO) {
+            val csv = downloadUrl(githubCsv)
 
             withContext(Dispatchers.Main) {
-                if (cancelled) return@withContext
+                if (!isAdded || cancelled) return@withContext
+
                 if (csv != null) {
-                    onSuccess(csv)
+                    onSuccess(csv, context)
                 } else {
-                    onFailure()
+                    onFailure(context)
                 }
-                dialog?.dismiss()
             }
         }
     }
 
-    private fun onSuccess(csv: String) {
+    /**
+     * Обрабатывает успешную загрузку CSV, парсит и сохраняет список
+     */
+    private fun onSuccess(csv: String, context: Context) {
         val count = parseAndSaveCsv(csv)
-        Toast.makeText(context, context.getString(R.string.servers_updated, count), Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, getString(R.string.servers_updated, count), Toast.LENGTH_SHORT).show()
+        dismissAllowingStateLoss()
     }
 
-    private fun onFailure() {
-        Toast.makeText(context, context.getString(R.string.servers_update_failed), Toast.LENGTH_SHORT).show()
+    /**
+     * Обрабатывает неудачную загрузку: пробует загрузить из кэша или из assets
+     */
+    private fun onFailure(context: Context) {
+        Toast.makeText(context, getString(R.string.servers_update_failed), Toast.LENGTH_SHORT).show()
+
         val existing = ServersStorage.load(context)
-        if (existing.isNotEmpty()) return
+        if (existing.isNotEmpty()) {
+            dismissAllowingStateLoss()
+            return
+        }
 
         try {
             val input = context.assets.open(assetCsv)
             val reader = BufferedReader(InputStreamReader(input))
             val parsed = ServersParser.parseCsv(reader)
             ServersStorage.save(context, parsed)
-            Toast.makeText(context, context.getString(R.string.servers_loaded_from_assets, parsed.size), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.servers_loaded_from_assets, parsed.size), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Toast.makeText(context, context.getString(R.string.servers_assets_error, e.message), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.servers_assets_error, e.message), Toast.LENGTH_LONG).show()
+        } finally {
+            dismissAllowingStateLoss()
         }
     }
 
+    /**
+     * Парсит CSV, сохраняет, при этом восстанавливает избранные из старого списка
+     * @return Кол-во серверов после объединения
+     */
     private fun parseAndSaveCsv(csv: String): Int {
+        val context = requireContext()
         val current = ServersStorage.load(context)
         val favorites = current.filter { it.favorite }
 
@@ -105,7 +144,10 @@ class GetServersDialog(private val context: Context, private val lifecycleOwner:
         return resultMap.size
     }
 
-    private suspend fun downloadUrl(urlStr: String, progressBar: ProgressBar, percentView: TextView): String? = withContext(Dispatchers.IO) {
+    /**
+     * Загружает CSV-файл с серверами по URL, если удачно — возвращает содержимое
+     */
+    private suspend fun downloadUrl(urlStr: String): String? = withContext(Dispatchers.IO) {
         var result: String? = null
 
         try {
@@ -116,7 +158,8 @@ class GetServersDialog(private val context: Context, private val lifecycleOwner:
 
             if (connection.responseCode == 200) {
                 connection.inputStream.use { inputStream ->
-                    result = readStream(inputStream, connection.contentLength, progressBar, percentView)
+                    val length = if (connection.contentLength > 0) connection.contentLength else estimatedSize
+                    result = readStream(inputStream, length)
                 }
             }
         } catch (e: Exception) {
@@ -126,49 +169,45 @@ class GetServersDialog(private val context: Context, private val lifecycleOwner:
         return@withContext result
     }
 
-    private fun readStream(
-        inputStream: java.io.InputStream,
-        totalLength: Int,
-        progressBar: ProgressBar,
-        percentView: TextView
-    ): String {
+    /**
+     * Читает входной поток как строку, отображает прогресс
+     */
+    private fun readStream(inputStream: java.io.InputStream, totalLength: Int): String {
         val buffer = ByteArray(4096)
         val out = StringBuilder()
         var totalRead = 0
         var read: Int
-
-        // Примерный размер CSV-файла в байтах (можно подкорректировать)
-        val estimatedSize = 1_000_000
-        val expectedLength = if (totalLength <= 0) estimatedSize else totalLength
-
         var lastProgress = -1
 
         while (inputStream.read(buffer).also { read = it } != -1 && !cancelled) {
             out.append(String(buffer, 0, read))
             totalRead += read
 
-            val progress = (totalRead * 100) / expectedLength
+            val progress = (totalRead * 100) / totalLength
             if (progress != lastProgress && progress <= 100) {
                 lastProgress = progress
-                lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                lifecycleScope.launch(Dispatchers.Main) {
                     progressBar.progress = progress
-                    percentView.text = context.getString(R.string.servers_get_loading_percent, progress)
+                    percentView.text = getString(R.string.servers_get_loading_percent, progress)
                 }
             }
         }
 
         // Завершаем на 100%
-        lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+        lifecycleScope.launch(Dispatchers.Main) {
             progressBar.progress = 100
-            percentView.text = context.getString(R.string.servers_get_loading_percent, 100)
+            percentView.text = getString(R.string.servers_get_loading_percent, 100)
         }
 
         return out.toString()
     }
 
-    fun dismiss() {
+    /**
+     * Отмена загрузки и очистка ресурсов при уничтожении view
+     */
+    override fun onDestroyView() {
         cancelled = true
         job?.cancel()
-        dialog?.dismiss()
+        super.onDestroyView()
     }
 }

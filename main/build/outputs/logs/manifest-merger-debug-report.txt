@@ -1,200 +1,200 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:2:1-121:12
-INJECTED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:2:1-121:12
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:2:1-121:12
+INJECTED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:2:1-121:12
 	package
-		INJECTED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml
+		INJECTED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:2:11-69
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:2:11-69
 application
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:4:5-120:19
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:4:5-120:19
 meta-data#android.content.APP_RESTRICTIONS
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:7:9-9:56
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:7:9-9:56
 	android:resource
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:9:13-53
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:9:13-53
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:8:13-60
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:8:13-60
 activity#de.blinkt.openvpn.activities.DisconnectVPN
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:11:9-17:52
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:11:9-17:52
 	android:excludeFromRecents
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:14:13-46
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:14:13-46
 	android:autoRemoveFromRecents
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:13:13-49
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:13:13-49
 	android:noHistory
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:15:13-37
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:15:13-37
 	android:theme
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:17:13-49
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:17:13-49
 	android:taskAffinity
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:16:13-50
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:16:13-50
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:12:13-53
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:12:13-53
 service#de.blinkt.openvpn.core.OpenVPNService
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:19:9-29:19
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:19:9-29:19
 	android:process
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:24:13-39
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:24:13-39
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:21:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:21:13-36
 	android:permission
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:22:13-69
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:22:13-69
 	android:foregroundServiceType
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:23:13-55
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:23:13-55
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:20:13-48
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:20:13-48
 intent-filter#action:name:android.net.VpnService
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:25:13-27:29
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:25:13-27:29
 action#android.net.VpnService
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:26:17-65
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:26:17-65
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:26:25-62
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:26:25-62
 property#android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:28:13-104
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:28:13-104
 	android:value
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:28:83-102
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:28:83-102
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:28:23-82
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:28:23-82
 service#de.blinkt.openvpn.api.ExternalOpenVPNService
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:31:9-38:19
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:31:9-38:19
 	android:process
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:33:13-39
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:33:13-39
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:34:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:34:13-36
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:32:13-55
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:32:13-55
 intent-filter#action:name:de.blinkt.openvpn.api.IOpenVPNAPIService
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:35:13-37:29
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:35:13-37:29
 action#de.blinkt.openvpn.api.IOpenVPNAPIService
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:36:17-83
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:36:17-83
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:36:25-80
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:36:25-80
 service#de.blinkt.openvpn.core.OpenVPNStatusService
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:40:9-43:42
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:40:9-43:42
 	android:process
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:43:13-39
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:43:13-39
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:42:13-37
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:42:13-37
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:41:13-54
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:41:13-54
 activity#de.blinkt.openvpn.api.GrantPermissionsActivity
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:45:9-51:20
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:45:9-51:20
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:47:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:47:13-36
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:46:13-57
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:46:13-57
 intent-filter#action:name:android.intent.action.MAIN
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:48:13-50:29
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:48:13-50:29
 action#android.intent.action.MAIN
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:49:17-69
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:49:17-69
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:49:25-66
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:49:25-66
 activity#de.blinkt.openvpn.api.ConfirmDialog
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:53:9-59:20
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:53:9-59:20
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:55:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:55:13-36
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:54:13-46
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:54:13-46
 receiver#de.blinkt.openvpn.OnBootReceiver
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:61:9-68:20
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:61:9-68:20
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:63:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:63:13-36
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:62:13-43
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:62:13-43
 intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.MY_PACKAGE_REPLACED
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:64:13-67:29
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:64:13-67:29
 	android:priority
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:64:28-50
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:64:28-50
 action#android.intent.action.BOOT_COMPLETED
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:65:17-79
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:65:17-79
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:65:25-76
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:65:25-76
 action#android.intent.action.MY_PACKAGE_REPLACED
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:66:17-84
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:66:17-84
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:66:25-81
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:66:25-81
 service#de.blinkt.openvpn.core.keepVPNAlive
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:70:9-74:71
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:70:9-74:71
 	android:process
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:72:13-39
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:72:13-39
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:73:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:73:13-36
 	android:permission
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:74:13-69
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:74:13-69
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:71:13-46
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:71:13-46
 activity#de.blinkt.openvpn.LaunchVPN
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:76:9-88:20
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:76:9-88:20
 	android:label
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:80:13-53
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:80:13-53
 	android:excludeFromRecents
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:79:13-46
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:79:13-46
 	android:autoRemoveFromRecents
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:78:13-49
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:78:13-49
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:83:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:83:13-36
 	android:theme
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:82:13-49
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:82:13-49
 	android:taskAffinity
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:81:13-46
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:81:13-46
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:77:13-38
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:77:13-38
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.DEFAULT
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:84:13-87:29
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:84:13-87:29
 category#android.intent.category.DEFAULT
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:86:17-76
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:86:17-76
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:86:27-73
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:86:27-73
 activity#de.blinkt.openvpn.api.RemoteAction
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:90:9-98:15
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:90:9-98:15
 	android:excludeFromRecents
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:94:13-46
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:94:13-46
 	android:launchMode
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:92:13-48
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:92:13-48
 	android:autoRemoveFromRecents
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:93:13-49
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:93:13-49
 	android:noHistory
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:97:13-37
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:97:13-37
 	android:theme
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:96:13-49
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:96:13-49
 	android:taskAffinity
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:95:13-46
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:95:13-46
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:91:13-45
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:91:13-45
 activity-alias#de.blinkt.openvpn.api.ConnectVPN
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:100:9-103:58
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:100:9-103:58
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:102:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:102:13-36
 	android:targetActivity
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:103:13-55
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:103:13-55
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:101:13-43
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:101:13-43
 activity-alias#de.blinkt.openvpn.api.DisconnectVPN
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:105:9-108:58
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:105:9-108:58
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:107:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:107:13-36
 	android:targetActivity
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:108:13-55
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:108:13-55
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:106:13-46
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:106:13-46
 activity-alias#de.blinkt.openvpn.api.PauseVPN
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:110:9-113:58
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:110:9-113:58
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:112:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:112:13-36
 	android:targetActivity
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:113:13-55
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:113:13-55
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:111:13-41
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:111:13-41
 activity-alias#de.blinkt.openvpn.api.ResumeVPN
-ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:115:9-118:58
+ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:115:9-118:58
 	android:exported
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:117:13-36
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:117:13-36
 	android:targetActivity
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:118:13-55
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:118:13-55
 	android:name
-		ADDED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml:116:13-42
+		ADDED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml:116:13-42
 uses-sdk
-INJECTED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml
-INJECTED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml
+INJECTED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml
+INJECTED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml
 	android:targetSdkVersion
-		INJECTED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml
+		INJECTED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from C:\FILES\PROJECTS\FVPN\main\src\main\AndroidManifest.xml
+		INJECTED from D:\PROJECTS\FuckVPN\main\src\main\AndroidManifest.xml
