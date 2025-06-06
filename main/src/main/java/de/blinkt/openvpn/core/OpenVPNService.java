@@ -72,6 +72,8 @@ import de.blinkt.openvpn.core.VpnStatus.StateListener;
 
 public class OpenVPNService extends VpnService implements StateListener, Callback, ByteCountListener, IOpenVPNServiceInternal
 {
+    public static volatile Integer currentPing = null;
+
     private static volatile boolean connected = false;
 
     public static boolean isConnected() {

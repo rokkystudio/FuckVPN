@@ -18,7 +18,6 @@ import fuck.system.vpn.servers.filters.CountryFilterStorage
 import fuck.system.vpn.servers.dialogs.GetServersDialog
 import fuck.system.vpn.servers.dialogs.PingServersDialog
 import fuck.system.vpn.servers.dialogs.MenuServerDialog
-import fuck.system.vpn.servers.dialogs.pingServers
 import fuck.system.vpn.servers.server.ServerAdapter
 import fuck.system.vpn.servers.server.ServerItem
 import fuck.system.vpn.servers.server.ServersStorage
@@ -30,9 +29,6 @@ import fuck.system.vpn.status.LastServerStorage
  */
 class ServersFragment : Fragment(R.layout.fragment_servers)
 {
-    /** URL с CSV-файлом серверов */
-    private val githubCsv = "https://raw.githubusercontent.com/rokkystudio/VPN/master/app/src/main/assets/vpngate.csv"
-
     /** Виджет со списком серверов */
     private lateinit var recyclerView: RecyclerView
 
@@ -81,10 +77,9 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     {
         vpnServers.clear()
         vpnServers.addAll(newServers)
-        updateServers()
+        updateServersAdapter()
 
-        PingServersDialog.newInstance(vpnServers)
-            .show(parentFragmentManager, PingServersDialog.TAG)
+        PingServersDialog().show(parentFragmentManager, PingServersDialog.TAG)
     }
 
     /**
@@ -107,7 +102,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
             }
         }
 
-        updateServers()
+        updateServersAdapter()
     }
 
     /**
@@ -129,7 +124,8 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     /**
      * Инициализация UI после создания View
      */
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = view.findViewById(R.id.recyclerServers)
@@ -144,7 +140,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
 
         parentFragmentManager.setFragmentResultListener(
             CountryFilterDialog.KEY, this) { _, _ ->
-            updateServersWithPing()
+            updateServersAdapter()
         }
 
         parentFragmentManager.setFragmentResultListener(
@@ -152,48 +148,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
             onServerMenuAction(bundle)
         }
 
-        parentFragmentManager.setFragmentResultListener(
-            PingServersDialog.RESULT_KEY, this) { _, result ->
-            onPingUpdated(result)
-        }
-
         setupButtons(view)
-        openGetServersDialog()
-    }
-
-    /**
-     * Обработка действия из контекстного меню сервера
-     */
-    private fun onServerMenuAction(bundle: Bundle) {
-        val action = bundle.getString(MenuServerDialog.EXTRA_ACTION)
-        val position = bundle.getInt(MenuServerDialog.EXTRA_POSITION)
-        if (position in filteredServers.indices) {
-            val server = filteredServers[position]
-            when (action) {
-                MenuServerDialog.ACTION_CONNECT -> openStatusFragmentWithServer(server)
-                MenuServerDialog.ACTION_FAVORITE -> {
-                    server.favorite = !server.favorite
-                    ServersStorage.save(requireContext(), vpnServers)
-                    updateServers()
-                }
-                MenuServerDialog.ACTION_DELETE -> {
-                    vpnServers.removeIf { it.ip == server.ip }
-                    ServersStorage.save(requireContext(), vpnServers)
-                    updateServers()
-                }
-            }
-        }
-    }
-
-    /**
-     * Получает результат обновлённого пинга серверов
-     */
-    private fun onPingUpdated(result: Bundle) {
-        val updatedServers = result.pingServers ?: return
-        vpnServers.clear()
-        vpnServers.addAll(updatedServers)
-        ServersStorage.save(requireContext(), vpnServers)
-        updateServers()
     }
 
     /**
@@ -204,7 +159,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
             .menu.findItem(R.id.nav_servers).isChecked = true
 
-        updateServers()
+        updateServersAdapter()
     }
 
     /**
@@ -229,22 +184,46 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     }
 
     /**
+     * Обработка действия из контекстного меню сервера
+     */
+    private fun onServerMenuAction(bundle: Bundle)
+    {
+        val action = bundle.getString(MenuServerDialog.EXTRA_ACTION)
+        val position = bundle.getInt(MenuServerDialog.EXTRA_POSITION)
+        if (position in filteredServers.indices) {
+            val server = filteredServers[position]
+            when (action) {
+                MenuServerDialog.ACTION_CONNECT -> openStatusFragmentWithServer(server)
+                MenuServerDialog.ACTION_FAVORITE -> {
+                    server.favorite = !server.favorite
+                    ServersStorage.save(requireContext(), vpnServers)
+                    updateServersAdapter()
+                }
+                MenuServerDialog.ACTION_DELETE -> {
+                    vpnServers.removeIf { it.ip == server.ip }
+                    ServersStorage.save(requireContext(), vpnServers)
+                    updateServersAdapter()
+                }
+            }
+        }
+    }
+
+    /**
      * Открывает диалог добавления нового сервера
      */
     private fun openAddServerDialog() {
-        AddServerDialog.newInstance { newServer ->
-            vpnServers.add(newServer)
-            updateServersWithPing()
-        }.show(parentFragmentManager, AddServerDialog.TAG)
+        if (parentFragmentManager.findFragmentByTag(AddServerDialog.TAG)?.isAdded != true) {
+            AddServerDialog().show(parentFragmentManager, AddServerDialog.TAG)
+        }
     }
 
     /**
      * Открывает диалог загрузки серверов
      */
     private fun openGetServersDialog() {
-        if (parentFragmentManager.findFragmentByTag(GetServersDialog.TAG)?.isAdded == true) return
-        GetServersDialog.newInstance(githubCsv)
-            .show(parentFragmentManager, GetServersDialog.TAG)
+        //if (parentFragmentManager.findFragmentByTag(GetServersDialog.TAG)?.isAdded != true) {
+          //  GetServersDialog().show(parentFragmentManager, GetServersDialog.TAG)
+        //}
     }
 
     /**
@@ -267,20 +246,13 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     private fun emptyServers() {
         vpnServers.clear()
         ServersStorage.save(requireContext(), vpnServers)
-        updateServers()
-    }
-
-    /**
-     * Запускает диалог пинга для всех серверов
-     */
-    private fun updateServersWithPing() {
-        val dialog = PingServersDialog.newInstance(vpnServers)
-        dialog.show(parentFragmentManager, PingServersDialog.TAG)
+        updateServersAdapter()
     }
 
     /** Обновляет список отображаемых серверов с учётом фильтров */
     @SuppressLint("NotifyDataSetChanged")
-    private fun updateServers() {
+    private fun updateServersAdapter()
+    {
         val countryFilters = CountryFilterStorage.loadAll(requireContext())
 
         filteredServers.clear()

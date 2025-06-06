@@ -28,7 +28,9 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.*;
 
-public class OpenVpnManagementThread implements Runnable, OpenVPNManagement {
+public class OpenVpnManagementThread implements Runnable, OpenVPNManagement
+{
+    private long lastByteCountUpdate = 0;
 
     public static final int ORBOT_TIMEOUT_MS = 20 * 1000;
     private static final String TAG = "openvpn";
@@ -517,14 +519,24 @@ public class OpenVpnManagementThread implements Runnable, OpenVPNManagement {
             VpnStatus.updateStateString(currentstate, args[2]);
     }
 
-    private void processByteCount(String argument) {
+    private void processByteCount(String argument)
+    {
         //   >BYTECOUNT:{BYTES_IN},{BYTES_OUT}
+
+        long now = System.currentTimeMillis();
+
+        if (lastByteCountUpdate != 0) {
+            int rtt = (int)(now - lastByteCountUpdate);
+            OpenVPNService.currentPing = rtt;
+        }
+
+        lastByteCountUpdate = now;
+
         int comma = argument.indexOf(',');
         long in = Long.parseLong(argument.substring(0, comma));
         long out = Long.parseLong(argument.substring(comma + 1));
 
         VpnStatus.updateByteCount(in, out);
-
     }
 
     private void processNeedCommand(String argument) {

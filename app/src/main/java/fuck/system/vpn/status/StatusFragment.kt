@@ -2,24 +2,29 @@ package fuck.system.vpn.status
 
 import android.content.*
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import fuck.system.vpn.R
-import fuck.system.vpn.servers.server.ServerItem
 import de.blinkt.openvpn.VpnProfile
 import de.blinkt.openvpn.core.OpenVPNService
 import de.blinkt.openvpn.core.ProfileManager
+import fuck.system.vpn.R
 import fuck.system.vpn.servers.server.ServerGeo
+import fuck.system.vpn.servers.server.ServerItem
 
-class StatusFragment : Fragment(R.layout.fragment_status)
-{
+/**
+ * Фрагмент отображения статуса текущего VPN-соединения:
+ * - Показывает информацию о сервере
+ * - Позволяет подключаться и отключаться
+ * - Отображает текущий ping (RTT), обновляемый в реальном времени
+ */
+class StatusFragment : Fragment(R.layout.fragment_status) {
+
     private var pendingServer: ServerItem? = null
     private var currentServer: ServerItem? = null
-
-    private var pingObserver: PingObserver? = null
 
     private lateinit var textName: TextView
     private lateinit var textIp: TextView
@@ -28,6 +33,19 @@ class StatusFragment : Fragment(R.layout.fragment_status)
     private lateinit var textPing: TextView
     private lateinit var imageFlag: ImageView
     private lateinit var buttonConnectDisconnect: Button
+
+    private var pingUpdateHandler: Handler? = null
+    private val pingUpdateRunnable = object : Runnable {
+        override fun run() {
+            if (isVpnConnected()) {
+                val ping = OpenVPNService.currentPing
+                textPing.text = if (ping > 0) "Ping: ${ping}ms" else "Ping: -"
+                pingUpdateHandler?.postDelayed(this, 1000)
+            } else {
+                textPing.text = "Ping: -"
+            }
+        }
+    }
 
     private val vpnDisconnectedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -41,13 +59,15 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         }
     }
 
-    // Просто обновляем статус — детали (true/false) получаем через OpenVPNService.isConnected()
     private val vpnStatusReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             updateVpnStatus()
         }
     }
 
+    /**
+     * Инициализация UI и слушателей
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -79,10 +99,11 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         }
     }
 
+    /**
+     * Запускается при возвращении на экран: восстанавливает сервер, статус и запускает обновление пинга
+     */
     override fun onResume() {
         super.onResume()
-        pingObserver?.stop()
-        pingObserver = null
 
         val server = LastServerStorage.load(requireContext())
         if (server == null) {
@@ -93,7 +114,6 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         currentServer = server
         fillViews(server)
 
-        // Блок автоподключения
         if (LastServerStorage.getAutoConnect(requireContext())) {
             LastServerStorage.setAutoConnect(requireContext(), false)
             startVpn(server)
@@ -101,21 +121,22 @@ class StatusFragment : Fragment(R.layout.fragment_status)
 
         updateVpnStatus()
 
-        if (server.ip != null) {
-            pingObserver = PingObserver(server.ip)
-            pingObserver?.observe(viewLifecycleOwner) { result ->
-                textPing.text = result
-            }
-            pingObserver?.start(viewLifecycleOwner.lifecycleScope)
-        }
+        pingUpdateHandler = Handler(Looper.getMainLooper())
+        pingUpdateHandler?.post(pingUpdateRunnable)
     }
 
+    /**
+     * Останавливает обновление пинга при выходе с экрана
+     */
     override fun onPause() {
         super.onPause()
-        pingObserver?.stop()
-        pingObserver = null
+        pingUpdateHandler?.removeCallbacks(pingUpdateRunnable)
+        pingUpdateHandler = null
     }
 
+    /**
+     * Очистка и отписка от BroadcastReceiver'ов
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         requireContext().unregisterReceiver(vpnDisconnectedReceiver)
@@ -123,19 +144,28 @@ class StatusFragment : Fragment(R.layout.fragment_status)
     }
 
     // ---- VPN ----
+
+    /**
+     * Запускает VPN, предварительно сохранив сервер и остановив текущий VPN (если есть)
+     */
     fun startVpn(server: ServerItem) {
         LastServerStorage.save(requireContext(), server)
         pendingServer = server
         stopVpn()
-        // После отключения receiver вызовет realStartVpn()
     }
 
+    /**
+     * Отправляет сигнал на отключение VPN
+     */
     fun stopVpn() {
         val stopIntent = Intent(requireContext(), OpenVPNService::class.java)
         stopIntent.action = OpenVPNService.DISCONNECT_VPN
         requireContext().applicationContext.startService(stopIntent)
     }
 
+    /**
+     * Реальное подключение после выключения старого соединения
+     */
     private fun realStartVpn(server: ServerItem) {
         val context = requireContext().applicationContext
         val profile = importProfileFromOvpn(server)
@@ -145,6 +175,9 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         context.startService(intent)
     }
 
+    /**
+     * Импортирует VPN-профиль из конфигурации .ovpn
+     */
     private fun importProfileFromOvpn(server: ServerItem): VpnProfile {
         val profile = VpnProfile(server.name)
         profile.mUseCustomConfig = true
@@ -152,6 +185,9 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         return profile
     }
 
+    /**
+     * Очищает старые VPN-профили
+     */
     private fun cleanOldProfiles(context: Context) {
         val manager = ProfileManager.getInstance(context)
         val allProfiles = manager.profiles.toList()
@@ -161,16 +197,23 @@ class StatusFragment : Fragment(R.layout.fragment_status)
     }
 
     // ---- UI ----
+
+    /**
+     * Заполняет UI-информацией о текущем сервере
+     */
     private fun fillViews(server: ServerItem) {
         textName.text = server.name
         textIp.text = "IP: ${server.ip ?: "-"}"
         textPort.text = "Port: ${server.port?.toString() ?: "-"}"
         textCountry.text = ServerGeo.getCountry(server.country)
-        textPing.text = "Ping: ${server.ping?.toString() ?: "-"}"
+        textPing.text = "Ping: -"
         imageFlag.setImageResource(ServerGeo.getFlag(server.country))
         buttonConnectDisconnect.isEnabled = true
     }
 
+    /**
+     * Очищает все текстовые поля и блокирует кнопку подключения
+     */
     private fun clearViews() {
         textName.text = ""
         textIp.text = ""
@@ -182,6 +225,9 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         buttonConnectDisconnect.isEnabled = false
     }
 
+    /**
+     * Обновляет состояние кнопки подключения в зависимости от статуса VPN
+     */
     private fun updateVpnStatus() {
         if (isVpnConnected()) {
             buttonConnectDisconnect.text = getString(R.string.status_disconnect)
@@ -191,6 +237,9 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         buttonConnectDisconnect.isEnabled = currentServer != null
     }
 
+    /**
+     * Проверяет, активно ли VPN-соединение
+     */
     private fun isVpnConnected(): Boolean {
         return OpenVPNService.isConnected()
     }
