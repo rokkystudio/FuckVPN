@@ -45,7 +45,7 @@ class ServerAdapter(
         holder.textPing.setTextColor(getPingGradientColor(server.ping))
         holder.imageFlag.setImageResource(ServerGeo.getFlag(server.country))
 
-        val starRes = if (server.favorite) R.drawable.ic_servers_star_filled else R.drawable.ic_servers_star_outline
+        val starRes = if (server.favorite) R.drawable.ic_star_filled else R.drawable.ic_star_outline
         holder.imageFavorite.setImageResource(starRes)
 
         // Вешаем обработку клика

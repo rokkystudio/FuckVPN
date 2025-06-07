@@ -47,8 +47,8 @@ class MenuServerDialog : DialogFragment()
         val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
 
         btnFavorite.setImageResource(
-            if (isFavorite) R.drawable.ic_servers_star_filled
-            else R.drawable.ic_servers_star_outline
+            if (isFavorite) R.drawable.ic_star_filled
+            else R.drawable.ic_star_outline
         )
         btnFavorite.contentDescription =
             if (isFavorite) getString(R.string.menu_server_remove_favorite)

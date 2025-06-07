@@ -12,7 +12,7 @@
         android:layout_height="56dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/menu_server_connect"
-        android:src="@drawable/ic_servers_connect" />
+        android:src="@drawable/ic_connect" />
 
     <ImageButton
         android:id="@+id/btnFavorite"
@@ -20,7 +20,7 @@
         android:layout_height="56dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/menu_server_add_favorite"
-        android:src="@drawable/ic_servers_favorite" />
+        android:src="@drawable/ic_favorite" />
 
     <ImageButton
         android:id="@+id/btnDelete"
@@ -28,5 +28,5 @@
         android:layout_height="56dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/menu_server_delete"
-        android:src="@drawable/ic_servers_remove" />
+        android:src="@drawable/ic_trash" />
 </LinearLayout>

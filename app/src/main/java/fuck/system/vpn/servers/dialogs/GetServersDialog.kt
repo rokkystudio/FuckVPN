@@ -15,8 +15,8 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-class GetServersDialog : DialogFragment() {
-
+class GetServersDialog : DialogFragment()
+{
     companion object {
         const val TAG = "GetServersDialog"
         private const val githubCsv = "https://raw.githubusercontent.com/rokkystudio/VPN/master/app/src/main/assets/vpngate.csv"
@@ -59,6 +59,20 @@ class GetServersDialog : DialogFragment() {
         if (!hasStarted) {
             hasStarted = true
             startLoading()
+        }
+    }
+
+    /**
+     * Устанавливает ширину диалогового окна на 80% от ширины экрана
+     */
+    override fun onStart()
+    {
+        super.onStart()
+
+        dialog?.window?.let { window ->
+            val metrics = resources.displayMetrics
+            val width = (metrics.widthPixels * 0.8).toInt()
+            window.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
     }
 

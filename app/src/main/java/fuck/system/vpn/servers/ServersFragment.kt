@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.dialogs.AddServerDialog
+import fuck.system.vpn.servers.dialogs.GetServersDialog
 import fuck.system.vpn.servers.filters.CountryFilterDialog
 import fuck.system.vpn.servers.filters.CountryFilterStorage
 import fuck.system.vpn.servers.dialogs.PingServersDialog
@@ -39,6 +40,11 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
 
     /** Отфильтрованные серверы, отображаемые на экране */
     private var filteredServers = mutableListOf<ServerItem>()
+
+
+    private var isDialogScheduled = false
+
+    private var isFirstStart = true
 
     /**
      * Слушатель изменений SharedPreferences для серверов
@@ -148,6 +154,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         }
 
         setupButtons(view)
+        scheduleGetServersDialog();
     }
 
     /**
@@ -220,12 +227,20 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
      * Открывает диалог загрузки серверов
      */
     private fun openGetServersDialog() {
-        //if (parentFragmentManager.findFragmentByTag(GetServersDialog.TAG)?.isAdded != true) {
-          //  GetServersDialog().show(parentFragmentManager, GetServersDialog.TAG)
-        //}
+        if (parentFragmentManager.findFragmentByTag(GetServersDialog.TAG)?.isAdded != true) {
+          GetServersDialog().show(parentFragmentManager, GetServersDialog.TAG)
+        }
     }
 
-    /**
+    private fun scheduleGetServersDialog() {
+        if (isDialogScheduled) return
+        isDialogScheduled = true
+        recyclerView.postDelayed({
+            openGetServersDialog()
+        }, 1000)
+    }
+
+        /**
      * Показывает подтверждение очистки списка серверов
      */
     private fun openEmptyServersDialog() {

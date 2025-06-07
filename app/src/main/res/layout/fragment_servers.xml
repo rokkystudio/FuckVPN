@@ -23,7 +23,7 @@
             android:minHeight="48dp"
             android:contentDescription="@string/servers_country_filter"
             android:tooltipText="@string/servers_country_filter"
-            app:icon="@drawable/ic_servers_flags" />
+            app:icon="@drawable/ic_flag" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/ServersButtonGetServers"
@@ -34,7 +34,7 @@
             android:minHeight="48dp"
             android:contentDescription="@string/servers_get_title"
             android:tooltipText="@string/servers_get_title"
-            app:icon="@drawable/ic_servers_web" />
+            app:icon="@drawable/ic_update" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/ServersButtonAddServer"
@@ -45,7 +45,7 @@
             android:minHeight="48dp"
             android:contentDescription="@string/servers_add_server"
             android:tooltipText="@string/servers_add_server"
-            app:icon="@drawable/ic_servers_add" />
+            app:icon="@drawable/ic_add" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/ServersButtonEmptyServers"
@@ -55,7 +55,7 @@
             android:minHeight="48dp"
             android:contentDescription="@string/servers_empty_list"
             android:tooltipText="@string/servers_empty_list"
-            app:icon="@drawable/ic_servers_empty" />
+            app:icon="@drawable/ic_clear" />
     </LinearLayout>
 
     <!-- Список серверов -->

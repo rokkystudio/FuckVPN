@@ -17,15 +17,17 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 
-        <item name="materialButtonStyle">@style/VpnButton</item>
+        <item name="materialButtonStyle">@style/MaterialButton</item>
     </style>
 
-    <style name="VpnButton" parent="Widget.Material3.Button">
+    <style name="MaterialButton" parent="Widget.Material3.Button">
         <item name="cornerRadius">5dp</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">0dp</item>
         <item name="iconTint">@color/button_text</item>
         <item name="backgroundTint">@color/button_body</item>
         <item name="iconSize">24dp</item>
+        <item name="android:textColor">#333333</item>
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>
