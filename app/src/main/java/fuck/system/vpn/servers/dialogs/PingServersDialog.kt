@@ -67,6 +67,17 @@ class PingServersDialog : DialogFragment()
     /** Messenger, который передаётся в PingService для получения результатов */
     private val pingMessenger = Messenger(pingHandler)
 
+    private val vpnPrepareLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            startPingService() // <- запускаем после получения разрешения
+        } else {
+            Toast.makeText(requireContext(), "Разрешение на VPN не получено", Toast.LENGTH_SHORT).show()
+            dismissAllowingStateLoss()
+        }
+    }
+
     /**
      * Загружает layout диалога.
      */
@@ -106,10 +117,18 @@ class PingServersDialog : DialogFragment()
      * Загружает список серверов из хранилища и передаёт их в PingService
      * для выполнения TCP/UDP-пинга. Передаёт Messenger для получения результатов.
      */
-    private fun startPinging()
-    {
+    private fun startPinging() {
         if (!isAdded) return
 
+        val intent = android.net.VpnService.prepare(requireContext())
+        if (intent != null) {
+            vpnPrepareLauncher.launch(intent)
+        } else {
+            startPingService()
+        }
+    }
+
+    private fun startPingService() {
         servers = ArrayList(ServersStorage.load(requireContext()))
         completed = 0
 
@@ -117,11 +136,12 @@ class PingServersDialog : DialogFragment()
         progressText.text = getString(R.string.servers_ping_state, 0, servers.size)
 
         val intent = Intent(requireContext(), PingService::class.java).apply {
-            putExtra("messenger", pingMessenger) // <-- передаём Messenger в сервис
+            putExtra("messenger", pingMessenger)
         }
 
         requireContext().startService(intent)
     }
+
 
     /**
      * Обновляет состояние прогрессбара после получения очередного ответа.
