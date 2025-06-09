@@ -7,12 +7,9 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-.DS_Store
+/main/build/
 /build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
-/.kotlin/errors/errors-1747812285186.log
-/main/build/
-/.kotlin/errors/errors-1749022577625.log
