@@ -40,11 +40,11 @@ object ServerGeo
     }
 
     fun getFlag(countryCode: String?): Int {
-        return flagMap[countryCode] ?: UNKNOWN_FLAG
+        return flagMap[countryCode?.lowercase()] ?: UNKNOWN_FLAG
     }
 
     fun getCountry(countryCode: String?): String {
-        return countryNames[countryCode] ?: UNKNOWN_COUNTRY
+        return countryNames[countryCode?.lowercase()] ?: UNKNOWN_COUNTRY
     }
 
     val countryNames = mapOf(

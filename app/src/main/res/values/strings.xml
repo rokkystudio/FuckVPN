@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">VPN</string>
     <string name="app_title" translatable="false">FUCK VPN v%s</string>
-    <string name="ping_value">%1$s ms</string>
 
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
@@ -11,38 +10,44 @@
     <string name="unselect_all">Unselect All</string>
     <string name="select_all">Select All</string>
 
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="repeat">Try Again</string>
+
     <string name="servers_remove_server">Remove server</string>
     <string name="servers_empty_list">Empty list</string>
     <string name="servers_add_server">Add server</string>
     <string name="servers_country_filter">Select country</string>
 
-    <string name="servers_get_title">Download servers</string>
-    <string name="servers_get_loading">Server list loading …</string>
-    <string name="servers_get_loading_percent">Download: %1$d%%</string>
+    <string name="server_update_title">Download servers</string>
+    <string name="server_update_loading">Server list loading …</string>
+    <string name="server_update_loading_percent">Download: %1$d%%</string>
 
-    <string name="country_filter_title">Select countries</string>
+    <string name="filter_country_title">Select countries</string>
 
-    <string name="servers_ping_title">Ping servers</string>
-    <string name="servers_ping_state">Completed: %1$d/%2$d</string>
+    <string name="ping_title">Ping servers</string>
+    <string name="ping_state">Completed: %1$d/%2$d</string>
+    <string name="ping_value">%1$s ms</string>
 
-    <string name="server_add_name">Server name (not required)</string>
-    <string name="server_add_openvpn">OpenVPN configuration</string>
-    <string name="server_add_openvpn_required">Configuration must be specified!</string>
-    <string name="server_add_load_file">Load from ovpn</string>
-    <string name="server_add_load_file_error">Error reading file</string>
-    <string name="menu_server_connect">Connect to server</string>
-    <string name="menu_server_add_favorite">Add to favorites</string>
-    <string name="menu_server_remove_favorite">Remove from favorites</string>
-    <string name="menu_server_delete">Delete server</string>
+    <string name="server_create_name">Server name (not required)</string>
+    <string name="server_create_openvpn">OpenVPN configuration</string>
+    <string name="server_create_openvpn_required">Configuration must be specified!</string>
+    <string name="server_create_load_file">Load from ovpn</string>
+    <string name="server_create_load_file_error">Error reading file</string>
+    <string name="server_create_invalid_config">Failed to extract IP from configuration</string>
+    <string name="server_create_duplicate">A server with this IP already exists</string>
+    <string name="server_create_complete">Server added</string>
+
+    <string name="server_action_connect">Connect to server</string>
+    <string name="server_action_add_favorite">Add to favorites</string>
+    <string name="server_action_remove_favorite">Remove from favorites</string>
+    <string name="server_action_delete">Delete server</string>
+
+    <string name="server_update_complete">Updated %1$d servers</string>
+    <string name="server_update_failed">Failed to update servers</string>
+    <string name="server_update_from_assets">Loaded %1$d servers from file</string>
+    <string name="servers_update_assets_error">Error loading from assets: %1$s</string>
 
     <string name="status_country_flag">Country flag</string>
-    <string name="status_connect">Connect</string>
-    <string name="status_disconnect">Disconnect</string>
-    <string name="repeat">Try Again</string>
-
-    <string name="servers_updated">Updated %1$d servers</string>
-    <string name="servers_update_failed">Failed to update servers</string>
-    <string name="servers_loaded_from_assets">Loaded %1$d servers from file</string>
-    <string name="servers_assets_error">Error loading from assets: %1$s</string>
 
 </resources>

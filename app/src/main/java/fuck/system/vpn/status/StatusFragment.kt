@@ -221,7 +221,7 @@ class StatusFragment : Fragment(R.layout.fragment_status) {
         textCountry.text = ""
         textPing.text = ""
         imageFlag.setImageDrawable(null)
-        buttonConnectDisconnect.text = getString(R.string.status_connect)
+        buttonConnectDisconnect.text = getString(R.string.connect)
         buttonConnectDisconnect.isEnabled = false
     }
 
@@ -230,9 +230,9 @@ class StatusFragment : Fragment(R.layout.fragment_status) {
      */
     private fun updateVpnStatus() {
         if (isVpnConnected()) {
-            buttonConnectDisconnect.text = getString(R.string.status_disconnect)
+            buttonConnectDisconnect.text = getString(R.string.disconnect)
         } else {
-            buttonConnectDisconnect.text = getString(R.string.status_connect)
+            buttonConnectDisconnect.text = getString(R.string.connect)
         }
         buttonConnectDisconnect.isEnabled = currentServer != null
     }

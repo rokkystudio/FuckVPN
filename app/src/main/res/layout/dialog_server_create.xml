@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/ServerAddName"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="@string/server_create_name"
+            android:inputType="textCapWords" />
+
+
+        <EditText
+            android:id="@+id/ServerAddOpenVpn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/server_create_openvpn"
+            android:inputType="textMultiLine"
+            android:layout_marginTop="12dp"
+            android:maxLines="10"
+            android:minLines="10" />
+
+        <Button
+            android:id="@+id/ServerAddLoadFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="40dp"
+            android:text="@string/server_create_load_file" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/ServerAddSave"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="20dp"
+                android:text="@string/save" />
+
+            <Button
+                android:id="@+id/ServersAddCancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="20dp"
+                android:text="@string/cancel" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

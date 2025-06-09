@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import fuck.system.vpn.databinding.ActivityMainBinding
-import fuck.system.vpn.servers.dialogs.GetServersDialog
 
 class MainActivity : AppCompatActivity()
 {

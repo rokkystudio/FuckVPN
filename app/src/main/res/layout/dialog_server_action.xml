@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Верхняя часть: информация о сервере -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageFlag"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/flag_xx"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/textCountry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="Country"
+            android:textSize="18sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/imageFlag"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/imageFavorite" />
+
+        <TextView
+            android:id="@+id/textIp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="IP address"
+            android:textSize="14sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="#00a0d0"
+            app:layout_constraintStart_toEndOf="@id/imageFlag"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/imageFavorite" />
+
+        <ImageView
+            android:id="@+id/imageFavorite"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toEndOf="@id/textIp"
+            app:layout_constraintTop_toTopOf="@id/textPing"
+            app:layout_constraintBottom_toBottomOf="@id/textPing"
+            app:layout_constraintEnd_toStartOf="@id/textPing"
+            app:tint="@color/favorite_tint_color" />
+
+        <TextView
+            android:id="@+id/textPing"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textSize="14sp"
+            android:textAlignment="textEnd"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Разделитель -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="?android:attr/listDivider" />
+
+    <!-- Нижняя часть: кнопки -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDelete"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/server_action_delete"
+            app:icon="@drawable/ic_trash"
+            app:iconGravity="textStart"
+            app:iconTint="?attr/colorOnPrimary"
+            android:backgroundTint="#a41"
+            android:text="" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConnect"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:contentDescription="@string/server_action_connect"
+            app:icon="@drawable/ic_connect"
+            app:iconGravity="textStart"
+            app:iconTint="?attr/colorOnPrimary"
+            android:backgroundTint="#7a3" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFavorite"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/server_action_add_favorite"
+            app:icon="@drawable/ic_favorite"
+            app:iconGravity="textStart"
+            app:iconTint="?attr/colorOnPrimary"
+            android:backgroundTint="#da3"
+            android:text="" />
+    </LinearLayout>
+
+</LinearLayout>
