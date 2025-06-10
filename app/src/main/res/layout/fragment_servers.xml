@@ -53,8 +53,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:minHeight="48dp"
-            android:contentDescription="@string/servers_empty_list"
-            android:tooltipText="@string/servers_empty_list"
+            android:contentDescription="@string/servers_clear_title"
+            android:tooltipText="@string/servers_clear_title"
             app:icon="@drawable/ic_clear" />
     </LinearLayout>
 

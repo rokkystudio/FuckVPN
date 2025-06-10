@@ -8,6 +8,10 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 
+    <color name="title">#FF9800</color>
+    <color name="hint">#019796</color>
+    <color name="dialog_background">#222222</color>
+
     <color name="button_body">#DDDDDD</color>
     <color name="button_text">#666666</color>
 
@@ -18,4 +22,8 @@
     <color name="unselected_icon_color">#666666</color>
 
     <color name="favorite_tint_color">#FF9800</color>
+
+    <color name="button_confirm_background">#77AA33</color>
+    <color name="button_special_background">#DDAA33</color>
+    <color name="button_cancel_background">#AA4411</color>
 </resources>

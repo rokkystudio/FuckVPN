@@ -93,7 +93,7 @@
             app:icon="@drawable/ic_trash"
             app:iconGravity="textStart"
             app:iconTint="?attr/colorOnPrimary"
-            android:backgroundTint="#a41"
+            android:backgroundTint="@color/button_cancel_background"
             android:text="" />
 
         <com.google.android.material.button.MaterialButton
@@ -107,7 +107,7 @@
             app:icon="@drawable/ic_connect"
             app:iconGravity="textStart"
             app:iconTint="?attr/colorOnPrimary"
-            android:backgroundTint="#7a3" />
+            android:backgroundTint="@color/button_confirm_background" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnFavorite"
@@ -117,7 +117,7 @@
             app:icon="@drawable/ic_favorite"
             app:iconGravity="textStart"
             app:iconTint="?attr/colorOnPrimary"
-            android:backgroundTint="#da3"
+            android:backgroundTint="@color/button_special_background"
             android:text="" />
     </LinearLayout>
 

@@ -15,7 +15,7 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-class ServerUpdateDialog : DialogFragment()
+class ServersUpdateDialog : DialogFragment()
 {
     companion object {
         const val TAG = "GetServersDialog"

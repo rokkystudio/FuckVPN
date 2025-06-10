@@ -7,26 +7,21 @@ import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.dialogs.ServerCreateDialog
-import fuck.system.vpn.servers.dialogs.ServerUpdateDialog
+import fuck.system.vpn.servers.dialogs.ServersUpdateDialog
 import fuck.system.vpn.servers.filters.FilterCountryDialog
 import fuck.system.vpn.servers.filters.FilterCountryStorage
 import fuck.system.vpn.servers.ping.PingDialog
 import fuck.system.vpn.servers.dialogs.ServerActionDialog
+import fuck.system.vpn.servers.dialogs.ServersClearDialog
 import fuck.system.vpn.servers.server.ServerAdapter
 import fuck.system.vpn.servers.server.ServerItem
 import fuck.system.vpn.servers.server.ServerStorage
 import fuck.system.vpn.status.LastServerStorage
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * Фрагмент, отображающий список VPN-серверов, с возможностью обновления, фильтрации,
@@ -41,82 +36,113 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     private lateinit var adapter: ServerAdapter
 
     /** Основной список всех серверов */
-    private val vpnServers = mutableListOf<ServerItem>()
+    private val vpnServer = mutableListOf<ServerItem>()
 
     /** Отфильтрованные серверы, отображаемые на экране */
-    private var filteredServers = mutableListOf<ServerItem>()
+    private var filterServer = mutableListOf<ServerItem>()
 
 
-    private var isDialogScheduled = false
+    /** Запланированный отложенный первичный запуск */
+    private var shouldInitialAction = true
+
+    /** Запланирован запуск обновления адаптера */
+    private var shouldAdapterUpdate = false
+
+    /** Запланирован запуск обновления пинга */
+    private var shouldServerPing = false
 
     /**
-     * Слушатель изменений SharedPreferences для серверов
+     * Слушатель изменений SharedPreferences для списка серверов.
+     * Срабатывает при любом обновлении значения по ключу [ServerStorage.KEY_SERVERS],
+     * например, после загрузки новых серверов или их редактирования вручную.
+     * Вызывает обновление UI и/или дополнительную обработку.
      */
-    private val serversObserver = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+    private val serverObserver = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
         if (key == ServerStorage.KEY_SERVERS) {
-            onServersChangedFromStorage()
+            onServerChanged()
         }
     }
 
+    /**
+     * Слушатель изменений фильтра стран в SharedPreferences.
+     * Срабатывает при изменении значения по ключу [FilterCountryStorage.KEY_FILTER],
+     * что может произойти, например, после выбора страны в фильтре.
+     * Вызывает обновление адаптера отображаемых серверов.
+     */
     private val countryObserver = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
         if (key == FilterCountryStorage.KEY_FILTER) {
-            updateServersAdapter()
+            updateAdapter()
         }
     }
 
     /**
-     * Вызывается при изменении данных в SharedPreferences
+     * Обрабатывает изменения в хранилище серверов.
+     * Загружает новые данные, обновляет список и адаптер, а также
+     * при необходимости запускает диалог пинга.
      */
-    private fun onServersChangedFromStorage()
+    private fun onServerChanged()
     {
-        val context = requireContext()
+        val context = context ?: return
         val newServers = ServerStorage.load(context)
-        val oldIps = vpnServers.mapNotNull { it.ip }.toSet()
-        val newIps = newServers.mapNotNull { it.ip }.toSet()
 
-        val added = newIps - oldIps
-        val removed = oldIps - newIps
-
-        if (added.isNotEmpty() || removed.isNotEmpty()) {
-            onServersChanged(newServers)
-        } else {
-            onServersUpdated(newServers)
+        vpnServer.apply {
+            clear()
+            addAll(newServers)
         }
-    }
 
-    /**
-     * Обнаружено добавление или удаление серверов
-     */
-    private fun onServersChanged(newServers: List<ServerItem>)
-    {
-        vpnServers.clear()
-        vpnServers.addAll(newServers)
-        updateServersAdapter()
-
-        PingDialog().show(parentFragmentManager, PingDialog.TAG)
-    }
-
-    /**
-     * Обновляет данные серверов в списке vpnServers на основе newServers.
-     * Список не пересоздаётся, порядок сохраняется. Обновляются только поля по совпадающему IP.
-     */
-    private fun onServersUpdated(newServers: List<ServerItem>) {
-        val updatesByIp = newServers.associateBy { it.ip }
-
-        for (server in vpnServers) {
-            val updated = updatesByIp[server.ip]
-            if (updated != null) {
-                server.name = updated.name
-                server.ovpn = updated.ovpn
-                server.favorite = updated.favorite
-                server.country = updated.country
-                server.ping = updated.ping
-                server.port = updated.port
-                server.proto = updated.proto
+        if (shouldServerPing) {
+            shouldServerPing = false
+            if (parentFragmentManager.isStateSaved.not()) {
+                PingDialog().show(parentFragmentManager, PingDialog.TAG)
             }
         }
 
-        updateServersAdapter()
+        updateAdapter()
+    }
+
+    /**
+     * Обновляет список отображаемых серверов с учётом фильтров
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    private fun updateAdapter()
+    {
+        if (!isResumed) {
+            shouldAdapterUpdate = true
+            return
+        }
+
+        shouldAdapterUpdate = false
+
+        val countryFilters = FilterCountryStorage.loadAll(requireContext())
+
+        filterServer.clear()
+        filterServer.addAll(
+            vpnServer.filter { server ->
+                val filter = countryFilters.find { it.country == server.country }
+                filter == null || filter.enabled
+            }
+        )
+
+        filterServer.sortWith(
+            compareByDescending<ServerItem> { it.favorite }
+                .thenBy { it.ping ?: Int.MAX_VALUE }
+        )
+
+        adapter.notifyDataSetChanged()
+    }
+
+    /**
+     * Выполняем отложенные запуски
+     */
+    override fun onResume() {
+        super.onResume()
+
+        //requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        //.menu.findItem(R.id.nav_servers).isChecked = true
+
+        if (shouldAdapterUpdate) {
+            updateAdapter()
+        }
     }
 
     /**
@@ -124,7 +150,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
      */
     override fun onStart() {
         super.onStart()
-        ServerStorage.observe(requireContext(), serversObserver)
+        ServerStorage.observe(requireContext(), serverObserver)
         FilterCountryStorage.observe(requireContext(), countryObserver)
     }
 
@@ -132,7 +158,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
      * Удаляет наблюдение за изменением списка серверов
      */
     override fun onStop() {
-        ServerStorage.removeObserver(requireContext(), serversObserver)
+        ServerStorage.removeObserver(requireContext(), serverObserver)
         FilterCountryStorage.removeObserver(requireContext(), countryObserver)
         super.onStop()
     }
@@ -146,7 +172,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
 
         recyclerView = view.findViewById(R.id.recyclerServers)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = ServerAdapter(filteredServers, object : ServerAdapter.OnServerClickListener {
+        adapter = ServerAdapter(filterServer, object : ServerAdapter.OnServerClickListener {
             override fun onServerClick(isFavorite: Boolean, position: Int) {
                 ServerActionDialog.newInstance(isFavorite, position)
                     .show(parentFragmentManager, ServerActionDialog.TAG)
@@ -154,24 +180,29 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         })
         recyclerView.adapter = adapter
 
-        parentFragmentManager.setFragmentResultListener(
-            ServerActionDialog.RESULT_KEY, this) { _, bundle ->
-            onServerMenuAction(bundle)
-        }
+        view.postDelayed({ onInitialAction() }, 1000)
 
         setupButtons(view)
-        scheduleGetServersDialog();
+    }
+
+
+    override fun onDestroyView() {
+        shouldInitialAction = false
+        super.onDestroyView()
     }
 
     /**
-     * Отмечает текущую вкладку как активную
+     * Выполняет начальное действие, когда фрагмент полностью готов.
+     * Исключает повторные и небезопасные вызовы при возможном уничтожении фрагмента.
      */
-    override fun onResume() {
-        super.onResume()
-        requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-            .menu.findItem(R.id.nav_servers).isChecked = true
+    private fun onInitialAction()
+    {
+        if (!shouldInitialAction) return
+        if (!isAdded) return
+        if (parentFragmentManager.isStateSaved) return
 
-        updateServersAdapter()
+        shouldInitialAction = false
+        openServersUpdateDialog()
     }
 
     /**
@@ -183,7 +214,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         }
 
         view.findViewById<Button>(R.id.ServersButtonGetServers).setOnClickListener {
-            openGetServersDialog()
+            openServersUpdateDialog()
         }
 
         view.findViewById<Button>(R.id.ServersButtonAddServer).setOnClickListener {
@@ -198,23 +229,24 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     /**
      * Обработка действия из контекстного меню сервера
      */
-    private fun onServerMenuAction(bundle: Bundle)
+    private fun onServerAction(bundle: Bundle)
     {
+        // TODO ПЕРЕДЕЛАТЬ ИНСТАНС
         val action = bundle.getString(ServerActionDialog.EXTRA_ACTION)
         val position = bundle.getInt(ServerActionDialog.EXTRA_POSITION)
-        if (position in filteredServers.indices) {
-            val server = filteredServers[position]
+        if (position in filterServer.indices) {
+            val server = filterServer[position]
             when (action) {
                 ServerActionDialog.ACTION_CONNECT -> openStatusFragmentWithServer(server)
                 ServerActionDialog.ACTION_FAVORITE -> {
                     server.favorite = !server.favorite
-                    ServerStorage.save(requireContext(), vpnServers)
-                    updateServersAdapter()
+                    ServerStorage.save(requireContext(), vpnServer)
+                    updateAdapter()
                 }
                 ServerActionDialog.ACTION_DELETE -> {
-                    vpnServers.removeIf { it.ip == server.ip }
-                    ServerStorage.save(requireContext(), vpnServers)
-                    updateServersAdapter()
+                    vpnServer.removeIf { it.ip == server.ip }
+                    ServerStorage.save(requireContext(), vpnServer)
+                    updateAdapter()
                 }
             }
         }
@@ -242,23 +274,9 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     /**
      * Открывает диалог загрузки серверов
      */
-    private fun openGetServersDialog() {
-        if (parentFragmentManager.findFragmentByTag(ServerUpdateDialog.TAG)?.isAdded != true) {
-          ServerUpdateDialog().show(parentFragmentManager, ServerUpdateDialog.TAG)
-        }
-    }
-
-    private fun scheduleGetServersDialog() {
-        if (isDialogScheduled) return
-        isDialogScheduled = true
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                delay(1000)
-                if (isAdded && parentFragmentManager.isStateSaved.not()) {
-                    openGetServersDialog()
-                }
-            }
+    private fun openServersUpdateDialog() {
+        if (parentFragmentManager.findFragmentByTag(ServersUpdateDialog.TAG)?.isAdded != true) {
+          ServersUpdateDialog().show(parentFragmentManager, ServersUpdateDialog.TAG)
         }
     }
 
@@ -266,45 +284,9 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
      * Показывает подтверждение очистки списка серверов
      */
     private fun openEmptyServersDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Очистка списка серверов")
-            .setMessage("Вы действительно хотите очистить список серверов?")
-            .setPositiveButton(R.string.clear_all) { _, _ ->
-                emptyServers()
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-    }
-
-    /**
-     * Полная очистка списка серверов
-     */
-    private fun emptyServers() {
-        vpnServers.clear()
-        ServerStorage.save(requireContext(), vpnServers)
-        updateServersAdapter()
-    }
-
-    /** Обновляет список отображаемых серверов с учётом фильтров */
-    @SuppressLint("NotifyDataSetChanged")
-    private fun updateServersAdapter()
-    {
-        val countryFilters = FilterCountryStorage.loadAll(requireContext())
-
-        filteredServers.clear()
-        filteredServers.addAll(
-            vpnServers.filter { server ->
-                val filter = countryFilters.find { it.country == server.country }
-                filter == null || filter.enabled
-            }
-        )
-
-        filteredServers.sortWith(
-            compareByDescending<ServerItem> { it.favorite }
-                .thenBy { it.ping ?: Int.MAX_VALUE }
-        )
-
-        adapter.notifyDataSetChanged()
+        if (parentFragmentManager.findFragmentByTag(ServersClearDialog.TAG)?.isAdded != true) {
+            ServersClearDialog().show(parentFragmentManager, ServersClearDialog.TAG)
+        }
     }
 
     /**

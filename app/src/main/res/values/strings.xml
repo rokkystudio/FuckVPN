@@ -15,7 +15,6 @@
     <string name="repeat">Try Again</string>
 
     <string name="servers_remove_server">Remove server</string>
-    <string name="servers_empty_list">Empty list</string>
     <string name="servers_add_server">Add server</string>
     <string name="servers_country_filter">Select country</string>
 
@@ -38,6 +37,11 @@
     <string name="server_create_duplicate">A server with this IP already exists</string>
     <string name="server_create_complete">Server added</string>
     <string name="server_create_updated">Server updated</string>
+
+    <string name="servers_clear_title">Empty server list</string>
+    <string name="servers_clear_confirm">Are you sure you want to clear the server list?</string>
+    <string name="servers_clear_hint">Favorite servers will not be deleted.</string>
+    <string name="servers_clear_complete">The server list has been cleared</string>
 
 
     <string name="server_action_connect">Connect to server</string>

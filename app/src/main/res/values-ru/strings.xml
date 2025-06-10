@@ -13,7 +13,6 @@
     <string name="repeat">Повторить</string>
 
     <string name="servers_remove_server">Удалить сервер</string>
-    <string name="servers_empty_list">Очистить список</string>
     <string name="servers_add_server">Добавить сервер</string>
     <string name="servers_country_filter">Выбор стран</string>
 
@@ -36,6 +35,11 @@
     <string name="server_create_duplicate">Сервер с таким IP уже существует</string>
     <string name="server_create_complete">Сервер добавлен</string>
     <string name="server_create_updated">Сервер обновлен</string>
+
+    <string name="servers_clear_title">Очистка списка серверов</string>
+    <string name="servers_clear_confirm">Вы действительно хотите очистить список серверов?</string>
+    <string name="servers_clear_hint">Избранные сервера не будут удалены.</string>
+    <string name="servers_clear_complete">Список серверов очищен</string>
 
     <string name="server_action_connect">Подключиться к серверу</string>
     <string name="server_action_add_favorite">Добавить в избранное</string>
