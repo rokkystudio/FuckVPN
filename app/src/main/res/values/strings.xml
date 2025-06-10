@@ -37,6 +37,8 @@
     <string name="server_create_invalid_config">Failed to extract IP from configuration</string>
     <string name="server_create_duplicate">A server with this IP already exists</string>
     <string name="server_create_complete">Server added</string>
+    <string name="server_create_updated">Server updated</string>
+
 
     <string name="server_action_connect">Connect to server</string>
     <string name="server_action_add_favorite">Add to favorites</string>

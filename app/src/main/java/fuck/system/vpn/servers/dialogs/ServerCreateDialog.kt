@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import fuck.system.vpn.R
-import fuck.system.vpn.servers.parser.OvpnParser
 import fuck.system.vpn.servers.parser.ServersParser
 import fuck.system.vpn.servers.server.ServerItem
 import fuck.system.vpn.servers.server.ServerStorage
@@ -18,10 +17,10 @@ import fuck.system.vpn.servers.server.ServerStorage
  * Диалог для ручного добавления нового VPN-сервера.
  *
  * Позволяет пользователю ввести или загрузить .ovpn-конфигурацию,
- * автоматически парсит из неё IP, порт, протокол и страну,
- * и сохраняет сервер в локальное хранилище, если он уникален.
+ * парсит из неё параметры (host, ip, port, proto, country)
+ * и сохраняет сервер в локальное хранилище.
  *
- * Защищён от добавления дубликатов по IP-адресу.
+ * Если сервер с таким IP уже существует — он будет обновлён.
  */
 class ServerCreateDialog : DialogFragment()
 {
@@ -30,22 +29,20 @@ class ServerCreateDialog : DialogFragment()
     }
 
     /**
-     * Регистрирует обработчик результата выбора файла пользователем.
-     * Используется для загрузки содержимого .ovpn-файла в текстовое поле.
+     * Регистрирует обработчик выбора файла .ovpn из хранилища.
+     * Загружает содержимое в текстовое поле.
      */
     private val filePicker = registerForActivityResult(
         ActivityResultContracts.OpenDocument(), ::onPickerResult
     )
 
     /**
-     * Обрабатывает результат выбора файла.
-     * Считывает содержимое выбранного .ovpn-файла и помещает его в соответствующее поле.
-     *
-     * @param uri URI выбранного пользователем файла или null, если выбор отменён.
+     * Обрабатывает результат выбора .ovpn-файла.
+     * Считывает содержимое и вставляет в текстовое поле.
      */
     private fun onPickerResult(uri: Uri?)
     {
-        if (uri == null) return
+        if (uri == null || !isAdded || dialog == null || view == null) return
 
         val edit = dialog?.findViewById<EditText>(R.id.ServerAddOpenVpn) ?: return
 
@@ -64,10 +61,7 @@ class ServerCreateDialog : DialogFragment()
     }
 
     /**
-     * Создаёт диалог для ручного добавления нового сервера.
-     * Инициализирует элементы интерфейса и обрабатывает действия кнопок.
-     *
-     * @return созданный экземпляр диалога
+     * Создаёт диалоговое окно с полями для ввода имени и вставки конфигурации.
      */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
     {
@@ -99,14 +93,11 @@ class ServerCreateDialog : DialogFragment()
 
     /**
      * Обрабатывает нажатие кнопки "Сохранить".
-     * Валидирует конфигурацию, парсит её, проверяет на дубликаты и сохраняет новый сервер.
-     *
-     * @param inputName поле ввода имени сервера (необязательно)
-     * @param inputOvpn поле ввода конфигурации OpenVPN (обязательно)
+     * Парсит конфигурацию, извлекает ключевые данные и сохраняет сервер.
+     * Если сервер с таким IP уже есть — заменяет.
      */
     private fun onSaveClicked(inputName: EditText?, inputOvpn: EditText?)
     {
-        val name = inputName?.text?.toString()?.trim().orEmpty()
         val ovpn = inputOvpn?.text?.toString()?.trim().orEmpty()
 
         if (ovpn.isBlank()) {
@@ -114,36 +105,52 @@ class ServerCreateDialog : DialogFragment()
             return
         }
 
-        val info = OvpnParser.parse(ovpn)
-        val ip = ServersParser.getIpFromOvpn(ovpn, null)
+        val host = ServersParser.getRemoteHost(ovpn)
+        val ip = ServersParser.resolveIp(host, null)
 
         if (ip == null) {
             Toast.makeText(requireContext(), getString(R.string.server_create_invalid_config), Toast.LENGTH_LONG).show()
             return
         }
 
-        // Проверка на дубликат IP
-        val servers = ServerStorage.load(requireContext())
-        if (servers.any { it.ip == ip }) {
-            Toast.makeText(requireContext(), getString(R.string.server_create_duplicate), Toast.LENGTH_LONG).show()
-            return
-        }
+        val port = ServersParser.getPortFromOvpn(ovpn)
+        val proto = ServersParser.getProtoFromOvpn(ovpn)
+        val country = ServersParser.getCountryFromOvpn(ovpn)
+
+        var name = inputName?.text?.toString()?.trim().orEmpty()
+        name = name.ifBlank { host ?: ip }
 
         val item = ServerItem(
-            name = if (name.isNotBlank()) name else ip,
+            name = name,
             ovpn = ovpn,
             favorite = false,
             ip = ip,
-            port = info.port,
-            country = info.country,
-            proto = info.proto,
+            port = port,
+            proto = proto,
+            country = country,
             ping = null
         )
 
-        val updated = servers.toMutableList().apply { add(item) }
-        ServerStorage.save(requireContext(), updated)
+        val context = requireContext()
+        val servers = ServerStorage.load(context).toMutableList()
+        val existingIndex = servers.indexOfFirst { it.ip == ip }
 
-        Toast.makeText(requireContext(), getString(R.string.server_create_complete), Toast.LENGTH_SHORT).show()
+        val isUpdate = existingIndex >= 0
+        if (isUpdate) {
+            servers[existingIndex] = item
+        } else {
+            servers.add(item)
+        }
+
+        ServerStorage.save(context, servers)
+
+        val msg = if (isUpdate) {
+            getString(R.string.server_create_updated)
+        } else {
+            getString(R.string.server_create_complete)
+        }
+
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
         dismiss()
     }
 }

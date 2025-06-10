@@ -1,43 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="ping_value">%1$s мс</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="close">Закрыть</string>
+    <string name="clear_all">Очистить все</string>
+
+    <string name="unselect_all">Отключить все</string>
+    <string name="select_all">Включить все</string>
+
+    <string name="connect">Подключиться</string>
+    <string name="disconnect">Отключиться</string>
+    <string name="repeat">Повторить</string>
+
     <string name="servers_remove_server">Удалить сервер</string>
     <string name="servers_empty_list">Очистить список</string>
     <string name="servers_add_server">Добавить сервер</string>
     <string name="servers_country_filter">Выбор стран</string>
+
     <string name="server_update_title">Загрузить серверы</string>
+    <string name="server_update_loading">Загрузка списка серверов</string>
+    <string name="server_update_loading_percent">Загрузка: %1$d%%</string>
+
     <string name="filter_country_title">Выберите страны</string>
-    <string name="select_all">Включить все</string>
-    <string name="clear_all">Очистить все</string>
-    <string name="unselect_all">Отключить все</string>
-    <string name="close">Закрыть</string>
-    <string name="cancel">Отмена</string>
+
     <string name="ping_title">Опрос серверов</string>
     <string name="ping_state">Выполнено: %1$d/%2$d</string>
+    <string name="ping_value">%1$s мс</string>
+
     <string name="server_create_name">Имя сервера</string>
     <string name="server_create_openvpn">OpenVPN конфигурация</string>
     <string name="server_create_openvpn_required">Требуется указать конфигурацию!</string>
     <string name="server_create_load_file">Загрузить из ovpn</string>
+    <string name="server_create_load_file_error">Ошибка чтения файла</string>
     <string name="server_create_invalid_config">Не удалось извлечь IP из конфигурации</string>
     <string name="server_create_duplicate">Сервер с таким IP уже существует</string>
     <string name="server_create_complete">Сервер добавлен</string>
+    <string name="server_create_updated">Сервер обновлен</string>
 
-    <string name="save">Сохранить</string>
-    <string name="server_create_load_file_error">Ошибка чтения файла</string>
-    <string name="server_update_loading">Загрузка списка серверов</string>
-    <string name="server_update_loading_percent">Загрузка: %1$d%%</string>
     <string name="server_action_connect">Подключиться к серверу</string>
     <string name="server_action_add_favorite">Добавить в избранное</string>
     <string name="server_action_remove_favorite">Удалить из избранного</string>
     <string name="server_action_delete">Удалить сервер</string>
-    <string name="status_country_flag">Флаг страны</string>
-    <string name="connect">Подключиться</string>
-    <string name="disconnect">Отключиться</string>
-    <string name="repeat">Повторить</string>
 
     <string name="server_update_complete">Обновлено %1$d серверов</string>
     <string name="server_update_failed">Не удалось обновить сервера</string>
     <string name="server_update_from_assets">Загружено %1$d серверов из файла</string>
     <string name="servers_update_assets_error">Ошибка загрузки из assets: %1$s</string>
 
+    <string name="status_country_flag">Флаг страны</string>
 </resources>

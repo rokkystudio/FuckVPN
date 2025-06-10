@@ -34,14 +34,7 @@ import kotlin.math.min
 class PingDialog : DialogFragment()
 {
     companion object {
-        /** Тэг для отображения диалога через FragmentManager */
         const val TAG = "PingServersDialog"
-
-        /** Ключ результата для передачи обновлённого списка серверов */
-        const val RESULT_KEY = "PingServersDialogResult"
-
-        /** Имя поля в Bundle, где передаются ServerItem-ы */
-        const val RESULT_EXTRA = "SERVERS"
     }
 
     private lateinit var pingServiceIntent: Intent
@@ -77,6 +70,7 @@ class PingDialog : DialogFragment()
     /** Messenger, который передаётся в PingService для получения результатов */
     private val pingMessenger = Messenger(pingHandler)
 
+    /** Launcher для получения разрешения от пользователя на использование VPN. */
     private val vpnPrepareLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -100,6 +94,16 @@ class PingDialog : DialogFragment()
     }
 
     /**
+     * Прерывает процесс пинга и останавливает PingService,
+     * если пользователь закрыл диалог или нажал кнопку "Отмена".
+     */
+    override fun onDestroyView() {
+        cancelled = true
+        stopPingService()
+        super.onDestroyView()
+    }
+
+    /**
      * Инициализирует UI и запускает процесс пинга.
      * Защищается от повторного запуска.
      */
@@ -113,7 +117,7 @@ class PingDialog : DialogFragment()
 
         cancelButton.setOnClickListener {
             cancelled = true
-            requireContext().stopService(Intent(requireContext(), PingService::class.java))
+            stopPingService()
             dismissAllowingStateLoss()
         }
 
@@ -138,7 +142,27 @@ class PingDialog : DialogFragment()
         }
     }
 
-    private fun startPingService() {
+    /**
+     * Завершает пинг:
+     * - сохраняет обновлённый список серверов в хранилище,
+     * - останавливает PingService,
+     * - закрывает диалог.
+     */
+    private fun finishPinging() {
+        ServerStorage.save(requireContext(), servers)
+        stopPingService()
+        dismissAllowingStateLoss()
+    }
+
+    /**
+     * Подготавливает и запускает PingService:
+     * - загружает список серверов из локального хранилища,
+     * - инициализирует прогрессбар и текст состояния,
+     * - формирует Intent с Messenger'ом для обратной связи,
+     * - запускает сервис для выполнения TCP/UDP-пинга.
+     */
+    private fun startPingService()
+    {
         servers = ArrayList(ServerStorage.load(requireContext()))
         completed = 0
 
@@ -152,6 +176,12 @@ class PingDialog : DialogFragment()
         requireContext().startService(pingServiceIntent)
     }
 
+    /**
+     * Останавливает PingService, если он был запущен.
+     */
+    private fun stopPingService() {
+        requireContext().stopService(pingServiceIntent)
+    }
 
     /**
      * Обновляет состояние прогрессбара после получения очередного ответа.
@@ -170,24 +200,7 @@ class PingDialog : DialogFragment()
         progressText.text = getString(R.string.ping_state, completed, servers.size)
 
         if (completed >= servers.size && !cancelled && isAdded) {
-            ServerStorage.save(requireContext(), servers)
-
-            parentFragmentManager.setFragmentResult(RESULT_KEY, Bundle().apply {
-                putParcelableArrayList(RESULT_EXTRA, servers)
-            })
-
-            requireContext().stopService(pingServiceIntent)
-            dismissAllowingStateLoss()
+            finishPinging()
         }
-    }
-
-    /**
-     * Прерывает процесс пинга и останавливает PingService,
-     * если пользователь закрыл диалог или нажал кнопку "Отмена".
-     */
-    override fun onDestroyView() {
-        cancelled = true
-        requireContext().stopService(pingServiceIntent)
-        super.onDestroyView()
     }
 }
