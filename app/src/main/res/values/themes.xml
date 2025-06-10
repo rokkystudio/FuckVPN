@@ -17,10 +17,11 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 
-        <item name="materialButtonStyle">@style/MaterialButton</item>
+        <item name="materialButtonStyle">@style/ButtonTheme</item>
+        <item name="dialogTheme">@style/DialogTheme</item>
     </style>
 
-    <style name="MaterialButton" parent="Widget.Material3.Button">
+    <style name="ButtonTheme" parent="Widget.Material3.Button">
         <item name="cornerRadius">5dp</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">0dp</item>
@@ -34,5 +35,12 @@
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="DialogTheme" parent="Theme.VPN">
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:background">@color/dialog_background</item>
+        <item name="android:padding">20dp</item>
     </style>
 </resources>

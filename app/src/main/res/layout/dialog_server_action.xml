@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="10dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -93,8 +92,7 @@
             app:icon="@drawable/ic_trash"
             app:iconGravity="textStart"
             app:iconTint="?attr/colorOnPrimary"
-            android:backgroundTint="@color/button_cancel_background"
-            android:text="" />
+            android:backgroundTint="@color/button_cancel_background" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnConnect"
@@ -117,8 +115,7 @@
             app:icon="@drawable/ic_favorite"
             app:iconGravity="textStart"
             app:iconTint="?attr/colorOnPrimary"
-            android:backgroundTint="@color/button_special_background"
-            android:text="" />
+            android:backgroundTint="@color/button_special_background" />
     </LinearLayout>
 
 </LinearLayout>

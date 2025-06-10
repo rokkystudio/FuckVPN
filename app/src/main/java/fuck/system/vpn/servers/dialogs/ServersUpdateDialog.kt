@@ -8,7 +8,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.parser.ServersParser
-import fuck.system.vpn.servers.server.ServerStorage
+import fuck.system.vpn.servers.server.ServersStorage
 import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -23,6 +23,8 @@ class ServersUpdateDialog : DialogFragment()
         private const val assetCsv = "vpngate.csv"
         private const val estimatedSize = 1024 * 1024 // Примерный размер файла в байтах
     }
+
+    override fun getTheme(): Int = R.style.DialogTheme
 
     private lateinit var textMessage: TextView
     private lateinit var progressBar: ProgressBar
@@ -116,7 +118,7 @@ class ServersUpdateDialog : DialogFragment()
     private fun onFailure(context: Context) {
         Toast.makeText(context, getString(R.string.server_update_failed), Toast.LENGTH_SHORT).show()
 
-        val existing = ServerStorage.load(context)
+        val existing = ServersStorage.load(context)
         if (existing.isNotEmpty()) {
             dismissAllowingStateLoss()
             return
@@ -126,7 +128,7 @@ class ServersUpdateDialog : DialogFragment()
             val input = context.assets.open(assetCsv)
             val reader = BufferedReader(InputStreamReader(input))
             val parsed = ServersParser.parseCsv(reader)
-            ServerStorage.save(context, parsed)
+            ServersStorage.save(context, parsed)
             Toast.makeText(context, getString(R.string.server_update_from_assets, parsed.size), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(context, getString(R.string.servers_update_assets_error, e.message), Toast.LENGTH_LONG).show()
@@ -141,7 +143,7 @@ class ServersUpdateDialog : DialogFragment()
      */
     private fun parseAndSaveCsv(csv: String): Int {
         val context = requireContext()
-        val current = ServerStorage.load(context)
+        val current = ServersStorage.load(context)
         val favorites = current.filter { it.favorite }
 
         val reader = csv.reader().buffered()
@@ -154,7 +156,7 @@ class ServersUpdateDialog : DialogFragment()
             }
         }
 
-        ServerStorage.save(context, resultMap.values.toList())
+        ServersStorage.save(context, resultMap.values.toList())
         return resultMap.size
     }
 

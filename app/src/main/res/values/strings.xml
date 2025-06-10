@@ -48,6 +48,7 @@
     <string name="server_action_add_favorite">Add to favorites</string>
     <string name="server_action_remove_favorite">Remove from favorites</string>
     <string name="server_action_delete">Delete server</string>
+    <string name="server_action_not_found">Server not found</string>
 
     <string name="server_update_complete">Updated %1$d servers</string>
     <string name="server_update_failed">Failed to update servers</string>

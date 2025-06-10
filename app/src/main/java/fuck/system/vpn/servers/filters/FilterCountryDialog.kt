@@ -11,17 +11,19 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fuck.system.vpn.R
-import fuck.system.vpn.servers.server.ServerStorage
+import fuck.system.vpn.servers.server.ServersStorage
 
 class FilterCountryDialog : DialogFragment()
 {
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: FilterCountryAdapter
-    private var adapterFilters: MutableList<FilterCountryItem> = mutableListOf()
-
     companion object {
         const val TAG = "CountryFilterDialog"
     }
+
+    override fun getTheme(): Int = R.style.DialogTheme
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: FilterCountryAdapter
+    private var adapterFilters: MutableList<FilterCountryItem> = mutableListOf()
 
     @Suppress("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
@@ -86,7 +88,7 @@ class FilterCountryDialog : DialogFragment()
 
     private fun prepareData()
     {
-        val allServers = ServerStorage.load(requireContext())
+        val allServers = ServersStorage.load(requireContext())
         val allCountryCodes = allServers.mapNotNull { it.country }.distinct()
 
         val savedFilters = FilterCountryStorage.loadAll(requireContext())

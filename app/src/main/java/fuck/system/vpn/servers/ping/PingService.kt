@@ -4,7 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.*
 import android.util.Log
-import fuck.system.vpn.servers.server.ServerStorage
+import fuck.system.vpn.servers.server.ServersStorage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
@@ -28,7 +28,7 @@ class PingService : Service()
 
         val context = applicationContext
 
-        val servers = ServerStorage.load(context)
+        val servers = ServersStorage.load(context)
             .filter { it.ip != null && it.port != null && it.proto != null }
             .toMutableList()
 
@@ -72,7 +72,7 @@ class PingService : Service()
 
             Log.d("PingService", "Ping complete: $responded of ${servers.size} responded")
 
-            ServerStorage.save(context, servers)
+            ServersStorage.save(context, servers)
 
             clientMessenger?.send(
                 Message.obtain(null, 1, responded, servers.size)

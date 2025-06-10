@@ -45,6 +45,7 @@
     <string name="server_action_add_favorite">Добавить в избранное</string>
     <string name="server_action_remove_favorite">Удалить из избранного</string>
     <string name="server_action_delete">Удалить сервер</string>
+    <string name="server_action_not_found">Сервер не найден</string>
 
     <string name="server_update_complete">Обновлено %1$d серверов</string>
     <string name="server_update_failed">Не удалось обновить сервера</string>

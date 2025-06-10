@@ -12,11 +12,11 @@ import androidx.core.graphics.toColorInt
 
 class ServerAdapter(
     private val servers: List<ServerItem>,
-    private val clickListener: OnServerClickListener
-) : RecyclerView.Adapter<ServerAdapter.ServerViewHolder>()
+    private val listener: OnServerClickListener
+)  : RecyclerView.Adapter<ServerAdapter.ServerViewHolder>()
 {
-    interface OnServerClickListener {
-        fun onServerClick(isFavorite: Boolean, position: Int)
+    fun interface OnServerClickListener {
+        fun onServerClick(server: ServerItem)
     }
 
     class ServerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -50,7 +50,7 @@ class ServerAdapter(
 
         // Вешаем обработку клика
         holder.itemView.setOnClickListener {
-            clickListener.onServerClick(server.favorite, position)
+            listener.onServerClick(server)
         }
     }
 

@@ -11,7 +11,7 @@ import androidx.fragment.app.DialogFragment
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.parser.ServersParser
 import fuck.system.vpn.servers.server.ServerItem
-import fuck.system.vpn.servers.server.ServerStorage
+import fuck.system.vpn.servers.server.ServersStorage
 
 /**
  * Диалог для ручного добавления нового VPN-сервера.
@@ -27,6 +27,8 @@ class ServerCreateDialog : DialogFragment()
     companion object {
         const val TAG = "AddServerDialog"
     }
+
+    override fun getTheme(): Int = R.style.DialogTheme
 
     /**
      * Регистрирует обработчик выбора файла .ovpn из хранилища.
@@ -132,7 +134,7 @@ class ServerCreateDialog : DialogFragment()
         )
 
         val context = requireContext()
-        val servers = ServerStorage.load(context).toMutableList()
+        val servers = ServersStorage.load(context)
         val existingIndex = servers.indexOfFirst { it.ip == ip }
 
         val isUpdate = existingIndex >= 0
@@ -142,7 +144,7 @@ class ServerCreateDialog : DialogFragment()
             servers.add(item)
         }
 
-        ServerStorage.save(context, servers)
+        ServersStorage.save(context, servers)
 
         val msg = if (isUpdate) {
             getString(R.string.server_create_updated)

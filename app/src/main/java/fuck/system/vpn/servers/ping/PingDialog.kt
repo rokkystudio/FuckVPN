@@ -18,7 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.server.ServerItem
-import fuck.system.vpn.servers.server.ServerStorage
+import fuck.system.vpn.servers.server.ServersStorage
 import kotlin.math.min
 
 /**
@@ -36,6 +36,8 @@ class PingDialog : DialogFragment()
     companion object {
         const val TAG = "PingServersDialog"
     }
+
+    override fun getTheme(): Int = R.style.DialogTheme
 
     private lateinit var pingServiceIntent: Intent
 
@@ -149,7 +151,7 @@ class PingDialog : DialogFragment()
      * - закрывает диалог.
      */
     private fun finishPinging() {
-        ServerStorage.save(requireContext(), servers)
+        ServersStorage.save(requireContext(), servers)
         stopPingService()
         dismissAllowingStateLoss()
     }
@@ -163,7 +165,7 @@ class PingDialog : DialogFragment()
      */
     private fun startPingService()
     {
-        servers = ArrayList(ServerStorage.load(requireContext()))
+        servers = ArrayList(ServersStorage.load(requireContext()))
         completed = 0
 
         progressBar.max = servers.size

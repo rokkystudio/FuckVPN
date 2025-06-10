@@ -3,11 +3,10 @@ package fuck.system.vpn.servers.dialogs
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import fuck.system.vpn.R
-import fuck.system.vpn.servers.server.ServerStorage
+import fuck.system.vpn.servers.server.ServersStorage
 
 /**
  * Диалог подтверждения очистки списка серверов.
@@ -19,8 +18,11 @@ class ServersClearDialog : DialogFragment()
         const val TAG = "ServersClearDialog"
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = Dialog(requireContext())
+    override fun getTheme(): Int = R.style.DialogTheme
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
+    {
+        val dialog = Dialog(requireContext(), theme)
         dialog.setContentView(R.layout.dialog_servers_clear)
         dialog.setTitle(getString(R.string.servers_clear_title))
 
@@ -29,7 +31,7 @@ class ServersClearDialog : DialogFragment()
 
         buttonClear?.setOnClickListener {
             // Очищаем список серверов
-            ServerStorage.save(requireContext(), emptyList())
+            ServersStorage.save(requireContext(), emptyList())
             Toast.makeText(requireContext(), R.string.servers_clear_complete, Toast.LENGTH_SHORT).show()
             dismiss()
         }

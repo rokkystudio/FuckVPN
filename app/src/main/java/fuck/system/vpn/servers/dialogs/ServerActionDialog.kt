@@ -1,87 +1,175 @@
 package fuck.system.vpn.servers.dialogs
 
-import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.app.Dialog
 import android.os.Bundle
-import android.widget.ImageButton
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.button.MaterialButton
 import fuck.system.vpn.R
+import fuck.system.vpn.servers.server.ServerGeo
+import fuck.system.vpn.servers.server.ServerItem
+import fuck.system.vpn.servers.server.ServersStorage
+import fuck.system.vpn.status.LastServerStorage
 
+/**
+ * Диалог действий с конкретным VPN-сервером.
+ *
+ * Отображает 3 действия:
+ * - Подключение к серверу
+ * - Добавление/удаление из избранного
+ * - Удаление сервера из списка
+ *
+ * Сервер определяется по IP, переданному в аргументах.
+ * Данные загружаются напрямую из ServersStorage.
+ */
 class ServerActionDialog : DialogFragment()
 {
-    companion object
-    {
+    companion object {
         const val TAG = "MenuServerDialog"
-        private const val KEY_FAVORITE = "favorite"
-        private const val KEY_POSITION = "position"
+        const val EXTRA_IP = "ip"
 
-        fun newInstance(isFavorite: Boolean, position: Int): ServerActionDialog
-        {
-            val dialog = ServerActionDialog()
-            dialog.arguments = Bundle().apply {
-                putBoolean(KEY_FAVORITE, isFavorite)
-                putInt(KEY_POSITION, position)
+        /**
+         * Создаёт новый экземпляр диалога с передачей IP сервера.
+         */
+        fun newInstance(ip: String) = ServerActionDialog().apply {
+            arguments = Bundle().apply {
+                putString(EXTRA_IP, ip)
             }
-            return dialog
         }
-
-        const val ACTION_CONNECT = "connect"
-        const val ACTION_FAVORITE = "favorite"
-        const val ACTION_DELETE = "delete"
-        const val RESULT_KEY = "menu_dialog_result"
-        const val EXTRA_ACTION = "action"
-        const val EXTRA_POSITION = "position"
     }
 
-    @SuppressLint("InflateParams")
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
+    override fun getTheme(): Int = R.style.DialogTheme
+
+    private lateinit var server: ServerItem
+    private lateinit var servers: MutableList<ServerItem>
+
+    /**
+     * Загружает layout диалога.
+     */
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, bundle: Bundle?): View? {
+        return inflater.inflate(R.layout.dialog_server_action, container, false)
+    }
+
+    /**
+     * Вызывается после создания view.
+     * Инициализирует данные сервера и UI-элементы.
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
-        val isFavorite = requireArguments().getBoolean(KEY_FAVORITE)
-        val position = requireArguments().getInt(KEY_POSITION)
+        super.onViewCreated(view, savedInstanceState)
 
-        val view = layoutInflater.inflate(R.layout.dialog_server_action, null, false)
+        val ip = requireArguments().getString(EXTRA_IP)
+        if (ip == null) {
+            exitWithNotFound()
+            return
+        }
 
-        val btnConnect = view.findViewById<ImageButton>(R.id.btnConnect)
-        val btnFavorite = view.findViewById<ImageButton>(R.id.btnFavorite)
-        val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
+        servers = ServersStorage.load(requireContext())
+        server = servers.find { it.ip == ip } ?: run {
+            exitWithNotFound()
+            return
+        }
 
-        btnFavorite.setImageResource(
-            if (isFavorite) R.drawable.ic_star_filled
-            else R.drawable.ic_star_outline
-        )
-        btnFavorite.contentDescription =
-            if (isFavorite) getString(R.string.server_action_remove_favorite)
-            else getString(R.string.server_action_add_favorite)
+        setupButtons(view)
+        setupServerInfo(view)
+    }
 
+    /**
+     * Назначает обработчики кнопок действий (подключение, удаление, избранное).
+     * Обновляет иконку кнопки избранного в соответствии с текущим состоянием.
+     */
+    private fun setupButtons(view: View)
+    {
+        val btnConnect = view.findViewById<MaterialButton>(R.id.btnConnect)
         btnConnect.setOnClickListener {
-            sendResult(ACTION_CONNECT, position)
-            dismiss()
-        }
-        btnFavorite.setOnClickListener {
-            sendResult(ACTION_FAVORITE, position)
-            dismiss()
-        }
-        btnDelete.setOnClickListener {
-            sendResult(ACTION_DELETE, position)
-            dismiss()
+            onConnectClicked()
         }
 
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(view)
-            .create()
-        dialog.setCanceledOnTouchOutside(true)
-        return dialog
+        val btnDelete = view.findViewById<MaterialButton>(R.id.btnDelete)
+        btnDelete.setOnClickListener {
+            onDeleteClicked()
+        }
+
+        val btnFavorite = view.findViewById<MaterialButton>(R.id.btnFavorite)
+        btnFavorite.setOnClickListener {
+            onFavoriteClicked()
+        }
+
+        updateFavoriteIcon(btnFavorite)
     }
 
-    private fun sendResult(action: String, position: Int)
+    /**
+     * Отображает информацию о сервере:
+     * страна, IP, пинг, флаг и текущий статус избранного.
+     */
+    private fun setupServerInfo(view: View)
     {
-        parentFragmentManager.setFragmentResult(
-            RESULT_KEY,
-            Bundle().apply {
-                putString(EXTRA_ACTION, action)
-                putInt(EXTRA_POSITION, position)
-            }
+        view.findViewById<TextView>(R.id.textCountry).text = ServerGeo.getCountry(server.country)
+        view.findViewById<TextView>(R.id.textIp).text = server.ip
+        view.findViewById<TextView>(R.id.textPing).text =
+            getString(R.string.ping_value, server.ping?.toString() ?: "—")
+
+        view.findViewById<ImageView>(R.id.imageFlag).setImageResource(ServerGeo.getFlag(server.country))
+
+        view.findViewById<ImageView>(R.id.imageFavorite).setImageResource(
+            if (server.favorite) R.drawable.ic_star_filled else R.drawable.ic_star_outline
         )
+    }
+
+    /**
+     * Обновляет иконку и описание кнопки "Избранное" в зависимости от текущего состояния.
+     */
+    private fun updateFavoriteIcon(button: MaterialButton)
+    {
+        var icon = R.drawable.ic_star_outline
+        var description = getString(R.string.server_action_add_favorite)
+
+        if (server.favorite) {
+            icon = R.drawable.ic_star_filled
+            description = getString(R.string.server_action_remove_favorite)
+        }
+
+        button.setIconResource(icon)
+        button.contentDescription = description
+    }
+
+    /**
+     * Сохраняет выбранный сервер в качестве последнего подключённого
+     * и закрывает диалог.
+     */
+    private fun onConnectClicked() {
+        LastServerStorage.save(requireContext(), server)
+        dismiss()
+    }
+
+    /**
+     * Переключает состояние "избранного" и обновляет UI.
+     */
+    private fun onFavoriteClicked() {
+        server.favorite = !server.favorite
+        ServersStorage.save(requireContext(), servers)
+        val button = view?.findViewById<MaterialButton>(R.id.btnFavorite)
+        if (button != null) updateFavoriteIcon(button)
+    }
+
+    /**
+     * Удаляет сервер из списка и сохраняет изменения.
+     */
+    private fun onDeleteClicked() {
+        servers.removeIf { it.ip == server.ip }
+        ServersStorage.save(requireContext(), servers)
+        dismiss()
+    }
+
+    /**
+     * Показывает сообщение об ошибке (сервер не найден) и закрывает диалог.
+     */
+    private fun exitWithNotFound() {
+        Toast.makeText(requireContext(), R.string.server_action_not_found, Toast.LENGTH_SHORT).show()
+        dismiss()
     }
 }

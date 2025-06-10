@@ -5,9 +5,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fuck.system.vpn.R
@@ -20,8 +18,7 @@ import fuck.system.vpn.servers.dialogs.ServerActionDialog
 import fuck.system.vpn.servers.dialogs.ServersClearDialog
 import fuck.system.vpn.servers.server.ServerAdapter
 import fuck.system.vpn.servers.server.ServerItem
-import fuck.system.vpn.servers.server.ServerStorage
-import fuck.system.vpn.status.LastServerStorage
+import fuck.system.vpn.servers.server.ServersStorage
 
 /**
  * Фрагмент, отображающий список VPN-серверов, с возможностью обновления, фильтрации,
@@ -53,12 +50,12 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
 
     /**
      * Слушатель изменений SharedPreferences для списка серверов.
-     * Срабатывает при любом обновлении значения по ключу [ServerStorage.KEY_SERVERS],
+     * Срабатывает при любом обновлении значения по ключу [ServersStorage.KEY_SERVERS],
      * например, после загрузки новых серверов или их редактирования вручную.
      * Вызывает обновление UI и/или дополнительную обработку.
      */
     private val serverObserver = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-        if (key == ServerStorage.KEY_SERVERS) {
+        if (key == ServersStorage.KEY_SERVERS) {
             onServerChanged()
         }
     }
@@ -83,7 +80,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     private fun onServerChanged()
     {
         val context = context ?: return
-        val newServers = ServerStorage.load(context)
+        val newServers = ServersStorage.load(context)
 
         vpnServer.apply {
             clear()
@@ -150,7 +147,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
      */
     override fun onStart() {
         super.onStart()
-        ServerStorage.observe(requireContext(), serverObserver)
+        ServersStorage.observe(requireContext(), serverObserver)
         FilterCountryStorage.observe(requireContext(), countryObserver)
     }
 
@@ -158,7 +155,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
      * Удаляет наблюдение за изменением списка серверов
      */
     override fun onStop() {
-        ServerStorage.removeObserver(requireContext(), serverObserver)
+        ServersStorage.removeObserver(requireContext(), serverObserver)
         FilterCountryStorage.removeObserver(requireContext(), countryObserver)
         super.onStop()
     }
@@ -172,12 +169,9 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
 
         recyclerView = view.findViewById(R.id.recyclerServers)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = ServerAdapter(filterServer, object : ServerAdapter.OnServerClickListener {
-            override fun onServerClick(isFavorite: Boolean, position: Int) {
-                ServerActionDialog.newInstance(isFavorite, position)
-                    .show(parentFragmentManager, ServerActionDialog.TAG)
-            }
-        })
+        adapter = ServerAdapter(filterServer) { server ->
+            openServerActionDialog(server)
+        }
         recyclerView.adapter = adapter
 
         view.postDelayed({ onInitialAction() }, 1000)
@@ -218,37 +212,11 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         }
 
         view.findViewById<Button>(R.id.ServersButtonAddServer).setOnClickListener {
-            openAddServerDialog()
+            openServerCreateDialog()
         }
 
         view.findViewById<Button>(R.id.ServersButtonEmptyServers).setOnClickListener {
-            openEmptyServersDialog()
-        }
-    }
-
-    /**
-     * Обработка действия из контекстного меню сервера
-     */
-    private fun onServerAction(bundle: Bundle)
-    {
-        // TODO ПЕРЕДЕЛАТЬ ИНСТАНС
-        val action = bundle.getString(ServerActionDialog.EXTRA_ACTION)
-        val position = bundle.getInt(ServerActionDialog.EXTRA_POSITION)
-        if (position in filterServer.indices) {
-            val server = filterServer[position]
-            when (action) {
-                ServerActionDialog.ACTION_CONNECT -> openStatusFragmentWithServer(server)
-                ServerActionDialog.ACTION_FAVORITE -> {
-                    server.favorite = !server.favorite
-                    ServerStorage.save(requireContext(), vpnServer)
-                    updateAdapter()
-                }
-                ServerActionDialog.ACTION_DELETE -> {
-                    vpnServer.removeIf { it.ip == server.ip }
-                    ServerStorage.save(requireContext(), vpnServer)
-                    updateAdapter()
-                }
-            }
+            openServersClearDialog()
         }
     }
 
@@ -261,11 +229,10 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         }
     }
 
-
     /**
      * Открывает диалог добавления нового сервера
      */
-    private fun openAddServerDialog() {
+    private fun openServerCreateDialog() {
         if (parentFragmentManager.findFragmentByTag(ServerCreateDialog.TAG)?.isAdded != true) {
             ServerCreateDialog().show(parentFragmentManager, ServerCreateDialog.TAG)
         }
@@ -280,21 +247,23 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         }
     }
 
-        /**
-     * Показывает подтверждение очистки списка серверов
+    /**
+     * Показывает диалог подтверждения очистки списка серверов
      */
-    private fun openEmptyServersDialog() {
+    private fun openServersClearDialog() {
         if (parentFragmentManager.findFragmentByTag(ServersClearDialog.TAG)?.isAdded != true) {
             ServersClearDialog().show(parentFragmentManager, ServersClearDialog.TAG)
         }
     }
 
     /**
-     * Переход к статусу и подключению к выбранному серверу
+     * Показывает диалог действия при клике по серверу в списке
      */
-    private fun openStatusFragmentWithServer(server: ServerItem) {
-        LastServerStorage.save(requireContext(), server)
-        LastServerStorage.setAutoConnect(requireContext(), true)
-        findNavController().navigate(R.id.nav_status)
+    private fun openServerActionDialog(server: ServerItem) {
+        val ip = server.ip ?: return
+        if (parentFragmentManager.findFragmentByTag(ServerActionDialog.TAG)?.isAdded != true) {
+            ServerActionDialog.newInstance(ip)
+                .show(parentFragmentManager, ServerActionDialog.TAG)
+        }
     }
 }
