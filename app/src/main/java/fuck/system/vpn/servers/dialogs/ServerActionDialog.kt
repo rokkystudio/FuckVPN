@@ -42,10 +42,10 @@ class ServerActionDialog : DialogFragment()
         }
     }
 
-    override fun getTheme(): Int = R.style.DialogTheme
-
     private lateinit var server: ServerItem
     private lateinit var servers: MutableList<ServerItem>
+
+    override fun getTheme(): Int = R.style.DialogTheme
 
     /**
      * Загружает layout диалога.

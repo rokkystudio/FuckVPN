@@ -5,35 +5,48 @@ import android.os.Bundle
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.lifecycleScope
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.parser.ServersParser
 import fuck.system.vpn.servers.server.ServersStorage
-import kotlinx.coroutines.*
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import androidx.core.content.edit
+import fuck.system.vpn.servers.server.ServerItem
 
+/**
+ * Диалог обновления списка VPN-серверов.
+ *
+ * Пытается загрузить CSV-файл с серверами из интернета. Если не удаётся —
+ * использует локальный кэш. Если кэша нет — использует файл из assets.
+ * Сохраняет результат и сохраняет избранные сервера из предыдущего списка.
+ */
 class ServersUpdateDialog : DialogFragment()
 {
-    companion object {
+    companion object
+    {
         const val TAG = "GetServersDialog"
-        private const val githubCsv = "https://raw.githubusercontent.com/rokkystudio/VPN/master/app/src/main/assets/vpngate.csv"
-        private const val assetCsv = "vpngate.csv"
-        private const val estimatedSize = 1024 * 1024 // Примерный размер файла в байтах
+
+        private const val CACHE_PREF = "vpn_cache"
+        private const val KEY_LAST_CSV = "last_csv"
+
+        private const val GITHUB_CSV_URL = "https://raw.githubusercontent.com/rokkystudio/VPN/master/app/src/main/assets/vpngate.csv"
+        private const val ASSET_CSV_NAME = "vpngate.csv"
+
+        private const val CONNECT_TIMEOUT_MS = 3000
+        private const val READ_TIMEOUT_MS = 3000
+        private const val HTTP_SUCCESS_CODE = 200
+        private const val ESTIMATED_SIZE_BYTES = 1258316 // Примерный размер файла в байтах
+        private const val BUFFER_SIZE = 4096
     }
 
-    override fun getTheme(): Int = R.style.DialogTheme
-
-    private lateinit var textMessage: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var percentView: TextView
     private lateinit var closeButton: Button
 
-    @Volatile private var cancelled = false
-    private var job: Job? = null
     private var hasStarted = false
+    private var lastProgress = -1
+
+    override fun getTheme(): Int = R.style.DialogTheme
 
     /**
      * Подключает layout-ресурс
@@ -45,16 +58,15 @@ class ServersUpdateDialog : DialogFragment()
     /**
      * Инициализирует элементы интерфейса и запускает загрузку серверов
      */
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
         super.onViewCreated(view, savedInstanceState)
 
-        textMessage = view.findViewById(R.id.GetServersTextMessage)
         progressBar = view.findViewById(R.id.GetServersProgressBar)
         percentView = view.findViewById(R.id.GetServersPercentText)
         closeButton = view.findViewById(R.id.GetServersCloseButton)
 
         closeButton.setOnClickListener {
-            cancelled = true
             dismissAllowingStateLoss()
         }
 
@@ -65,95 +77,131 @@ class ServersUpdateDialog : DialogFragment()
     }
 
     /**
-     * Устанавливает ширину диалогового окна на 80% от ширины экрана
+     * Отмена загрузки и очистка ресурсов при уничтожении view
      */
-    override fun onStart()
-    {
-        super.onStart()
-
-        dialog?.window?.let { window ->
-            val metrics = resources.displayMetrics
-            val width = (metrics.widthPixels * 0.8).toInt()
-            window.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
-        }
+    override fun onDestroyView() {
+        hasStarted = false
+        super.onDestroyView()
     }
 
     /**
-     * Запускает фоновую корутину для загрузки серверов из сети или fallback из assets
+     * Запускает загрузку серверов в отдельном потоке.
      */
     private fun startLoading() {
-        progressBar.progress = 0
-        percentView.text = ""
-        textMessage.setText(R.string.server_update_loading)
+        Thread {
+            performLoading()
+        }.start()
+    }
+
+    /**
+     * Выполняет загрузку CSV и передаёт результат в основной поток.
+     */
+    private fun performLoading()
+    {
+        if (!isAdded || !hasStarted) return
 
         val context = requireContext()
+        val csv = downloadCsv(GITHUB_CSV_URL)
 
-        job = requireActivity().lifecycleScope.launch(Dispatchers.IO) {
-            val csv = downloadUrl(githubCsv)
+        if (!isAdded || !hasStarted) return
 
-            withContext(Dispatchers.Main) {
-                if (!isAdded || cancelled) return@withContext
-
-                if (csv != null) {
-                    onSuccess(csv, context)
-                } else {
-                    onFailure(context)
-                }
+        requireActivity().runOnUiThread {
+            if (csv != null) {
+                onSuccess(context, csv)
+            } else {
+                onFailure(context)
             }
         }
     }
 
     /**
-     * Обрабатывает успешную загрузку CSV, парсит и сохраняет список
+     * Обрабатывает успешную загрузку CSV: сохраняет его в кэш,
+     * парсит, объединяет с избранными и сохраняет в хранилище.
      */
-    private fun onSuccess(csv: String, context: Context) {
-        val count = parseAndSaveCsv(csv)
-        Toast.makeText(context, getString(R.string.server_update_complete, count), Toast.LENGTH_SHORT).show()
+    private fun onSuccess(context: Context, csv: String)
+    {
+        saveCsvCache(context, csv)
+        val count = parseCsvString(csv)
+
+        showToast(context, getString(R.string.server_update_complete, count))
         dismissAllowingStateLoss()
     }
 
     /**
-     * Обрабатывает неудачную загрузку: пробует загрузить из кэша или из assets
+     * Обрабатывает неудачную загрузку:
+     * пробует восстановить список из кэша или из assets.
      */
-    private fun onFailure(context: Context) {
-        Toast.makeText(context, getString(R.string.server_update_failed), Toast.LENGTH_SHORT).show()
-
-        val existing = ServersStorage.load(context)
-        if (existing.isNotEmpty()) {
+    private fun onFailure(context: Context)
+    {
+        var count = parseCsvCache(context)
+        if (count != null) {
+            showToast(context, getString(R.string.server_update_from_cache, count))
             dismissAllowingStateLoss()
             return
         }
 
-        try {
-            val input = context.assets.open(assetCsv)
-            val reader = BufferedReader(InputStreamReader(input))
-            val parsed = ServersParser.parseCsv(reader)
-            ServersStorage.save(context, parsed)
-            Toast.makeText(context, getString(R.string.server_update_from_assets, parsed.size), Toast.LENGTH_SHORT).show()
+        count = parseCsvAssets(context)
+        if (count != null) {
+            showToast(context, getString(R.string.server_update_from_assets, count))
+        } else {
+            showToast(context, getString(R.string.server_update_failed))
+        }
+        dismissAllowingStateLoss()
+    }
+
+    /**
+     * Парсит CSV-строку, объединяет с избранными и сохраняет.
+     * @return Общее количество серверов после объединения.
+     */
+    private fun parseCsvString(csv: String): Int {
+        val context = requireContext()
+        val reader = csv.reader().buffered()
+        val parsed = ServersParser.parseCsv(reader)
+        return updateServers(context, parsed)
+    }
+
+    /**
+     * Загружает список из кэша и сохраняет.
+     * @return Количество серверов или null при ошибке.
+     */
+    private fun parseCsvCache(context: Context): Int? {
+        return try {
+            val csv = context.getSharedPreferences(CACHE_PREF, Context.MODE_PRIVATE)
+                .getString(KEY_LAST_CSV, null) ?: return null
+            parseCsvString(csv)
         } catch (e: Exception) {
-            Toast.makeText(context, getString(R.string.servers_update_assets_error, e.message), Toast.LENGTH_LONG).show()
-        } finally {
-            dismissAllowingStateLoss()
+            e.printStackTrace()
+            null
         }
     }
 
     /**
-     * Парсит CSV, сохраняет, при этом восстанавливает избранные из старого списка
-     * @return Кол-во серверов после объединения
+     * Загружает список из assets и сохраняет.
+     * @return Количество серверов или null при ошибке.
      */
-    private fun parseAndSaveCsv(csv: String): Int {
-        val context = requireContext()
+    private fun parseCsvAssets(context: Context): Int? {
+        return try {
+            val input = context.assets.open(ASSET_CSV_NAME)
+            val csv = input.bufferedReader().readText()
+            parseCsvString(csv)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    /**
+     * Объединяет новый список с текущими избранными серверами и сохраняет.
+     * @return Общее количество серверов после объединения.
+     */
+    private fun updateServers(context: Context, parsed: List<ServerItem>): Int
+    {
         val current = ServersStorage.load(context)
         val favorites = current.filter { it.favorite }
 
-        val reader = csv.reader().buffered()
-        val parsed = ServersParser.parseCsv(reader)
-
         val resultMap = favorites.associateBy { it.ip }.toMutableMap()
-        for (server in parsed) {
-            if (!resultMap.containsKey(server.ip)) {
-                resultMap[server.ip] = server
-            }
+        parsed.forEach { server ->
+            resultMap.putIfAbsent(server.ip, server)
         }
 
         ServersStorage.save(context, resultMap.values.toList())
@@ -161,69 +209,102 @@ class ServersUpdateDialog : DialogFragment()
     }
 
     /**
+     * Сохраняет CSV в SharedPreferences как последний успешный сеанс.
+     */
+    private fun saveCsvCache(context: Context, csv: String) {
+        context.getSharedPreferences(CACHE_PREF, Context.MODE_PRIVATE).edit {
+            putString(KEY_LAST_CSV, csv)
+        }
+    }
+
+    /**
      * Загружает CSV-файл с серверами по URL, если удачно — возвращает содержимое
      */
-    private suspend fun downloadUrl(urlStr: String): String? = withContext(Dispatchers.IO) {
-        var result: String? = null
-
+    @Suppress("SameParameterValue")
+    private fun downloadCsv(urlStr: String): String?
+    {
         try {
             val connection = (URL(urlStr).openConnection() as HttpURLConnection).apply {
-                connectTimeout = 8000
-                readTimeout = 8000
+                connectTimeout = CONNECT_TIMEOUT_MS
+                readTimeout = READ_TIMEOUT_MS
             }
 
-            if (connection.responseCode == 200) {
-                connection.inputStream.use { inputStream ->
-                    val length = if (connection.contentLength > 0) connection.contentLength else estimatedSize
-                    result = readStream(inputStream, length)
+            if (hasStarted && connection.responseCode == HTTP_SUCCESS_CODE)
+            {
+                val input = connection.inputStream
+                var length = ESTIMATED_SIZE_BYTES
+
+                if (connection.contentLength > 0) {
+                    length = connection.contentLength
                 }
+                return input.use { readStream(it, length) }
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        return@withContext result
+        return null
     }
 
     /**
      * Читает входной поток как строку, отображает прогресс
      */
-    private fun readStream(inputStream: java.io.InputStream, totalLength: Int): String {
-        val buffer = ByteArray(4096)
+    private fun readStream(inputStream: java.io.InputStream, totalLength: Int): String
+    {
+        val buffer = ByteArray(BUFFER_SIZE)
         val out = StringBuilder()
         var totalRead = 0
         var read: Int
-        var lastProgress = -1
 
-        while (inputStream.read(buffer).also { read = it } != -1 && !cancelled) {
+        while (inputStream.read(buffer).also { read = it } != -1 && hasStarted) {
             out.append(String(buffer, 0, read))
             totalRead += read
-
-            val progress = (totalRead * 100) / totalLength
-            if (progress != lastProgress && progress <= 100) {
-                lastProgress = progress
-                lifecycleScope.launch(Dispatchers.Main) {
-                    progressBar.progress = progress
-                    percentView.text = getString(R.string.server_update_loading_percent, progress)
-                }
-            }
+            updateProgress(totalRead, totalLength)
         }
 
-        // Завершаем на 100%
-        lifecycleScope.launch(Dispatchers.Main) {
-            progressBar.progress = 100
-            percentView.text = getString(R.string.server_update_loading_percent, 100)
-        }
-
+        finishProgress()
         return out.toString()
     }
 
     /**
-     * Отмена загрузки и очистка ресурсов при уничтожении view
+     * Обновляет прогресс загрузки в UI, если изменился процент.
      */
-    override fun onDestroyView() {
-        cancelled = true
-        job?.cancel()
-        super.onDestroyView()
+    private fun updateProgress(bytesRead: Int, totalBytes: Int)
+    {
+        val progress = (bytesRead * 100) / totalBytes
+        if (progress != lastProgress && progress <= 100) {
+            lastProgress = progress
+            runOnUiThreadSafe {
+                progressBar.progress = progress
+                percentView.text = getString(R.string.servers_update_loading_percent, progress)
+            }
+        }
+    }
+
+    /**
+     * Устанавливает прогресс на 100%.
+     */
+    private fun finishProgress()
+    {
+        if (!hasStarted) return
+
+        runOnUiThreadSafe {
+            progressBar.progress = 100
+            percentView.text = getString(R.string.servers_update_loading_percent, 100)
+        }
+    }
+
+    /**
+     * Безопасный вызов runOnUiThread.
+     */
+    private fun runOnUiThreadSafe(action: () -> Unit) {
+        if (isAdded) requireActivity().runOnUiThread(action)
+    }
+
+    /**
+     * Показывает короткое сообщение Toast.
+     */
+    private fun showToast(context: Context, text: String) {
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
     }
 }

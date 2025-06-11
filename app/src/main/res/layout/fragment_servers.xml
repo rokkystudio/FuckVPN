@@ -21,8 +21,8 @@
             android:layout_weight="1"
             android:layout_marginEnd="20dp"
             android:minHeight="48dp"
-            android:contentDescription="@string/servers_country_filter"
-            android:tooltipText="@string/servers_country_filter"
+            android:contentDescription="@string/servers_country_filter_title"
+            android:tooltipText="@string/servers_country_filter_title"
             app:icon="@drawable/ic_flag" />
 
         <com.google.android.material.button.MaterialButton
@@ -32,8 +32,8 @@
             android:layout_weight="1"
             android:layout_marginEnd="20dp"
             android:minHeight="48dp"
-            android:contentDescription="@string/server_update_title"
-            android:tooltipText="@string/server_update_title"
+            android:contentDescription="@string/servers_update_title"
+            android:tooltipText="@string/servers_update_title"
             app:icon="@drawable/ic_update" />
 
         <com.google.android.material.button.MaterialButton
@@ -43,8 +43,8 @@
             android:layout_weight="1"
             android:layout_marginEnd="20dp"
             android:minHeight="48dp"
-            android:contentDescription="@string/servers_add_server"
-            android:tooltipText="@string/servers_add_server"
+            android:contentDescription="@string/servers_create_title"
+            android:tooltipText="@string/servers_create_title"
             app:icon="@drawable/ic_add" />
 
         <com.google.android.material.button.MaterialButton

@@ -17,6 +17,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 
+        <item name="textInputStyle">@style/TextInputStyle</item>
         <item name="materialButtonStyle">@style/ButtonTheme</item>
         <item name="dialogTheme">@style/DialogTheme</item>
     </style>
@@ -29,7 +30,7 @@
         <item name="backgroundTint">@color/button_body</item>
         <item name="iconSize">24dp</item>
         <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/button_text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:singleLine">true</item>
@@ -41,6 +42,16 @@
         <item name="android:windowMinWidthMajor">90%</item>
         <item name="android:windowMinWidthMinor">90%</item>
         <item name="android:background">@color/dialog_background</item>
-        <item name="android:padding">20dp</item>
+    </style>
+
+    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">@color/text_input_background</item>
+        <item name="boxStrokeColor">@color/text_input_border</item>
+        <item name="android:textColorHint">@color/text_input_hint</item>
+        <item name="hintTextColor">@color/text_input_hint</item>
+        <item name="boxCornerRadiusTopStart">5dp</item>
+        <item name="boxCornerRadiusTopEnd">5dp</item>
+        <item name="boxCornerRadiusBottomStart">5dp</item>
+        <item name="boxCornerRadiusBottomEnd">5dp</item>
     </style>
 </resources>

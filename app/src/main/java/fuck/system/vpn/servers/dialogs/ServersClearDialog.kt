@@ -1,7 +1,9 @@
 package fuck.system.vpn.servers.dialogs
 
-import android.app.Dialog
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -20,26 +22,35 @@ class ServersClearDialog : DialogFragment()
 
     override fun getTheme(): Int = R.style.DialogTheme
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
+    /**
+     * Загружает layout диалога.
+     */
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, bundle: Bundle?): View? {
+        return inflater.inflate(R.layout.dialog_servers_clear, container, false)
+    }
+
+    /**
+     * Инициализирует кнопки и их действия.
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
-        val dialog = Dialog(requireContext(), theme)
-        dialog.setContentView(R.layout.dialog_servers_clear)
-        dialog.setTitle(getString(R.string.servers_clear_title))
+        super.onViewCreated(view, savedInstanceState)
 
-        val buttonClear = dialog.findViewById<Button>(R.id.ServersEmptyButtonClear)
-        val buttonCancel = dialog.findViewById<Button>(R.id.ServersEmptyButtonCancel)
-
-        buttonClear?.setOnClickListener {
-            // Очищаем список серверов
-            ServersStorage.save(requireContext(), emptyList())
-            Toast.makeText(requireContext(), R.string.servers_clear_complete, Toast.LENGTH_SHORT).show()
-            dismiss()
+        view.findViewById<Button>(R.id.ServersEmptyButtonClear).setOnClickListener {
+            clearServers()
         }
 
-        buttonCancel?.setOnClickListener {
+        view.findViewById<Button>(R.id.ServersEmptyButtonCancel).setOnClickListener {
             dismiss()
         }
+    }
 
-        return dialog
+    /**
+     * Удаляет все серверы из хранилища и закрывает диалог.
+     */
+    private fun clearServers() {
+        ServersStorage.save(requireContext(), emptyList())
+        Toast.makeText(requireContext(), R.string.servers_clear_complete, Toast.LENGTH_SHORT).show()
+        dismiss()
     }
 }

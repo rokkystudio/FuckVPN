@@ -1,78 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:padding="20dp">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="?android:attr/dividerHorizontal"
-        android:showDividers="middle"
-        android:dividerPadding="8dp">
+        android:text="@string/servers_create_title"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:textColor="@color/title"
+        android:paddingBottom="12dp" />
 
-        <com.google.android.material.textfield.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/server_create_name">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ServerAddName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/server_create_name">
+            android:inputType="textCapWords" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ServerAddName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords" />
-        </com.google.android.material.textfield.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/server_create_openvpn"
+        android:layout_marginTop="12dp">
+
+    <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ServerAddOpenVpn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/server_create_openvpn"
-            android:layout_marginTop="12dp">
+            android:inputType="textMultiLine"
+            android:gravity="top"
+            android:minLines="10"
+            android:maxLines="10" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/ServerAddOpenVpn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:minLines="10"
-                android:maxLines="10" />
-        </com.google.android.material.textfield.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ServerAddLoadFile"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="20dp"
+            android:contentDescription="@string/server_create_load_file"
+            app:icon="@drawable/ic_load"
+            android:backgroundTint="@color/button_special_background" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ServerAddSave"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_weight="1"
+            android:layout_marginEnd="20dp"
+            android:text="@string/save"
+            android:backgroundTint="@color/button_confirm_background" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/ServerAddLoadFile"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginEnd="20dp"
-                android:contentDescription="@string/server_create_load_file"
-                app:icon="@drawable/ic_load"
-                app:iconTint="#fa3"
-                android:text="" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/ServerAddSave"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="20dp"
-                android:text="@string/save" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/ServersAddCancel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/cancel" />
-
-        </LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ServersAddCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/cancel"
+            android:backgroundTint="@color/button_cancel_background" />
 
     </LinearLayout>
-</ScrollView>
+
+</LinearLayout>

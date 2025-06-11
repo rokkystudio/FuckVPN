@@ -1,8 +1,10 @@
 package fuck.system.vpn.servers.dialogs
 
-import android.app.Dialog
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -31,66 +33,38 @@ class ServerCreateDialog : DialogFragment()
     override fun getTheme(): Int = R.style.DialogTheme
 
     /**
-     * Регистрирует обработчик выбора файла .ovpn из хранилища.
-     * Загружает содержимое в текстовое поле.
+     * Загружает layout диалога.
      */
-    private val filePicker = registerForActivityResult(
-        ActivityResultContracts.OpenDocument(), ::onPickerResult
-    )
-
-    /**
-     * Обрабатывает результат выбора .ovpn-файла.
-     * Считывает содержимое и вставляет в текстовое поле.
-     */
-    private fun onPickerResult(uri: Uri?)
-    {
-        if (uri == null || !isAdded || dialog == null || view == null) return
-
-        val edit = dialog?.findViewById<EditText>(R.id.ServerAddOpenVpn) ?: return
-
-        try {
-            val resolver = requireContext().contentResolver
-            resolver.openInputStream(uri)?.use { stream ->
-                val text = stream.bufferedReader().readText()
-                edit.setText(text)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            edit.setText("")
-            Toast.makeText(requireContext(), getString(R.string.server_create_load_file_error), Toast.LENGTH_LONG).show()
-            edit.requestFocus()
-        }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, bundle: Bundle?): View? {
+        return inflater.inflate(R.layout.dialog_server_create, container, false)
     }
 
     /**
-     * Создаёт диалоговое окно с полями для ввода имени и вставки конфигурации.
+     * Вызывается после создания view.
      */
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.dialog_server_create)
-        dialog.setTitle(getString(R.string.servers_add_server))
+        super.onViewCreated(view, savedInstanceState)
 
-        val inputName = dialog.findViewById<EditText>(R.id.ServerAddName)
-        val inputOvpn = dialog.findViewById<EditText>(R.id.ServerAddOpenVpn)
-        val buttonSave = dialog.findViewById<Button>(R.id.ServerAddSave)
-        val buttonCancel = dialog.findViewById<Button>(R.id.ServersAddCancel)
-        val buttonLoadFile = dialog.findViewById<Button>(R.id.ServerAddLoadFile)
+        val inputName = view.findViewById<EditText>(R.id.ServerAddName)
+        val inputOvpn = view.findViewById<EditText>(R.id.ServerAddOpenVpn)
+        val buttonSave = view.findViewById<Button>(R.id.ServerAddSave)
+        val buttonCancel = view.findViewById<Button>(R.id.ServersAddCancel)
+        val buttonLoadFile = view.findViewById<Button>(R.id.ServerAddLoadFile)
 
-        buttonSave?.setOnClickListener { onSaveClicked(inputName, inputOvpn) }
-        buttonCancel?.setOnClickListener { dismiss() }
         buttonLoadFile?.setOnClickListener {
-            filePicker.launch(
-                arrayOf(
-                    "*/*",
-                    "application/x-openvpn-profile",
-                    "application/octet-stream",
-                    "text/*"
-                )
-            )
+            filePicker.launch(arrayOf(
+                "*/*", "application/x-openvpn-profile", "application/octet-stream", "text/*"
+            ))
         }
 
-        return dialog
+        buttonSave?.setOnClickListener {
+            onSaveClicked(inputName, inputOvpn)
+        }
+
+        buttonCancel?.setOnClickListener {
+            dismiss()
+        }
     }
 
     /**
@@ -122,7 +96,7 @@ class ServerCreateDialog : DialogFragment()
         var name = inputName?.text?.toString()?.trim().orEmpty()
         name = name.ifBlank { host ?: ip }
 
-        val item = ServerItem(
+        val server = ServerItem(
             name = name,
             ovpn = ovpn,
             favorite = false,
@@ -133,26 +107,76 @@ class ServerCreateDialog : DialogFragment()
             ping = null
         )
 
+        saveServer(server)
+
+        Toast.makeText(context, R.string.server_create_complete, Toast.LENGTH_SHORT).show()
+        dismiss()
+    }
+
+    /**
+     * Сохраняет сервер в локальное хранилище.
+     * Если сервер с таким IP уже существует — обновляет его.
+     * Иначе добавляет новый сервер.
+     */
+    private fun saveServer(item: ServerItem)
+    {
         val context = requireContext()
         val servers = ServersStorage.load(context)
-        val existingIndex = servers.indexOfFirst { it.ip == ip }
+        val existingIndex = servers.indexOfFirst { it.ip == item.ip }
 
-        val isUpdate = existingIndex >= 0
-        if (isUpdate) {
+        if (existingIndex >= 0) {
             servers[existingIndex] = item
         } else {
             servers.add(item)
         }
 
         ServersStorage.save(context, servers)
+    }
 
-        val msg = if (isUpdate) {
-            getString(R.string.server_create_updated)
+    /**
+     * Регистрирует обработчик выбора файла .ovpn из хранилища.
+     * Загружает содержимое в текстовое поле.
+     */
+    private val filePicker = registerForActivityResult(
+        ActivityResultContracts.OpenDocument(), ::onPickerResult
+    )
+
+    /**
+     * Обрабатывает результат выбора .ovpn-файла.
+     * Считывает содержимое и вставляет в текстовое поле.
+     */
+    private fun onPickerResult(uri: Uri?)
+    {
+        if (uri == null || !isAdded) return
+
+        val edit = view?.findViewById<EditText>(R.id.ServerAddOpenVpn) ?: return
+        val text = readOvpn(uri)
+
+        if (text != null) {
+            edit.setText(text)
         } else {
-            getString(R.string.server_create_complete)
+            edit.setText("")
+            Toast.makeText(requireContext(), getString(R.string.server_create_load_file_error), Toast.LENGTH_LONG).show()
+            edit.requestFocus()
         }
+    }
 
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-        dismiss()
+    /**
+     * Загружает и декодирует OVPN-конфигурацию из указанного URI.
+     * Если файл закодирован в Base64 — декодирует его.
+     * В случае ошибки возвращает null.
+     */
+    private fun readOvpn(uri: Uri): String?
+    {
+        return try {
+            val resolver = requireContext().contentResolver
+            resolver.openInputStream(uri)?.use { stream ->
+                val rawText = stream.bufferedReader().readText()
+                ServersParser.decodeConfig(rawText)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

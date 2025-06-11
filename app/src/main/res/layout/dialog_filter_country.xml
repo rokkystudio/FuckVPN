@@ -2,10 +2,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/CountryFilterRoot"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="12dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/servers_country_filter_title"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:textColor="@color/title"
+        android:paddingBottom="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/CountryFilterList"
@@ -32,7 +43,8 @@
             android:layout_marginEnd="20dp"
             app:icon="@drawable/ic_select_all"
             android:contentDescription="@string/select_all"
-            android:tooltipText="@string/select_all" />
+            android:tooltipText="@string/select_all"
+            android:backgroundTint="@color/button_special_background" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/CountryFilterButtonUnselectAll"
@@ -42,7 +54,8 @@
             android:layout_marginEnd="20dp"
             app:icon="@drawable/ic_unselect_all"
             android:contentDescription="@string/unselect_all"
-            android:tooltipText="@string/unselect_all" />
+            android:tooltipText="@string/unselect_all"
+            android:backgroundTint="@color/button_cancel_background" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/CountryFilterButtonClose"
@@ -51,6 +64,8 @@
             android:layout_weight="1"
             app:icon="@drawable/ic_back"
             android:contentDescription="@string/close"
-            android:tooltipText="@string/close" />
+            android:tooltipText="@string/close"
+            android:backgroundTint="@color/button_confirm_background" />
+
     </LinearLayout>
 </LinearLayout>

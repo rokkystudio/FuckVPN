@@ -1,11 +1,11 @@
 package fuck.system.vpn.servers.filters
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +13,10 @@ import androidx.recyclerview.widget.RecyclerView
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.server.ServersStorage
 
+/**
+ * Диалог фильтрации серверов по странам.
+ * Позволяет выбрать, какие страны отображать в списке серверов.
+ */
 class FilterCountryDialog : DialogFragment()
 {
     companion object {
@@ -21,43 +25,30 @@ class FilterCountryDialog : DialogFragment()
 
     override fun getTheme(): Int = R.style.DialogTheme
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: FilterCountryAdapter
-    private var adapterFilters: MutableList<FilterCountryItem> = mutableListOf()
+    private var recyclerView: RecyclerView? = null
+    private var adapter = FilterCountryAdapter(mutableListOf()) {}
 
-    @Suppress("InflateParams")
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
+    /** Список стран с состоянием фильтрации (вкл/выкл) */
+    private var filters: MutableList<FilterCountryItem> = mutableListOf()
+
+    /**
+     * Подключает layout-ресурс
+     */
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.dialog_filter_country, container, false)
+    }
+
+    /**
+     * Инициализирует кнопки и список стран.
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
-        val builder = AlertDialog.Builder(requireContext())
-        val inflater = requireActivity().layoutInflater
-        val view = inflater.inflate(R.layout.dialog_filter_country, null, false)
+        super.onViewCreated(view, savedInstanceState)
 
-        setupRecyclerView(view)
-        setupButtons(view)
-
-        builder.setView(view)
-        return builder.create()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        prepareData()
-        setupAdapter()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        FilterCountryStorage.saveAll(requireContext(), adapterFilters)
-    }
-
-    private fun setupRecyclerView(view: View) {
         recyclerView = view.findViewById(R.id.CountryFilterList)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.itemAnimator = DefaultItemAnimator()
-    }
+        recyclerView?.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView?.itemAnimator = DefaultItemAnimator()
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun setupButtons(view: View) {
         view.findViewById<Button>(R.id.CountryFilterButtonSelectAll)
             .setOnClickListener { onSelectAllClicked() }
 
@@ -65,27 +56,50 @@ class FilterCountryDialog : DialogFragment()
             .setOnClickListener { onUnselectAllClicked() }
 
         view.findViewById<Button>(R.id.CountryFilterButtonClose)
-            .setOnClickListener { onCloseClicked() }
+            .setOnClickListener { dismiss() }
     }
 
+    /**
+     * Загружает данные и обновляет адаптер при открытии диалога.
+     */
+    override fun onStart() {
+        super.onStart()
+        prepareData()
+        setupAdapter()
+    }
+
+    /**
+     * Сохраняет выбранные фильтры при закрытии диалога.
+     */
+    override fun onStop() {
+        super.onStop()
+        FilterCountryStorage.saveAll(requireContext(), filters)
+    }
+
+    /**
+     * Отмечает все страны как активные.
+     */
     @SuppressLint("NotifyDataSetChanged")
     private fun onSelectAllClicked() {
-        if (adapterFilters.isEmpty()) return
-        adapterFilters.forEach { it.enabled = true }
+        if (filters.isEmpty()) return
+        filters.forEach { it.enabled = true }
         adapter.notifyDataSetChanged()
     }
 
+    /**
+     * Отмечает все страны как неактивные.
+     */
     @SuppressLint("NotifyDataSetChanged")
     private fun onUnselectAllClicked() {
-        if (adapterFilters.isEmpty()) return
-        adapterFilters.forEach { it.enabled = false }
+        if (filters.isEmpty()) return
+        filters.forEach { it.enabled = false }
         adapter.notifyDataSetChanged()
     }
 
-    private fun onCloseClicked() {
-        dismiss()
-    }
-
+    /**
+     * Формирует список фильтров из всех доступных стран,
+     * объединяя сохранённые фильтры и новые страны.
+     */
     private fun prepareData()
     {
         val allServers = ServersStorage.load(requireContext())
@@ -95,29 +109,29 @@ class FilterCountryDialog : DialogFragment()
             .filter { !it.enabled } // Только отключённые
             .toMutableList()
 
-        // Добавляем новые страны с enabled = true, если их нет в сохранённых
+        // Добавляем страны, которых нет в сохранённых
         allCountryCodes.forEach { code ->
             if (savedFilters.none { it.country == code }) {
                 savedFilters.add(FilterCountryItem(code, true))
             }
         }
 
-        adapterFilters = savedFilters
+        filters = savedFilters
             .distinctBy { it.country }
             .sortedBy { it.country }
             .toMutableList()
     }
 
+    /**
+     * Создаёт и обновляет адаптер с чекбоксами стран.
+     */
     @SuppressLint("NotifyDataSetChanged")
-    private fun setupAdapter() {
-        if (!::adapter.isInitialized) {
-            adapter = FilterCountryAdapter(adapterFilters) { position ->
-                adapterFilters[position].enabled = !adapterFilters[position].enabled
-                adapter.notifyItemChanged(position)
-            }
-            recyclerView.adapter = adapter
-        } else {
-            adapter.notifyDataSetChanged()
+    private fun setupAdapter()
+    {
+        adapter = FilterCountryAdapter(filters) { position ->
+            filters[position].enabled = !filters[position].enabled
+            adapter.notifyItemChanged(position)
         }
+        recyclerView?.adapter = adapter
     }
 }

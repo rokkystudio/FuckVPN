@@ -15,12 +15,11 @@
     <string name="repeat">Try Again</string>
 
     <string name="servers_remove_server">Remove server</string>
-    <string name="servers_add_server">Add server</string>
-    <string name="servers_country_filter">Select country</string>
+    <string name="servers_country_filter_title">Select countries to display</string>
 
-    <string name="server_update_title">Download servers</string>
-    <string name="server_update_loading">Server list loading …</string>
-    <string name="server_update_loading_percent">Download: %1$d%%</string>
+    <string name="servers_update_title">Download servers</string>
+    <string name="servers_update_loading">Server list loading …</string>
+    <string name="servers_update_loading_percent">Download: %1$d%%</string>
 
     <string name="filter_country_title">Select countries</string>
 
@@ -28,6 +27,7 @@
     <string name="ping_state">Completed: %1$d/%2$d</string>
     <string name="ping_value">%1$s ms</string>
 
+    <string name="servers_create_title">Add server</string>
     <string name="server_create_name">Server name (not required)</string>
     <string name="server_create_openvpn">OpenVPN configuration</string>
     <string name="server_create_openvpn_required">Configuration must be specified!</string>
@@ -44,16 +44,17 @@
     <string name="servers_clear_complete">The server list has been cleared</string>
 
 
+    <string name="server_action_title">Select server</string>
     <string name="server_action_connect">Connect to server</string>
     <string name="server_action_add_favorite">Add to favorites</string>
     <string name="server_action_remove_favorite">Remove from favorites</string>
     <string name="server_action_delete">Delete server</string>
     <string name="server_action_not_found">Server not found</string>
 
-    <string name="server_update_complete">Updated %1$d servers</string>
-    <string name="server_update_failed">Failed to update servers</string>
-    <string name="server_update_from_assets">Loaded %1$d servers from file</string>
-    <string name="servers_update_assets_error">Error loading from assets: %1$s</string>
+    <string name="server_update_complete">Loaded from remote server: %1$d</string>
+    <string name="server_update_from_cache">Loaded from previous session: %1$d</string>
+    <string name="server_update_from_assets">Loaded from initialization file: %1$d</string>
+    <string name="server_update_failed">Failed to load server list!</string>
 
     <string name="status_country_flag">Country flag</string>
 
