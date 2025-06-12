@@ -12,6 +12,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.DialogFragment
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.parser.ServersParser
+import fuck.system.vpn.servers.parser.ServersParser.isValidIp
+import fuck.system.vpn.servers.parser.ServersParser.parseCsvIp
+import fuck.system.vpn.servers.parser.ServersParser.resolveHost
 import fuck.system.vpn.servers.server.ServerItem
 import fuck.system.vpn.servers.server.ServersStorage
 
@@ -26,11 +29,11 @@ import fuck.system.vpn.servers.server.ServersStorage
  */
 class ServerCreateDialog : DialogFragment()
 {
+    override fun getTheme(): Int = R.style.DialogTheme
+
     companion object {
         const val TAG = "AddServerDialog"
     }
-
-    override fun getTheme(): Int = R.style.DialogTheme
 
     /**
      * Загружает layout диалога.
@@ -81,17 +84,23 @@ class ServerCreateDialog : DialogFragment()
             return
         }
 
-        val host = ServersParser.getRemoteHost(ovpn)
-        val ip = ServersParser.resolveIp(host, null)
+        val host = ServersParser.getOvpnHost(ovpn)
+
+        // Пробуем получить IP-адрес
+        val ip = when {
+            host == null -> null
+            isValidIp(host) -> host
+            else -> resolveHost(host)
+        }
 
         if (ip == null) {
             Toast.makeText(requireContext(), getString(R.string.server_create_invalid_config), Toast.LENGTH_LONG).show()
             return
         }
 
-        val port = ServersParser.getPortFromOvpn(ovpn)
-        val proto = ServersParser.getProtoFromOvpn(ovpn)
-        val country = ServersParser.getCountryFromOvpn(ovpn)
+        val port = ServersParser.getOvpnPort(ovpn)
+        val proto = ServersParser.getOvpnProto(ovpn)
+        val country = ServersParser.getOvpnCountry(ovpn)
 
         var name = inputName?.text?.toString()?.trim().orEmpty()
         name = name.ifBlank { host ?: ip }
@@ -172,7 +181,7 @@ class ServerCreateDialog : DialogFragment()
             val resolver = requireContext().contentResolver
             resolver.openInputStream(uri)?.use { stream ->
                 val rawText = stream.bufferedReader().readText()
-                ServersParser.decodeConfig(rawText)
+                ServersParser.decodeOvpn(rawText)
             }
         } catch (e: Exception) {
             e.printStackTrace()

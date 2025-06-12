@@ -15,7 +15,7 @@
         android:gravity="center"
         android:textAllCaps="true"
         android:textColor="@color/title"
-        android:paddingBottom="12dp" />
+        android:paddingBottom="20dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -91,19 +91,19 @@
 
     <!-- Нижняя часть: кнопки -->
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDelete"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:contentDescription="@string/server_action_delete"
+            android:tooltipText="@string/server_action_delete"
+            android:backgroundTint="@color/button_cancel_background"
             app:icon="@drawable/ic_trash"
-            app:iconGravity="textStart"
-            app:iconTint="?attr/colorOnPrimary"
-            android:backgroundTint="@color/button_cancel_background" />
+            style="@style/ButtonTheme" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnConnect"
@@ -113,20 +113,20 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:contentDescription="@string/server_action_connect"
+            android:tooltipText="@string/server_action_connect"
+            android:backgroundTint="@color/button_confirm_background"
             app:icon="@drawable/ic_connect"
-            app:iconGravity="textStart"
-            app:iconTint="?attr/colorOnPrimary"
-            android:backgroundTint="@color/button_confirm_background" />
+            style="@style/ButtonTheme" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnFavorite"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:contentDescription="@string/server_action_add_favorite"
+            android:tooltipText="@string/server_action_add_favorite"
+            android:backgroundTint="@color/button_special_background"
             app:icon="@drawable/ic_favorite"
-            app:iconGravity="textStart"
-            app:iconTint="?attr/colorOnPrimary"
-            android:backgroundTint="@color/button_special_background" />
+            style="@style/ButtonTheme" />
     </LinearLayout>
 
 </LinearLayout>

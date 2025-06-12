@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="nav_servers">Серверы</string>
+    <string name="nav_status">Статус</string>
+    <string name="nav_settings">Настройки</string>
+
     <string name="save">Сохранить</string>
     <string name="cancel">Отмена</string>
     <string name="close">Закрыть</string>
@@ -12,20 +17,16 @@
     <string name="disconnect">Отключиться</string>
     <string name="repeat">Повторить</string>
 
-    <string name="servers_remove_server">Удалить сервер</string>
-    <string name="servers_create_title">Добавить сервер</string>
-    <string name="servers_country_filter_title">Выбор стран</string>
-
-    <string name="servers_update_title">Загрузить серверы</string>
-    <string name="servers_update_loading">Загрузка списка серверов</string>
+    <string name="servers_update_title">Загрузка серверов</string>
     <string name="servers_update_loading_percent">Загрузка: %1$d%%</string>
 
     <string name="filter_country_title">Выберите страны для отображения</string>
 
-    <string name="ping_title">Опрос серверов</string>
-    <string name="ping_state">Выполнено: %1$d/%2$d</string>
-    <string name="ping_value">%1$s мс</string>
+    <string name="servers_ping_title">Опрос серверов</string>
+    <string name="servers_ping_state">Выполнено: %1$d/%2$d</string>
+    <string name="servers_ping_value">%1$s мс</string>
 
+    <string name="server_create_title">Добавить сервер</string>
     <string name="server_create_name">Имя сервера</string>
     <string name="server_create_openvpn">OpenVPN конфигурация</string>
     <string name="server_create_openvpn_required">Требуется указать конфигурацию!</string>
@@ -54,4 +55,7 @@
     <string name="server_update_failed">Не удалось загрузить список серверов!</string>
 
     <string name="status_country_flag">Флаг страны</string>
+
+    <string name="desc_favorite">Избранный сервер</string>
+    <string name="desc_server_flag">Флаг сервера</string>
 </resources>

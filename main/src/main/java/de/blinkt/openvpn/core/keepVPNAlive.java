@@ -98,7 +98,7 @@ public class keepVPNAlive extends JobService implements VpnStatus.StateListener 
         {
             jib.setPeriodic(initervalMillis);
         }
-        jib.setPersisted(true);
+        jib.setPersisted(false);
 
         JobScheduler jobScheduler = null;
         jobScheduler = getJobScheduler(c);

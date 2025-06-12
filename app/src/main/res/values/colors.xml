@@ -12,7 +12,7 @@
     <color name="hint">#019796</color>
     <color name="dialog_background">#222222</color>
 
-    <color name="button_body">#666666</color>
+    <color name="button_body">#444444</color>
     <color name="button_text">#FFFFFF</color>
 
     <color name="actionBarBackground">#333333</color>
@@ -27,7 +27,11 @@
     <color name="button_special_background">#DDAA33</color>
     <color name="button_cancel_background">#AA4411</color>
 
-    <color name="text_input_background">#DDDDDD</color>
-    <color name="text_input_border">#555555</color>
-    <color name="text_input_hint">#AAAAAA</color>
+    <color name="input_background">#DDDDDD</color>
+    <color name="input_border">#555555</color>
+    <color name="input_hint">#663366</color>
+    <color name="input_text">#333333</color>
+
+    <color name="proto_tcp">#77AA33</color>
+    <color name="proto_udp">#663366</color>
 </resources>

@@ -1,5 +1,6 @@
 package fuck.system.vpn.servers.dialogs
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Bundle
 import android.view.*
@@ -22,6 +23,8 @@ import fuck.system.vpn.servers.server.ServerItem
  */
 class ServersUpdateDialog : DialogFragment()
 {
+    override fun getTheme(): Int = R.style.DialogTheme
+
     companion object
     {
         const val TAG = "GetServersDialog"
@@ -36,7 +39,7 @@ class ServersUpdateDialog : DialogFragment()
         private const val READ_TIMEOUT_MS = 3000
         private const val HTTP_SUCCESS_CODE = 200
         private const val ESTIMATED_SIZE_BYTES = 1258316 // Примерный размер файла в байтах
-        private const val BUFFER_SIZE = 4096
+        private const val BUFFER_SIZE = 512
     }
 
     private lateinit var progressBar: ProgressBar
@@ -44,15 +47,12 @@ class ServersUpdateDialog : DialogFragment()
     private lateinit var closeButton: Button
 
     private var hasStarted = false
-    private var lastProgress = -1
-
-    override fun getTheme(): Int = R.style.DialogTheme
 
     /**
      * Подключает layout-ресурс
      */
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.dialog_update, container, false)
+        return inflater.inflate(R.layout.dialog_servers_update, container, false)
     }
 
     /**
@@ -62,9 +62,9 @@ class ServersUpdateDialog : DialogFragment()
     {
         super.onViewCreated(view, savedInstanceState)
 
-        progressBar = view.findViewById(R.id.GetServersProgressBar)
-        percentView = view.findViewById(R.id.GetServersPercentText)
-        closeButton = view.findViewById(R.id.GetServersCloseButton)
+        progressBar = view.findViewById(R.id.ServersUpdateProgress)
+        percentView = view.findViewById(R.id.ServersUpdateState)
+        closeButton = view.findViewById(R.id.ServersUpdateClose)
 
         closeButton.setOnClickListener {
             dismissAllowingStateLoss()
@@ -105,12 +105,10 @@ class ServersUpdateDialog : DialogFragment()
 
         if (!isAdded || !hasStarted) return
 
-        requireActivity().runOnUiThread {
-            if (csv != null) {
-                onSuccess(context, csv)
-            } else {
-                onFailure(context)
-            }
+        if (csv != null) {
+            onSuccess(context, csv)
+        } else {
+            onFailure(context)
         }
     }
 
@@ -123,8 +121,10 @@ class ServersUpdateDialog : DialogFragment()
         saveCsvCache(context, csv)
         val count = parseCsvString(csv)
 
-        showToast(context, getString(R.string.server_update_complete, count))
-        dismissAllowingStateLoss()
+        runOnUiThreadSafe {
+            showToast(context, context.getString(R.string.server_update_complete, count))
+            dismissAllowingStateLoss()
+        }
     }
 
     /**
@@ -133,20 +133,31 @@ class ServersUpdateDialog : DialogFragment()
      */
     private fun onFailure(context: Context)
     {
-        var count = parseCsvCache(context)
-        if (count != null) {
-            showToast(context, getString(R.string.server_update_from_cache, count))
-            dismissAllowingStateLoss()
+        // Сначала пытаемся загрузить из кэша
+        val cacheCount = parseCsvCache(context)
+        if (cacheCount != null) {
+            runOnUiThreadSafe {
+                showToast(context, context.getString(R.string.server_update_from_cache, cacheCount))
+                dismissAllowingStateLoss()
+            }
             return
         }
 
-        count = parseCsvAssets(context)
-        if (count != null) {
-            showToast(context, getString(R.string.server_update_from_assets, count))
-        } else {
-            showToast(context, getString(R.string.server_update_failed))
+        // Если кэш не сработал — пробуем из assets
+        val assetCount = parseCsvAssets(context)
+        if (assetCount != null) {
+            runOnUiThreadSafe {
+                showToast(context, context.getString(R.string.server_update_from_assets, assetCount))
+                dismissAllowingStateLoss()
+            }
+            return
         }
-        dismissAllowingStateLoss()
+
+        // Всё провалилось — показываем ошибку
+        runOnUiThreadSafe {
+            showToast(context, context.getString(R.string.server_update_failed))
+            dismissAllowingStateLoss()
+        }
     }
 
     /**
@@ -267,38 +278,65 @@ class ServersUpdateDialog : DialogFragment()
     }
 
     /**
-     * Обновляет прогресс загрузки в UI, если изменился процент.
+     * Обновляет прогресс загрузки в UI с плавной анимацией.
      */
     private fun updateProgress(bytesRead: Int, totalBytes: Int)
     {
         val progress = (bytesRead * 100) / totalBytes
-        if (progress != lastProgress && progress <= 100) {
-            lastProgress = progress
-            runOnUiThreadSafe {
-                progressBar.progress = progress
-                percentView.text = getString(R.string.servers_update_loading_percent, progress)
+        runOnUiThreadSafe {
+            animateProgress(progress)
+            percentView.text = getString(R.string.servers_update_loading_percent, progress)
+        }
+    }
+
+    /**
+     * Анимирует плавное обновление прогресса.
+     */
+    private fun animateProgress(target: Int)
+    {
+        val clamped = target.coerceAtMost(100)
+
+        if (progressBar.progress != clamped) {
+            ObjectAnimator.ofInt(progressBar, "progress", progressBar.progress, clamped).apply {
+                duration = 150
+                start()
             }
         }
     }
 
     /**
-     * Устанавливает прогресс на 100%.
+     * Устанавливает прогресс на 100% с анимацией.
      */
     private fun finishProgress()
     {
         if (!hasStarted) return
 
         runOnUiThreadSafe {
-            progressBar.progress = 100
+            animateProgress(100)
             percentView.text = getString(R.string.servers_update_loading_percent, 100)
         }
     }
 
     /**
-     * Безопасный вызов runOnUiThread.
+     * Проверяет, что фрагмент безопасен для UI-операций:
+     * он добавлен в FragmentManager и имеет доступ к Activity и Context.
+     */
+    private val isUiThreadSafe: Boolean
+        get() = isAdded && activity != null && context != null
+
+    /**
+     * Безопасно выполняет действие в UI-потоке, если фрагмент всё ещё активен.
+     *
+     * Предотвращает сбои при доступе к context, activity или вызове getString,
+     * если диалог уже был закрыт или уничтожен.
+     *
+     * @param action Действие, которое нужно выполнить на главном потоке
      */
     private fun runOnUiThreadSafe(action: () -> Unit) {
-        if (isAdded) requireActivity().runOnUiThread(action)
+        if (!isUiThreadSafe) return
+        activity?.runOnUiThread {
+            if (isUiThreadSafe) action()
+        }
     }
 
     /**

@@ -9,19 +9,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/servers_clear_title"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textStyle="bold"
         android:gravity="center"
         android:textAllCaps="true"
         android:textColor="@color/title"
-        android:paddingBottom="12dp"
+        android:paddingBottom="20dp"
         android:paddingTop="0dp"/>
 
     <TextView
         android:text="@string/servers_clear_confirm"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:breakStrategy="balanced"
         android:gravity="center"
         android:paddingBottom="16dp" />
 
@@ -46,7 +47,8 @@
             android:layout_weight="1"
             android:layout_marginEnd="20dp"
             android:text="@string/clear_all"
-            android:backgroundTint="@color/button_cancel_background" />
+            android:backgroundTint="@color/button_cancel_background"
+            style="@style/ButtonTheme" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/ServersEmptyButtonCancel"
@@ -54,7 +56,8 @@
             android:layout_height="50dp"
             android:layout_weight="1"
             android:text="@string/cancel"
-            android:backgroundTint="@color/button_confirm_background" />
+            android:backgroundTint="@color/button_confirm_background"
+            style="@style/ButtonTheme" />
 
     </LinearLayout>
 </LinearLayout>

@@ -1,71 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:gravity="center_vertical">
 
+    <!-- Флаг -->
     <ImageView
         android:id="@+id/imageFlag"
         android:layout_width="60dp"
         android:layout_height="40dp"
+        android:contentDescription="@string/desc_server_flag"
         android:scaleType="centerCrop"
-        android:src="@drawable/flag_xx"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:src="@drawable/flag_xx" />
 
-    <TextView
-        android:id="@+id/textCountry"
+    <!-- Центр: страна, IP + протокол -->
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="Country"
-        android:textSize="18sp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        app:layout_constraintStart_toEndOf="@id/imageFlag"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/imageFavorite" />
+        android:layout_weight="1"
+        android:layout_marginStart="20dp">
 
-    <TextView
-        android:id="@+id/textIp"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="IP address"
-        android:textSize="14sp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="#00a0d0"
-        app:layout_constraintStart_toEndOf="@id/imageFlag"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/imageFavorite" />
+        <TextView
+            android:id="@+id/textCountry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Server name / Country"
+            android:textSize="18sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textIp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="IP Address"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="#00a0d0" />
+
+            <TextView
+                android:id="@+id/textProto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Protocol"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:textColor="#993366"
+                android:textAllCaps="true" />
+        </LinearLayout>
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/imageFavorite"
         android:layout_width="24dp"
         android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
         android:layout_marginStart="10dp"
-        android:contentDescription="Favorite star"
-        app:layout_constraintStart_toEndOf="@id/textIp"
-        app:layout_constraintTop_toTopOf="@id/textPing"
-        app:layout_constraintBottom_toBottomOf="@id/textPing"
-        app:layout_constraintEnd_toStartOf="@id/textPing"
+        android:contentDescription="@string/desc_favorite"
+        android:src="@drawable/ic_star_outline"
         app:tint="@color/favorite_tint_color" />
 
     <TextView
         android:id="@+id/textPing"
-        android:layout_width="70dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_marginStart="10dp"
-        android:text="8000 ms"
+        android:text="ping ms"
         android:textSize="14sp"
         android:textAlignment="textEnd"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-
+        android:gravity="end" />
+</LinearLayout>

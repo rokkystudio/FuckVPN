@@ -1,25 +1,27 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.VPN" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+<resources>
+    <style name="Theme.VPN" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowBackground">#111111</item>
         <item name="android:textColor">#AAAAAA</item>
 
-        <!-- Primary brand color. -->
         <item name="colorPrimary">@color/gray</item>
         <item name="colorPrimaryVariant">@color/darkgray</item>
         <item name="colorOnPrimary">@color/white</item>
 
-        <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 
-        <item name="textInputStyle">@style/TextInputStyle</item>
+        <item name="android:dialogTheme">@style/DialogTheme</item>
         <item name="materialButtonStyle">@style/ButtonTheme</item>
-        <item name="dialogTheme">@style/DialogTheme</item>
+        <item name="textInputStyle">@style/InputLayoutStyle</item>
+    </style>
+
+    <style name="DialogTheme" parent="Theme.Material3.Dark.Dialog">
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+        <item name="android:background">@color/dialog_background</item>
     </style>
 
     <style name="ButtonTheme" parent="Widget.Material3.Button">
@@ -29,7 +31,7 @@
         <item name="iconTint">@color/button_text</item>
         <item name="backgroundTint">@color/button_body</item>
         <item name="iconSize">24dp</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/button_text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">true</item>
@@ -38,17 +40,17 @@
         <item name="android:maxLines">1</item>
     </style>
 
-    <style name="DialogTheme" parent="Theme.VPN">
-        <item name="android:windowMinWidthMajor">90%</item>
-        <item name="android:windowMinWidthMinor">90%</item>
-        <item name="android:background">@color/dialog_background</item>
+    <style name="InputTextStyle" parent="Widget.Material3.TextInputEditText.FilledBox">
+        <item name="android:textColor">@color/input_text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColorHint">@color/input_hint</item>
+        <item name="android:backgroundTint">@color/input_background</item>
     </style>
 
-    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
-        <item name="boxBackgroundColor">@color/text_input_background</item>
-        <item name="boxStrokeColor">@color/text_input_border</item>
-        <item name="android:textColorHint">@color/text_input_hint</item>
-        <item name="hintTextColor">@color/text_input_hint</item>
+    <style name="InputLayoutStyle" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxStrokeColor">@color/input_border</item>
+        <item name="hintTextColor">@color/input_hint</item>
+
         <item name="boxCornerRadiusTopStart">5dp</item>
         <item name="boxCornerRadiusTopEnd">5dp</item>
         <item name="boxCornerRadiusBottomStart">5dp</item>

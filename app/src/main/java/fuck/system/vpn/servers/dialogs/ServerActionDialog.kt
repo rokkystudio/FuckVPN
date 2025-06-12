@@ -28,9 +28,13 @@ import fuck.system.vpn.status.LastServerStorage
  */
 class ServerActionDialog : DialogFragment()
 {
+    override fun getTheme(): Int = R.style.DialogTheme
+
     companion object {
         const val TAG = "MenuServerDialog"
         const val EXTRA_IP = "ip"
+
+        const val CONNECT_REQUEST = "ServerActionDialog.CONNECT"
 
         /**
          * Создаёт новый экземпляр диалога с передачей IP сервера.
@@ -45,7 +49,8 @@ class ServerActionDialog : DialogFragment()
     private lateinit var server: ServerItem
     private lateinit var servers: MutableList<ServerItem>
 
-    override fun getTheme(): Int = R.style.DialogTheme
+    private lateinit var btnFavorite: MaterialButton
+    private lateinit var imageFavorite: ImageView
 
     /**
      * Загружает layout диалога.
@@ -74,16 +79,18 @@ class ServerActionDialog : DialogFragment()
             return
         }
 
-        setupButtons(view)
-        setupServerInfo(view)
-    }
+        val textCountry = view.findViewById<TextView>(R.id.textCountry)
+        textCountry.text = ServerGeo.getCountry(server.country)
 
-    /**
-     * Назначает обработчики кнопок действий (подключение, удаление, избранное).
-     * Обновляет иконку кнопки избранного в соответствии с текущим состоянием.
-     */
-    private fun setupButtons(view: View)
-    {
+        val textIp = view.findViewById<TextView>(R.id.textIp)
+        textIp.text = server.ip
+
+        val textPing = view.findViewById<TextView>(R.id.textPing)
+        textPing.text = getString(R.string.servers_ping_value, server.ping?.toString() ?: "—")
+
+        val imageFlag = view.findViewById<ImageView>(R.id.imageFlag)
+        imageFlag.setImageResource(ServerGeo.getFlag(server.country))
+
         val btnConnect = view.findViewById<MaterialButton>(R.id.btnConnect)
         btnConnect.setOnClickListener {
             onConnectClicked()
@@ -94,47 +101,32 @@ class ServerActionDialog : DialogFragment()
             onDeleteClicked()
         }
 
-        val btnFavorite = view.findViewById<MaterialButton>(R.id.btnFavorite)
+        btnFavorite = view.findViewById(R.id.btnFavorite)
         btnFavorite.setOnClickListener {
             onFavoriteClicked()
         }
 
-        updateFavoriteIcon(btnFavorite)
-    }
+        imageFavorite = view.findViewById<ImageView>(R.id.imageFavorite)
 
-    /**
-     * Отображает информацию о сервере:
-     * страна, IP, пинг, флаг и текущий статус избранного.
-     */
-    private fun setupServerInfo(view: View)
-    {
-        view.findViewById<TextView>(R.id.textCountry).text = ServerGeo.getCountry(server.country)
-        view.findViewById<TextView>(R.id.textIp).text = server.ip
-        view.findViewById<TextView>(R.id.textPing).text =
-            getString(R.string.ping_value, server.ping?.toString() ?: "—")
-
-        view.findViewById<ImageView>(R.id.imageFlag).setImageResource(ServerGeo.getFlag(server.country))
-
-        view.findViewById<ImageView>(R.id.imageFavorite).setImageResource(
-            if (server.favorite) R.drawable.ic_star_filled else R.drawable.ic_star_outline
-        )
+        updateFavoriteIcon()
     }
 
     /**
      * Обновляет иконку и описание кнопки "Избранное" в зависимости от текущего состояния.
      */
-    private fun updateFavoriteIcon(button: MaterialButton)
+    private fun updateFavoriteIcon()
     {
-        var icon = R.drawable.ic_star_outline
-        var description = getString(R.string.server_action_add_favorite)
-
         if (server.favorite) {
-            icon = R.drawable.ic_star_filled
-            description = getString(R.string.server_action_remove_favorite)
+            btnFavorite.setIconResource(R.drawable.ic_star_outline)
+            btnFavorite.contentDescription = getString(R.string.server_action_remove_favorite)
+            btnFavorite.tooltipText = getString(R.string.server_action_remove_favorite)
+            imageFavorite.setImageResource(R.drawable.ic_star_filled)
+        } else {
+            btnFavorite.setIconResource(R.drawable.ic_star_filled)
+            btnFavorite.contentDescription = getString(R.string.server_action_add_favorite)
+            btnFavorite.tooltipText = getString(R.string.server_action_add_favorite)
+            imageFavorite.setImageResource(R.drawable.ic_star_outline)
         }
-
-        button.setIconResource(icon)
-        button.contentDescription = description
     }
 
     /**
@@ -143,6 +135,7 @@ class ServerActionDialog : DialogFragment()
      */
     private fun onConnectClicked() {
         LastServerStorage.save(requireContext(), server)
+        parentFragmentManager.setFragmentResult(CONNECT_REQUEST, Bundle())
         dismiss()
     }
 
@@ -152,8 +145,7 @@ class ServerActionDialog : DialogFragment()
     private fun onFavoriteClicked() {
         server.favorite = !server.favorite
         ServersStorage.save(requireContext(), servers)
-        val button = view?.findViewById<MaterialButton>(R.id.btnFavorite)
-        if (button != null) updateFavoriteIcon(button)
+        updateFavoriteIcon()
     }
 
     /**

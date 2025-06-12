@@ -16,6 +16,8 @@ android {
         versionName = "1.0"
     }
 
+    sourceSets["main"].jniLibs.srcDirs("src/main/jniLibs")
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -39,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.jsoup)
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
     implementation(libs.google.gson)

@@ -23,7 +23,7 @@ object ServersParser
      * Декодирует base64-строку конфигурации.
      * Если не удалось (например, она не в base64), возвращает исходную строку.
      */
-    fun decodeConfig(input: String): String {
+    fun decodeOvpn(input: String): String {
         return try {
             String(Base64.decode(input, Base64.DEFAULT))
         } catch (e: Exception) {
@@ -35,9 +35,86 @@ object ServersParser
     /**
      * Извлекает хост (IP или домен) из строки конфигурации OpenVPN.
      */
-    fun getRemoteHost(ovpn: String): String? {
-        val match = Regex("""remote\s+([^\s]+)""").find(ovpn)
-        return match?.groupValues?.get(1)
+    fun getOvpnHost(ovpn: String): String?
+    {
+        val lines = ovpn.lines()
+        for (line in lines) {
+            val trimmed = line.trimStart()
+
+            // Пропускаем строку, если она полностью комментарий
+            if (trimmed.startsWith("#")) continue
+
+            // Отрезаем комментарий справа, если есть
+            val code = trimmed.substringBefore("#").trim()
+
+            // Ищем remote <host>
+            val match = Regex("""^remote\s+([^\s]+)""").find(code)
+            if (match != null) return match.groupValues[1]
+        }
+        return null
+    }
+
+    /**
+     * Извлекает порт из строки remote в ovpn-конфиге.
+     * Пример строки: "remote vpn.example.com 1194"
+     */
+    fun getOvpnPort(ovpn: String): Int?
+    {
+        val lines = ovpn.lines()
+        for (line in lines) {
+            val trimmed = line.trimStart()
+
+            // Пропускаем строку, если это комментарий
+            if (trimmed.startsWith("#")) continue
+
+            // Отрезаем комментарий справа
+            val code = trimmed.substringBefore("#").trim()
+
+            // Ищем строку вида: remote <host> <port>
+            val match = Regex("""^remote\s+[^\s]+\s+(\d+)""").find(code)
+            if (match != null) return match.groupValues[1].toIntOrNull()
+        }
+        return null
+    }
+
+    /**
+     * Извлекает протокол из ovpn-конфига ("udp" или "tcp").
+     */
+    fun getOvpnProto(ovpn: String): String?
+    {
+        val lines = ovpn.lines()
+        for (line in lines) {
+            val trimmed = line.trimStart()
+
+            // Пропускаем комментарии
+            if (trimmed.startsWith("#")) continue
+
+            // Обрезаем комментарии справа
+            val code = trimmed.substringBefore("#").trim()
+
+            // Ищем протокол: proto udp или proto tcp
+            val match = Regex("""^proto\s+(udp|tcp)\b""").find(code)
+            if (match != null) return match.groupValues[1]
+        }
+        return null
+    }
+
+    /**
+     * Извлекает страну из строки #COUNTRY=XX (без учёта регистра).
+     */
+    fun getOvpnCountry(ovpn: String): String?
+    {
+        val lines = ovpn.lines()
+        for (line in lines) {
+            val trimmed = line.trimStart()
+            if (!trimmed.startsWith("#")) continue
+
+            val match = Regex("""(?i)#.*\bCOUNTRY\s*=\s*([a-z]{2})""").find(trimmed)
+            if (match != null) {
+                return match.groupValues[1].lowercase()
+            }
+        }
+        return null
     }
 
     /**
@@ -52,39 +129,16 @@ object ServersParser
      * Пытается разрешить доменное имя в IP-адрес.
      * Возвращает null, если резолвинг не удался.
      */
-    fun getIpFromHost(host: String): String? {
+    fun resolveHost(host: String): String?
+    {
+        if (isValidIp(host)) return host
+
         return try {
             InetAddress.getByName(host).hostAddress
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
-    }
-
-    /**
-     * Извлекает порт из строки remote в ovpn-конфиге.
-     * Пример строки: "remote vpn.example.com 1194"
-     */
-    fun getPortFromOvpn(ovpn: String): Int? {
-        val regex = Regex("""remote\s+[\w.-]+\s+(\d+)""")
-        val match = regex.find(ovpn)
-        return match?.groupValues?.get(1)?.toIntOrNull()
-    }
-
-    /**
-     * Извлекает протокол из ovpn-конфига ("udp" или "tcp").
-     */
-    fun getProtoFromOvpn(ovpn: String): String? {
-        val match = Regex("""proto\s+(udp|tcp)""").find(ovpn)
-        return match?.groupValues?.get(1)
-    }
-
-    /**
-     * Извлекает страну из строки #COUNTRY=XX (без учёта регистра).
-     */
-    fun getCountryFromOvpn(ovpn: String): String? {
-        val regex = Regex("""(?i)#.*COUNTRY\s*=\s*([a-z]{2})""")
-        return regex.find(ovpn)?.groupValues?.get(1)?.lowercase()
     }
 
     /**
@@ -115,28 +169,40 @@ object ServersParser
     fun parseCsvLine(line: String): ServerItem?
     {
         val parts = line.split(",")
-        val ovpn = parseCsvConfig(parts)
-        if (ovpn == null) return null
 
-        val address = parseCsvIp(parts)
-        val host = getRemoteHost(ovpn)
+        val base64 = parseCsvConfig(parts) ?: return null
+        val ovpn = decodeOvpn(base64).trim()
 
-        val ip = resolveIp(host, address)
-        if (ip == null) return null
+        val host = getOvpnHost(ovpn)
 
-        val port = getPortFromOvpn(ovpn)
-            ?: parseCsvPort(parts)
+        // Пробуем получить IP-адрес
+        var ip: String? = parseCsvIp(parts)
 
-        val proto = getProtoFromOvpn(ovpn)
+        if (host != null) {
+            ip = resolveHost(host)
+        }
+
+        // Если нет даже host и ip — это совсем сломанная строка
+        if (host == null && ip == null) return null
+
+        val port = getOvpnPort(ovpn) ?: parseCsvPort(parts)
+        val proto = getOvpnProto(ovpn)
         val ping = parseCsvPing(parts)
 
-        val country = getCountryFromOvpn(ovpn)
-            ?: parseCsvCountry(parts)
-            ?: getCountryByIp(ip)
+        var country: String? = getOvpnCountry(ovpn)
+
+        if (country == null) {
+            country = parseCsvCountry(parts)
+        }
+
+        if (country == null && ip != null) {
+            country = getCountryByIp(ip)
+        }
 
         val name = parseCsvName(parts)
             ?: host
             ?: ip
+            ?: "Unknown"
 
         return ServerItem(
             name = name,
@@ -150,21 +216,9 @@ object ServersParser
         )
     }
 
-    /**
-     * Извлекает IP-адрес, используя host из OVPN или IP из CSV.
-     * Если host — домен, пытается его разрешить в IP.
-     */
-    fun resolveIp(csvHost: String?, csvIp: String?): String? {
-        if (csvHost == null) return csvIp
-        if (isValidIp(csvHost)) return csvHost
-
-        val resolved = getIpFromHost(csvHost)
-        return resolved ?: csvIp
-    }
-
     /** Декодирует и возвращает OVPN-конфигурацию из 14-й колонки. */
     fun parseCsvConfig(parts: List<String>): String? {
-        return parts.getOrNull(14)?.let { decodeConfig(it) }
+        return parts.getOrNull(14)
     }
 
     /** Извлекает имя сервера из 3-й колонки, если оно не пустое. */

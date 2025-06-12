@@ -2,6 +2,10 @@
     <string name="app_name" translatable="false">VPN</string>
     <string name="app_title" translatable="false">FUCK VPN v%s</string>
 
+    <string name="nav_servers">Servers</string>
+    <string name="nav_status">Status</string>
+    <string name="nav_settings">Settings</string>
+
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
@@ -14,20 +18,16 @@
     <string name="disconnect">Disconnect</string>
     <string name="repeat">Try Again</string>
 
-    <string name="servers_remove_server">Remove server</string>
-    <string name="servers_country_filter_title">Select countries to display</string>
+    <string name="filter_country_title">Select countries to display</string>
 
     <string name="servers_update_title">Download servers</string>
-    <string name="servers_update_loading">Server list loading …</string>
     <string name="servers_update_loading_percent">Download: %1$d%%</string>
 
-    <string name="filter_country_title">Select countries</string>
+    <string name="servers_ping_title">Ping servers</string>
+    <string name="servers_ping_state">Completed: %1$d/%2$d</string>
+    <string name="servers_ping_value">%1$s ms</string>
 
-    <string name="ping_title">Ping servers</string>
-    <string name="ping_state">Completed: %1$d/%2$d</string>
-    <string name="ping_value">%1$s ms</string>
-
-    <string name="servers_create_title">Add server</string>
+    <string name="server_create_title">Add server</string>
     <string name="server_create_name">Server name (not required)</string>
     <string name="server_create_openvpn">OpenVPN configuration</string>
     <string name="server_create_openvpn_required">Configuration must be specified!</string>
@@ -38,11 +38,10 @@
     <string name="server_create_complete">Server added</string>
     <string name="server_create_updated">Server updated</string>
 
-    <string name="servers_clear_title">Empty server list</string>
+    <string name="servers_clear_title">Clear server list</string>
     <string name="servers_clear_confirm">Are you sure you want to clear the server list?</string>
     <string name="servers_clear_hint">Favorite servers will not be deleted.</string>
     <string name="servers_clear_complete">The server list has been cleared</string>
-
 
     <string name="server_action_title">Select server</string>
     <string name="server_action_connect">Connect to server</string>
@@ -57,5 +56,7 @@
     <string name="server_update_failed">Failed to load server list!</string>
 
     <string name="status_country_flag">Country flag</string>
+    <string name="desc_favorite">Favorite server</string>
+    <string name="desc_server_flag">Server flag</string>
 
 </resources>

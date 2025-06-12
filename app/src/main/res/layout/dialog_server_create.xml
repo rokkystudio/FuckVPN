@@ -3,31 +3,34 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="20dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/servers_create_title"
+        android:text="@string/server_create_title"
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
         android:textAllCaps="true"
         android:textColor="@color/title"
-        android:paddingBottom="12dp" />
+        android:paddingBottom="20dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/server_create_name">
+        android:hint="@string/server_create_name"
+        android:layout_marginBottom="15dp"
+        style="@style/InputLayoutStyle" >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ServerAddName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapWords" />
+            android:inputType="textCapWords"
+            style="@style/InputTextStyle" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -35,16 +38,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/server_create_openvpn"
-        android:layout_marginTop="12dp">
+        style="@style/InputLayoutStyle" >
 
-    <com.google.android.material.textfield.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/ServerAddOpenVpn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
             android:gravity="top"
             android:minLines="10"
-            android:maxLines="10" />
+            android:maxLines="10"
+            style="@style/InputTextStyle" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -60,8 +64,9 @@
             android:layout_height="50dp"
             android:layout_marginEnd="20dp"
             android:contentDescription="@string/server_create_load_file"
+            android:backgroundTint="@color/button_special_background"
             app:icon="@drawable/ic_load"
-            android:backgroundTint="@color/button_special_background" />
+            style="@style/ButtonTheme" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/ServerAddSave"
@@ -70,7 +75,8 @@
             android:layout_weight="1"
             android:layout_marginEnd="20dp"
             android:text="@string/save"
-            android:backgroundTint="@color/button_confirm_background" />
+            android:backgroundTint="@color/button_confirm_background"
+            style="@style/ButtonTheme" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/ServersAddCancel"
@@ -78,7 +84,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/cancel"
-            android:backgroundTint="@color/button_cancel_background" />
+            android:backgroundTint="@color/button_cancel_background"
+            style="@style/ButtonTheme" />
 
     </LinearLayout>
 

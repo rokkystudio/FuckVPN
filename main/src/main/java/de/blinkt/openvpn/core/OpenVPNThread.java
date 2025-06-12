@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +32,8 @@ import java.util.regex.Pattern;
 
 import de.blinkt.openvpn.R;
 
-public class OpenVPNThread implements Runnable {
+public class OpenVPNThread implements Runnable
+{
     private static final String DUMP_PATH_STRING = "Dump path: ";
     @SuppressLint("SdCardPath")
     private static final String TAG = "OpenVPN";
@@ -116,23 +118,31 @@ public class OpenVPNThread implements Runnable {
         }
     }
 
-    private void startOpenVPNThreadArgs(String[] argv) {
-        LinkedList<String> argvlist = new LinkedList<String>();
-
+    private void startOpenVPNThreadArgs(String[] argv)
+    {
+        LinkedList<String> argvlist = new LinkedList<>();
         Collections.addAll(argvlist, argv);
 
         ProcessBuilder pb = new ProcessBuilder(argvlist);
-        // Hack O rama
-
         String lbpath = genLibraryPath(argv, pb);
 
         pb.environment().put("LD_LIBRARY_PATH", lbpath);
         pb.environment().put("TMPDIR", mTmpDir);
-
         pb.redirectErrorStream(true);
+
         try {
+            Log.e(TAG, "🚀 Попытка запустить OpenVPN бинарник");
+            Log.e(TAG, "📂 Команда: " + argvlist);
+            Log.e(TAG, "📂 LD_LIBRARY_PATH: " + lbpath);
+            Log.e(TAG, "📂 TMPDIR: " + mTmpDir);
+
+            // Доп. проверка исполняемости бинарника
+            File bin = new File(argv[0]);
+            Log.e(TAG, "📄 Файл бинарника: " + bin.getAbsolutePath());
+            Log.e(TAG, "📄 Существует: " + bin.exists() + ", Исполняемый: " + bin.canExecute());
+
             mProcess = pb.start();
-            // Close the output, since we don't need it
+            Log.e(TAG, "✅ mProcess создан: " + mProcess);
 
             InputStream in = mProcess.getInputStream();
             OutputStream out = mProcess.getOutputStream();
@@ -176,17 +186,22 @@ public class OpenVPNThread implements Runnable {
                 }
 
                 if (Thread.interrupted()) {
-                    throw new InterruptedException("OpenVpn process was killed form java code");
+                    throw new InterruptedException("OpenVpn process was killed from Java code");
                 }
             }
         } catch (InterruptedException | IOException e) {
+            Log.e(TAG, "❌ Ошибка запуска OpenVPN: " + e.getMessage(), e);
             VpnStatus.logException("Error reading from output of OpenVPN process", e);
             mStreamFuture.cancel(true);
             stopProcess();
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Необработанное исключение: " + e.getMessage(), e);
+            VpnStatus.logException("Unexpected exception in OpenVPN thread", e);
+            mStreamFuture.cancel(true);
+            stopProcess();
         }
-
-
     }
+
 
     private String genLibraryPath(String[] argv, ProcessBuilder pb) {
         // Hack until I find a good way to get the real library path

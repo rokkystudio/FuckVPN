@@ -1,64 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_gravity="center"
     android:gravity="center"
-    android:padding="24dp"
+    android:padding="10dp"
     tools:context=".status.StatusFragment">
 
-    <ImageView
-        android:id="@+id/StatusServerFlag"
-        android:layout_width="56dp"
-        android:layout_height="36dp"
-        android:scaleType="centerCrop"
-        android:layout_gravity="center_horizontal"
-        android:contentDescription="@string/status_country_flag" />
-
-    <TextView
-        android:id="@+id/StatusServerName"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@android:color/black"
-        android:gravity="center_horizontal"
-        android:paddingTop="16dp" />
+        android:padding="10dp"
+        android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/StatusServerCountry"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:gravity="center_horizontal" />
+        <!-- Флаг -->
+        <ImageView
+            android:id="@+id/StatusFlag"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:contentDescription="@string/desc_server_flag"
+            android:scaleType="centerCrop"
+            android:src="@drawable/flag_xx" />
 
-    <TextView
-        android:id="@+id/StatusServerIp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:gravity="center_horizontal" />
+        <!-- Центр: страна, IP + протокол -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="20dp">
 
-    <TextView
-        android:id="@+id/StatusServerPort"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:gravity="center_horizontal" />
+            <TextView
+                android:id="@+id/StatusCountry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Server name / Country"
+                android:textSize="18sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
-    <TextView
-        android:id="@+id/StatusServerPing"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:gravity="center_horizontal" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-    <Button
+                <TextView
+                    android:id="@+id/StatusIp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="IP Address"
+                    android:textSize="14sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textColor="#00a0d0" />
+
+                <TextView
+                    android:id="@+id/StatusPort"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="Port"
+                    android:textSize="14sp"
+                    android:maxLines="1"
+                    android:textColor="#00a0d0" />
+
+                <TextView
+                    android:id="@+id/StatusProto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="Protocol"
+                    android:textSize="14sp"
+                    android:maxLines="1"
+                    android:textColor="#993366"
+                    android:textAllCaps="true" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/StatusFavorite"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@string/desc_favorite"
+            android:src="@drawable/ic_star_outline"
+            app:tint="@color/favorite_tint_color" />
+
+        <TextView
+            android:id="@+id/StatusPing"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:text="ping ms"
+            android:textSize="14sp"
+            android:textAlignment="textEnd"
+            android:gravity="end" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/StatusConnectDisconnect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp" />
+
+    <fuck.system.vpn.status.MapView
+        android:id="@+id/StatusMapView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
         android:layout_marginTop="24dp" />
 </LinearLayout>

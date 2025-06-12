@@ -22,6 +22,7 @@ class ServerAdapter(
     class ServerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textCountry: TextView = itemView.findViewById(R.id.textCountry)
         val textIp: TextView = itemView.findViewById(R.id.textIp)
+        val textProto: TextView = itemView.findViewById(R.id.textProto)
         val textPing: TextView = itemView.findViewById(R.id.textPing)
         val imageFlag: ImageView = itemView.findViewById(R.id.imageFlag)
         val imageFavorite: ImageView = itemView.findViewById(R.id.imageFavorite)
@@ -40,7 +41,16 @@ class ServerAdapter(
         holder.textCountry.text = ServerGeo.getCountry(server.country)
         holder.textIp.text = server.ip
         holder.textPing.text = holder.textPing.context.getString(
-            R.string.ping_value, server.ping?.toString() ?: "—")
+            R.string.servers_ping_value, server.ping?.toString() ?: "—")
+
+        val context = holder.textProto.context
+        val protoColor = when (server.proto) {
+            "tcp" -> context.getColor(R.color.proto_tcp)
+            "udp" -> context.getColor(R.color.proto_udp)
+            else -> holder.textProto.currentTextColor
+        }
+        holder.textProto.setTextColor(protoColor)
+        holder.textProto.text = server.proto
 
         holder.textPing.setTextColor(getPingGradientColor(server.ping))
         holder.imageFlag.setImageResource(ServerGeo.getFlag(server.country))

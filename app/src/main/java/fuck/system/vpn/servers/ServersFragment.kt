@@ -8,17 +8,21 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.dialogs.ServerCreateDialog
 import fuck.system.vpn.servers.dialogs.ServersUpdateDialog
 import fuck.system.vpn.servers.filters.FilterCountryDialog
 import fuck.system.vpn.servers.filters.FilterCountryStorage
-import fuck.system.vpn.servers.ping.PingDialog
+import fuck.system.vpn.servers.ping.ServersPingDialog
 import fuck.system.vpn.servers.dialogs.ServerActionDialog
+import fuck.system.vpn.servers.dialogs.ServerActionDialog.Companion.CONNECT_REQUEST
 import fuck.system.vpn.servers.dialogs.ServersClearDialog
 import fuck.system.vpn.servers.server.ServerAdapter
 import fuck.system.vpn.servers.server.ServerItem
 import fuck.system.vpn.servers.server.ServersStorage
+
 
 /**
  * Фрагмент, отображающий список VPN-серверов, с возможностью обновления, фильтрации,
@@ -90,7 +94,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         if (shouldServerPing) {
             shouldServerPing = false
             if (parentFragmentManager.isStateSaved.not()) {
-                PingDialog().show(parentFragmentManager, PingDialog.TAG)
+                ServersPingDialog().show(parentFragmentManager, ServersPingDialog.TAG)
             }
         }
 
@@ -134,9 +138,6 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
     override fun onResume() {
         super.onResume()
 
-        //requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        //.menu.findItem(R.id.nav_servers).isChecked = true
-
         if (shouldAdapterUpdate) {
             updateAdapter()
         }
@@ -160,6 +161,16 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         super.onStop()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        parentFragmentManager.setFragmentResultListener(CONNECT_REQUEST, this) { _, _ ->
+            requireActivity()
+                .findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                .selectedItemId = R.id.nav_status
+        }
+    }
+
     /**
      * Инициализация UI после создания View
      */
@@ -177,6 +188,8 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
         view.postDelayed({ onInitialAction() }, 1000)
 
         setupButtons(view)
+
+        onServerChanged()
     }
 
 
@@ -234,6 +247,7 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
      */
     private fun openServerCreateDialog() {
         if (parentFragmentManager.findFragmentByTag(ServerCreateDialog.TAG)?.isAdded != true) {
+            shouldServerPing = true
             ServerCreateDialog().show(parentFragmentManager, ServerCreateDialog.TAG)
         }
     }
@@ -243,7 +257,8 @@ class ServersFragment : Fragment(R.layout.fragment_servers)
      */
     private fun openServersUpdateDialog() {
         if (parentFragmentManager.findFragmentByTag(ServersUpdateDialog.TAG)?.isAdded != true) {
-          ServersUpdateDialog().show(parentFragmentManager, ServersUpdateDialog.TAG)
+            shouldServerPing = true
+            ServersUpdateDialog().show(parentFragmentManager, ServersUpdateDialog.TAG)
         }
     }
 

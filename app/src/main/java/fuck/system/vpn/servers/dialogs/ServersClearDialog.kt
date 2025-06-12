@@ -16,11 +16,11 @@ import fuck.system.vpn.servers.server.ServersStorage
  */
 class ServersClearDialog : DialogFragment()
 {
+    override fun getTheme(): Int = R.style.DialogTheme
+
     companion object {
         const val TAG = "ServersClearDialog"
     }
-
-    override fun getTheme(): Int = R.style.DialogTheme
 
     /**
      * Загружает layout диалога.

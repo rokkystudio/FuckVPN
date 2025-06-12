@@ -19,11 +19,11 @@ import fuck.system.vpn.servers.server.ServersStorage
  */
 class FilterCountryDialog : DialogFragment()
 {
+    override fun getTheme(): Int = R.style.DialogTheme
+
     companion object {
         const val TAG = "CountryFilterDialog"
     }
-
-    override fun getTheme(): Int = R.style.DialogTheme
 
     private var recyclerView: RecyclerView? = null
     private var adapter = FilterCountryAdapter(mutableListOf()) {}

@@ -4,6 +4,7 @@ geoip2 = "4.3.1"
 appcompat = "1.7.0"
 googleGson = "2.10.1"
 icmp4aVersion = "1.0.0"
+jsoup = "1.15.4"
 kotlinxCoroutinesAndroid = "1.10.2"
 material = "1.12.0"
 constraintlayout = "2.2.1"
@@ -19,6 +20,7 @@ okhttp = "4.12.0"
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 geoip2 = { module = "com.maxmind.geoip2:geoip2", version.ref = "geoip2" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "googleGson" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 marsounjan-icmp4a = { module = "com.marsounjan:icmp4a", version.ref = "icmp4aVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
