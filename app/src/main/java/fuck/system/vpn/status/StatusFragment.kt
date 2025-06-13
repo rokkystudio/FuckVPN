@@ -6,7 +6,6 @@ import android.net.VpnService
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -16,19 +15,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
-import de.blinkt.openvpn.VpnProfile
-import de.blinkt.openvpn.VpnProfile.EXTRA_PROFILEUUID
-import de.blinkt.openvpn.VpnProfile.EXTRA_PROFILE_VERSION
-import de.blinkt.openvpn.core.ConfigParser
-import de.blinkt.openvpn.core.OpenVPNService
-import de.blinkt.openvpn.core.ProfileManager
 import fuck.system.vpn.R
 import fuck.system.vpn.servers.server.ServerGeo
 import fuck.system.vpn.servers.server.ServerItem
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.StringReader
 import java.util.UUID
 
@@ -60,39 +50,6 @@ class StatusFragment : Fragment(R.layout.fragment_status)
     /** Launcher для запроса системного разрешения на VPN */
     private lateinit var vpnPermissionLauncher: ActivityResultLauncher<Intent>
 
-    /** Обновление пинга в реальном времени */
-    private var pingUpdateHandler: Handler? = null
-
-    private val pingUpdateRunnable = object : Runnable {
-        override fun run() {
-            if (isVpnConnected()) {
-                val ping = OpenVPNService.currentPing
-                textPing.text = if (ping > 0) "${'$'}{ping}ms" else "-"
-                pingUpdateHandler?.postDelayed(this, 1000)
-            } else {
-                textPing.text = "-"
-            }
-        }
-    }
-
-    private val vpnDisconnectedReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            context?.let {
-                pendingServer?.let { server ->
-                    realStartVpn(server)
-                    pendingServer = null
-                }
-            }
-        }
-    }
-
-    private val vpnStatusReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            mapView.update()
-            updateVpnStatus()
-        }
-    }
-
     /**
      * Вызывается при создании представления.
      * Инициализирует UI, регистрирует VPN-события и настраивает кнопку подключения.
@@ -111,20 +68,6 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         buttonAction = view.findViewById(R.id.StatusConnectDisconnect)
         mapView = view.findViewById(R.id.StatusMapView)
         mapView.update()
-
-        // Регистрация BroadcastReceiver'ов
-        ContextCompat.registerReceiver(
-            requireContext(),
-            vpnDisconnectedReceiver,
-            IntentFilter("de.blinkt.openvpn.DISCONNECTED"),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-        ContextCompat.registerReceiver(
-            requireContext(),
-            vpnStatusReceiver,
-            IntentFilter("de.blinkt.openvpn.VPN_STATUS"),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
 
         // Запрос разрешения на VPN через launcher
         vpnPermissionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -170,9 +113,6 @@ class StatusFragment : Fragment(R.layout.fragment_status)
         }
 
         updateVpnStatus()
-
-        pingUpdateHandler = Handler(Looper.getMainLooper())
-        pingUpdateHandler?.post(pingUpdateRunnable)
     }
 
     /**
@@ -180,8 +120,6 @@ class StatusFragment : Fragment(R.layout.fragment_status)
      */
     override fun onPause() {
         super.onPause()
-        pingUpdateHandler?.removeCallbacks(pingUpdateRunnable)
-        pingUpdateHandler = null
     }
 
     /**
@@ -190,8 +128,6 @@ class StatusFragment : Fragment(R.layout.fragment_status)
     override fun onDestroyView() {
         super.onDestroyView()
         mapView.clear()
-        requireContext().unregisterReceiver(vpnDisconnectedReceiver)
-        requireContext().unregisterReceiver(vpnStatusReceiver)
     }
 
     /**
@@ -215,9 +151,9 @@ class StatusFragment : Fragment(R.layout.fragment_status)
      * Отправляет системный сигнал на отключение от текущего VPN.
      */
     fun stopVpn() {
-        val stopIntent = Intent(requireContext(), OpenVPNService::class.java)
-        stopIntent.action = OpenVPNService.DISCONNECT_VPN
-        requireContext().applicationContext.startService(stopIntent)
+        //val stopIntent = Intent(requireContext(), OpenVPNService::class.java)
+        //stopIntent.action = OpenVPNService.DISCONNECT_VPN
+        //requireContext().applicationContext.startService(stopIntent)
     }
 
     /**
@@ -226,85 +162,21 @@ class StatusFragment : Fragment(R.layout.fragment_status)
      */
     private fun realStartVpn(server: ServerItem)
     {
-        val context = requireContext().applicationContext
-        Log.e("VPN", "🚀 Начало realStartVpn для ${server.name}")
-
-        val profile = importProfileFromOvpn(server)
-        if (profile == null) {
-            Log.e("VPN", "❌ Ошибка импорта профиля: null")
-            Toast.makeText(context, "Ошибка импорта VPN‑профиля", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        Log.e("VPN", "✅ Профиль импортирован: ${profile.name}, UUID: ${profile.uuidString}")
-
-        cleanOldProfiles(context)
-        Log.e("VPN", "🧹 Старые профили удалены")
-
-        val manager = ProfileManager.getInstance(context)
-        manager.addProfile(profile)
-        Log.e("VPN", "📌 Профиль добавлен в менеджер")
-
-        ProfileManager.saveProfile(context, profile)
-        Log.e("VPN", "💾 Профиль сохранён")
-
-        Log.e("VPN", "📂 filesDir при сохранении: ${context.filesDir.absolutePath}")
-
-        ProfileManager.setConnectedVpnProfile(context, profile)
-        Log.e("VPN", "🔗 Установлен активный профиль: ${profile.uuidString}")
-
-        manager.saveProfileList(context) // 🔧 <-- ЭТО ОБЯЗАТЕЛЬНО!
-
-        // 🔧 Форсируем сохранение чтобы было видно сразу в новом процессе
-        val prefs = context.getSharedPreferences("de.blinkt.openvpn_preferences", Context.MODE_PRIVATE)
-        prefs.edit().putString("lastConnectedProfile", profile.uuidString).commit()
-
-        // 🟡 Форсируем обновление
-        manager.refreshVPNList(context)
-        Log.e("VPN", "🔄 VPN список профилей обновлён. Всего: ${manager.profiles.size}")
-
-        val confirm = ProfileManager.get(context, profile.uuidString, profile.mVersion, 20)
-        if (confirm == null) {
-            Log.e("VPN", "❌ Подтверждение профиля не удалось. UUID: ${profile.uuidString}")
-            Toast.makeText(context, "VPN‑профиль не загружен", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        Log.e("VPN", "✅ Профиль подтверждён: ${confirm.name}, UUID: ${confirm.uuidString}, версия: ${confirm.mVersion}")
-
-        val intent = profile.getStartServiceIntent(context, "manual", true).apply {
-            putExtra(EXTRA_PROFILEUUID, profile.uuidString)
-            putExtra(EXTRA_PROFILE_VERSION, profile.mVersion)
-        }
-        ContextCompat.startForegroundService(context, intent)
+        // ContextCompat.startForegroundService(context, intent)
     }
 
     /**
      * Создаёт объект VPN-профиля из строки конфигурации .ovpn.
      */
-    private fun importProfileFromOvpn(server: ServerItem): VpnProfile? {
-        return try {
-            val cp = ConfigParser()
-            cp.parseConfig(StringReader(server.ovpn)) // парсим текст
+    private fun importProfileFromOvpn(server: ServerItem) {
 
-            // ✅ создаём профиль, задаём имя и UUID
-            cp.convertProfile().apply {
-                mName = server.name
-                setUUID(UUID.randomUUID())
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
     }
 
     /**
      * Удаляет все сохранённые VPN-профили перед созданием нового.
      */
     private fun cleanOldProfiles(context: Context) {
-        val manager = ProfileManager.getInstance(context)
-        val allProfiles = manager.profiles.toList()
-        allProfiles.forEach { manager.removeProfile(context, it) }
+
     }
 
     /**
@@ -351,5 +223,7 @@ class StatusFragment : Fragment(R.layout.fragment_status)
     /**
      * Проверяет активность VPN-подключения через OpenVPNService.
      */
-    private fun isVpnConnected(): Boolean = OpenVPNService.isConnected()
+    private fun isVpnConnected(): Boolean {
+        return false // TODO
+    }
 }

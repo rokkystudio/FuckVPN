@@ -18,12 +18,7 @@ class App : Application()
         instance = this
 
         try {
-            System.loadLibrary("ovpnexec")        // исполняемый бинарник
-            System.loadLibrary("openvpn")         // основной VPN-движок
-            System.loadLibrary("ovpn3")           // если используете OpenVPN3
-            System.loadLibrary("osslutil")        // openssl утилиты
-            System.loadLibrary("osslspeedtest")   // если используется
-            System.loadLibrary("ovpnutil")        // это уже было
+            System.loadLibrary("libovpncli")
             Log.d("App", "✅ All native libs loaded")
         } catch (e: UnsatisfiedLinkError) {
             Log.e("App", "❌ Failed to load native libs", e)
