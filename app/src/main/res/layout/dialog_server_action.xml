@@ -115,7 +115,7 @@
             android:contentDescription="@string/server_action_connect"
             android:tooltipText="@string/server_action_connect"
             android:backgroundTint="@color/button_confirm_background"
-            app:icon="@drawable/ic_connect"
+            app:icon="@drawable/ic_launch"
             style="@style/ButtonTheme" />
 
         <com.google.android.material.button.MaterialButton

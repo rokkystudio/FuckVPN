@@ -16,8 +16,6 @@ android {
         versionName = "1.0"
     }
 
-    sourceSets["main"].jniLibs.srcDirs("src/main/jniLibs")
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -56,4 +54,5 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.core.ktx)
+    implementation(project(":openvpn"))
 }
